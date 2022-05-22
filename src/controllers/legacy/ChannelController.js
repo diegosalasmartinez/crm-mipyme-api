@@ -1,4 +1,4 @@
-const db = require("../models/index")
+const db = require("../../models/index")
 
 const getChannels = async (req, res) => {
   const channels = await db.Channel.findAll({ 

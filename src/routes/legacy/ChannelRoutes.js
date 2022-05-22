@@ -1,5 +1,5 @@
 const express = require("express")
-const { getChannels, createChannel } = require("../controllers/ChannelController")
+const { getChannels, createChannel } = require("../../controllers/legacy/ChannelController")
 
 const router = express.Router()
 
