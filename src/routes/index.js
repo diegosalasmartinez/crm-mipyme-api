@@ -1,11 +1,7 @@
-const AuthRoutes = require("./AuthRoutes")
-const UserRoutes = require("./UserRoutes")
-const ChannelRoutes = require("./ChannelRoutes")
-const VideoRoutes = require("./VideoRoutes")
+const authRoutes = require("./AuthRoutes")
+const productoRoutes = require("./ProductoRoutes")
 
 module.exports = {
-  AuthRoutes,
-  UserRoutes,
-  ChannelRoutes,
-  VideoRoutes
+  authRoutes,
+  productoRoutes
 }

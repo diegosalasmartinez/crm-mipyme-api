@@ -1,9 +1,9 @@
-const AuthenticationMiddleware = require("./AuthMiddleware")
-const ErrorHandlerMiddleware = require("./ErrorHandlerMiddleware")
-const NotFoundMiddleware = require("./NotFoundMiddleware")
+const authenticationMiddleware = require("./AuthMiddleware")
+const errorHandlerMiddleware = require("./ErrorHandlerMiddleware")
+const notFoundMiddleware = require("./NotFoundMiddleware")
 
 module.exports = {
-  AuthenticationMiddleware,
-  ErrorHandlerMiddleware,
-  NotFoundMiddleware
+  authenticationMiddleware,
+  errorHandlerMiddleware,
+  notFoundMiddleware
 }

@@ -10,13 +10,13 @@ const xss = require("xss-clean")
 const rateLimit = require("express-rate-limit")
 
 // Routes
-const { AuthRoutes, UserRoutes, ChannelRoutes, VideoRoutes } = require("./src/routes")
+const { authRoutes, productoRoutes } = require("./src/routes")
 
 // Middlewares
 const {
-  AuthenticationMiddleware,
-  ErrorHandlerMiddleware,
-  NotFoundMiddleware
+  authenticationMiddleware,
+  errorHandlerMiddleware,
+  notFoundMiddleware
 } = require("./src/middleware")
 
 const app = express()
@@ -36,12 +36,10 @@ app.get("/", (req, res) => {
 const baseUrl = "/api/v1"
 // app.use(baseUrl + '/auth', authRoutes);
 // app.use(authenticationMiddleware);
-app.use(baseUrl + "/users", UserRoutes)
-app.use(baseUrl + "/channels", ChannelRoutes)
-app.use(baseUrl + "/videos", VideoRoutes)
+app.use(baseUrl + "/productos", productoRoutes)
 
-app.use(NotFoundMiddleware)
-app.use(ErrorHandlerMiddleware)
+app.use(notFoundMiddleware)
+app.use(errorHandlerMiddleware)
 
 const port = process.env.PORT || 5000
 app.listen(port, () => {
