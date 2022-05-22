@@ -1,10 +1,6 @@
 const db = require("../models/index")
 
 const obtenerProductos = async (req, res) => {
-  for (let index = 0; index < 5000; index++) {
-   console.log(index) 
-  }
-  
   const productos = await db.Producto.findAll()
   res.status(200).json(productos)
 }
