@@ -3,24 +3,27 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return Promise.all([
-      queryInterface.createTable("User", {
+      queryInterface.createTable("Producto", {
         id: {
           type: Sequelize.UUID,
           defaultValue: Sequelize.UUIDV4,
           primaryKey: true,
           allowNull: false
         },
-        name: {
+        nombre: {
           type: Sequelize.STRING
         },
-        firstName: {
+        codigo: {
           type: Sequelize.STRING
         },
-        lastName: {
+        descripcion: {
           type: Sequelize.STRING
         },
-        email: {
-          type: Sequelize.STRING,
+        precioUnidad: {
+          type: Sequelize.FLOAT
+        },
+        activo: {
+          type: Sequelize.BOOLEAN,
           unique: true,
           allowNull: false
         },
@@ -32,67 +35,97 @@ module.exports = {
           type: Sequelize.DATE,
           allowNull: false
         }
-      }),
-      queryInterface.createTable("Channel", {
-        id: {
-          type: Sequelize.UUID,
-          defaultValue: Sequelize.UUIDV4,
-          primaryKey: true,
-          allowNull: false
-        },
-        userId: {
-          type: Sequelize.UUID,
-          references: {
-            model: "User",
-            key: "id",
-          },
-          onDelete: "SET NULL",
-          onUpdate: "CASCADE",
-          allowNull: false
-        },
-        name: {
-          type: Sequelize.STRING,
-          allowNull: false
-        },
-        createdAt: {
-          type: Sequelize.DATE,
-          allowNull: false
-        },
-        updatedAt: {
-          type: Sequelize.DATE,
-          allowNull: false
-        }
-      }),
-      queryInterface.createTable("Video", {
-        id: {
-          type: Sequelize.UUID,
-          defaultValue: Sequelize.UUIDV4,
-          primaryKey: true,
-          allowNull: false
-        },
-        channelId: {
-          type: Sequelize.UUID,
-          references: {
-            model: "Channel",
-            key: "id",
-          },
-          onDelete: "SET NULL",
-          onUpdate: "CASCADE",
-          allowNull: false
-        },
-        name: {
-          type: Sequelize.STRING,
-          allowNull: false
-        },
-        createdAt: {
-          type: Sequelize.DATE,
-          allowNull: false
-        },
-        updatedAt: {
-          type: Sequelize.DATE,
-          allowNull: false
-        }
-      }), 
+      })
+      // queryInterface.createTable("User", {
+      //   id: {
+      //     type: Sequelize.UUID,
+      //     defaultValue: Sequelize.UUIDV4,
+      //     primaryKey: true,
+      //     allowNull: false
+      //   },
+      //   name: {
+      //     type: Sequelize.STRING
+      //   },
+      //   firstName: {
+      //     type: Sequelize.STRING
+      //   },
+      //   lastName: {
+      //     type: Sequelize.STRING
+      //   },
+      //   email: {
+      //     type: Sequelize.STRING,
+      //     unique: true,
+      //     allowNull: false
+      //   },
+      //   createdAt: {
+      //     type: Sequelize.DATE,
+      //     allowNull: false
+      //   },
+      //   updatedAt: {
+      //     type: Sequelize.DATE,
+      //     allowNull: false
+      //   }
+      // }),
+      // queryInterface.createTable("Channel", {
+      //   id: {
+      //     type: Sequelize.UUID,
+      //     defaultValue: Sequelize.UUIDV4,
+      //     primaryKey: true,
+      //     allowNull: false
+      //   },
+      //   userId: {
+      //     type: Sequelize.UUID,
+      //     references: {
+      //       model: "User",
+      //       key: "id",
+      //     },
+      //     onDelete: "SET NULL",
+      //     onUpdate: "CASCADE",
+      //     allowNull: false
+      //   },
+      //   name: {
+      //     type: Sequelize.STRING,
+      //     allowNull: false
+      //   },
+      //   createdAt: {
+      //     type: Sequelize.DATE,
+      //     allowNull: false
+      //   },
+      //   updatedAt: {
+      //     type: Sequelize.DATE,
+      //     allowNull: false
+      //   }
+      // }),
+      // queryInterface.createTable("Video", {
+      //   id: {
+      //     type: Sequelize.UUID,
+      //     defaultValue: Sequelize.UUIDV4,
+      //     primaryKey: true,
+      //     allowNull: false
+      //   },
+      //   channelId: {
+      //     type: Sequelize.UUID,
+      //     references: {
+      //       model: "Channel",
+      //       key: "id",
+      //     },
+      //     onDelete: "SET NULL",
+      //     onUpdate: "CASCADE",
+      //     allowNull: false
+      //   },
+      //   name: {
+      //     type: Sequelize.STRING,
+      //     allowNull: false
+      //   },
+      //   createdAt: {
+      //     type: Sequelize.DATE,
+      //     allowNull: false
+      //   },
+      //   updatedAt: {
+      //     type: Sequelize.DATE,
+      //     allowNull: false
+      //   }
+      // }), 
     ])
   },
   async down(queryInterface, Sequelize) {
