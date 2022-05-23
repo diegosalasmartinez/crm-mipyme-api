@@ -8,10 +8,10 @@ const obtenerProductos = async (req, res) => {
 const agregarProducto = async (req, res) => {
   const producto = req.body
   const productoCreated = await db.Producto.create({
-    // name: user.name,
-    // firstName: user.firstName,
-    // lastName: user.lastName,
-    // email: user.email
+    nombre: producto.nombre,
+    codigo: producto.codigo,
+    descripcion: producto.descripcion,
+    precioUnidad: producto.precioUnidad
   })
   res.status(201).json(productoCreated)
 }

@@ -18,7 +18,10 @@ module.exports = (sequelize, DataTypes) => {
       codigo: DataTypes.STRING,
       descripcion: DataTypes.STRING,
       precioUnidad: DataTypes.FLOAT,
-      activo: DataTypes.BOOLEAN,
+      activo: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+      },
     },
     {
       sequelize,

@@ -24,7 +24,6 @@ module.exports = {
         },
         activo: {
           type: Sequelize.BOOLEAN,
-          unique: true,
           allowNull: false
         },
         createdAt: {
