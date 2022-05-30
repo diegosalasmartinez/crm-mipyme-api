@@ -5,6 +5,12 @@ const obtenerProductos = async (req, res) => {
   res.status(200).json(productos)
 }
 
+const obtenerProducto = async (req, res) => {
+  const { idProducto } = req.params
+  const producto = await db.Producto.findByPk(idProducto)
+  res.status(200).json(producto)
+}
+
 const agregarProducto = async (req, res) => {
   const producto = req.body
   const productoCreated = await db.Producto.create({
@@ -16,7 +22,21 @@ const agregarProducto = async (req, res) => {
   res.status(201).json(productoCreated)
 }
 
+const editarProducto = async (req, res) => {
+  const producto = req.body
+  const updateValues = {
+    nombre: producto.nombre,
+    codigo: producto.codigo,
+    descripcion: producto.descripcion,
+    precioUnidad: producto.precioUnidad
+  }
+  await db.Producto.update(updateValues, { where: { id: producto.id }})
+  res.status(200).json({ message: `Producto ${producto.id} actualizado` })
+}
+
 module.exports = {
   obtenerProductos,
-  agregarProducto
+  obtenerProducto,
+  agregarProducto,
+  editarProducto
 }
