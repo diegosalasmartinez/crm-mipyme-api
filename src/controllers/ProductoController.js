@@ -19,7 +19,7 @@ const agregarProducto = async (req, res) => {
     descripcion: producto.descripcion,
     precioUnidad: producto.precioUnidad
   })
-  res.status(201).json(productoCreated)
+  res.status(201).json({ message: `Producto (${producto.nombre}) creado` })
 }
 
 const editarProducto = async (req, res) => {
@@ -31,7 +31,7 @@ const editarProducto = async (req, res) => {
     precioUnidad: producto.precioUnidad
   }
   await db.Producto.update(updateValues, { where: { id: producto.id }})
-  res.status(200).json({ message: `Producto ${producto.id} actualizado` })
+  res.status(200).json({ message: `Producto (${producto.nombre}) actualizado` })
 }
 
 module.exports = {
