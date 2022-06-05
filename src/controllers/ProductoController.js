@@ -1,7 +1,7 @@
-const db = require("../models/index")
+const db = require("../db/models/index")
 
 const obtenerProductos = async (req, res) => {
-  const { page, rowsPerPage } = req.query
+  const { page = 0, rowsPerPage = 10 } = req.query
   const productos = await db.Producto.findAll({
     offset: page * rowsPerPage,
     limit: rowsPerPage,
