@@ -1,6 +1,7 @@
 const db = require("../db/models/index")
+const { StatusCodes } = require("http-status-codes")
 
-const obtenerProductos = async (req, res) => {
+const listarProductos = async (req, res) => {
   const { page = 0, rowsPerPage = 10 } = req.query
   const productos = await db.Producto.findAll({
     offset: page * rowsPerPage,
@@ -15,13 +16,13 @@ const obtenerProductos = async (req, res) => {
     }
   })
 
-  res.status(200).json({ data: productos, count })
+  res.status(StatusCodes.OK).json({ data: productos, count })
 }
 
-const obtenerProducto = async (req, res) => {
+const mostrarProducto = async (req, res) => {
   const { idProducto } = req.params
   const producto = await db.Producto.findByPk(idProducto)
-  res.status(200).json(producto)
+  res.status(StatusCodes.OK).json(producto)
 }
 
 const agregarProducto = async (req, res) => {
@@ -32,7 +33,7 @@ const agregarProducto = async (req, res) => {
     descripcion: producto.descripcion,
     precioUnidad: producto.precioUnidad
   })
-  res.status(201).json({ message: `Producto (${producto.nombre}) creado` })
+  res.status(StatusCodes.CREATED).json({ message: `Producto (${producto.nombre}) creado` })
 }
 
 const editarProducto = async (req, res) => {
@@ -44,19 +45,19 @@ const editarProducto = async (req, res) => {
     precioUnidad: producto.precioUnidad
   }
   await db.Producto.update(updateValues, { where: { id: producto.id }})
-  res.status(200).json({ message: `Producto (${producto.nombre}) actualizado` })
+  res.status(StatusCodes.OK).json({ message: `Producto (${producto.nombre}) actualizado` })
 }
 
 const eliminarProducto = async (req, res) => {
   const { idProducto } = req.params
   const { nombre } = req.query
   await db.Producto.update({ activo: false }, { where: { id: idProducto }})
-  res.status(200).json({ message: `Producto (${nombre}) eliminado` })
+  res.status(StatusCodes.OK).json({ message: `Producto (${nombre}) eliminado` })
 }
 
 module.exports = {
-  obtenerProductos,
-  obtenerProducto,
+  listarProductos,
+  mostrarProducto,
   agregarProducto,
   editarProducto,
   eliminarProducto

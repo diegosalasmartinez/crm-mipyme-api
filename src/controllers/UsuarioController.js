@@ -1,6 +1,6 @@
 const db = require("../db/models/index")
 
-const obtenerUsuarios = async (req, res) => {
+const listarUsuarios = async (req, res) => {
   const { page = 0, rowsPerPage = 10 } = req.query
   const usuarios = await db.Usuario.findAll({
     offset: page * rowsPerPage,
@@ -35,6 +35,6 @@ const agregarUsuario = async (req, res) => {
 }
 
 module.exports = {
-  obtenerUsuarios,
+  listarUsuarios,
   agregarUsuario,
 }

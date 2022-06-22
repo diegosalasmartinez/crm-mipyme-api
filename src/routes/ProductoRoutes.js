@@ -1,10 +1,10 @@
 const express = require("express")
-const { obtenerProductos, obtenerProducto, agregarProducto, editarProducto, eliminarProducto } = require("../controllers/ProductoController")
+const { listarProductos, mostrarProducto, agregarProducto, editarProducto, eliminarProducto } = require("../controllers/ProductoController")
 
 const router = express.Router()
 
-router.get("/", obtenerProductos)
-router.get("/:idProducto", obtenerProducto)
+router.get("/", listarProductos)
+router.get("/:idProducto", mostrarProducto)
 router.post("/", agregarProducto)
 router.patch("/", editarProducto)
 router.delete("/:idProducto", eliminarProducto)
