@@ -10,7 +10,7 @@ const xss = require("xss-clean")
 const rateLimit = require("express-rate-limit")
 
 // Routes
-const { authRoutes, productoRoutes } = require("./src/routes")
+const { authRoutes, usuarioRoutes, productoRoutes } = require("./src/routes")
 
 // Middlewares
 const {
@@ -34,8 +34,9 @@ app.get("/", (req, res) => {
 })
 
 const baseUrl = "/api/v1"
-// app.use(baseUrl + '/auth', authRoutes);
+app.use(baseUrl + '/auth', authRoutes);
 // app.use(authenticationMiddleware);
+app.use(baseUrl + "/usuarios", usuarioRoutes)
 app.use(baseUrl + "/productos", productoRoutes)
 
 app.use(notFoundMiddleware)

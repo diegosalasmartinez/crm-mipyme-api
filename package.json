@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "down": "npx sequelize-cli db:migrate:undo",
     "migrate": "npx sequelize-cli db:migrate",
+    "migrate-down": "npx sequelize-cli db:migrate:undo",
+    "seeds": "npx sequelize-cli db:seed:all",
+    "seeds-down": "npx sequelize-cli db:seed:undo:all",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
     "start": "node index.js"
@@ -28,6 +30,7 @@
     "pg": "^8.7.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.19.0",
+    "uuid": "^8.3.2",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
