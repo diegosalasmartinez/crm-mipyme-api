@@ -34,8 +34,8 @@ app.get("/", (req, res) => {
 })
 
 const baseUrl = "/api/v1"
-app.use(baseUrl + '/auth', authRoutes);
-// app.use(authenticationMiddleware);
+app.use(baseUrl + '/auth', authRoutes)
+app.use(authenticationMiddleware)
 app.use(baseUrl + "/usuarios", usuarioRoutes)
 app.use(baseUrl + "/productos", productoRoutes)
 
