@@ -7,19 +7,20 @@ const login = async (req, res) => {
   if (!username || !password) {
     throw new BadRequestError('Por favor, ingrese el usuario y contraseña')
   }
-  const user = await db.Usuario.findOne({ where: { usuario: username }})
-  if (!user) {
+  const usuario = await db.Usuario.findOne({ where: { usuario: username }})
+  if (!usuario) {
     throw new BadRequestError(`No existe el usuario ${username}`)
   }
-  const correctPassword = await user.comparePassword(password)
+  const correctPassword = await usuario.comparePassword(password)
   if (!correctPassword) {
     throw new BadRequestError('Credenciales inválidas')
   }
-
-  const token = user.createJWT()
+  const empresaUsuario = await usuario.getEmpresaUsuario()
+  const token = usuario.createJWT(empresaUsuario.empresaId)
   const userResponse = {
-    id: user.id,
-    nombre: user.getFullName()
+    id: usuario.id,
+    empresaId: empresaUsuario.empresaId,
+    nombre: usuario.getFullName()
   }
   res.status(StatusCodes.OK).json({ usuario: userResponse, token })
 }
