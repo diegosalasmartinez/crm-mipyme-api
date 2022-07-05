@@ -71,16 +71,6 @@ module.exports = {
           primaryKey: true,
           allowNull: false
         },
-        empresaId: {
-          type: Sequelize.UUID,
-          references: {
-            model: "Empresa",
-            key: "id",
-          },
-          onDelete: "SET NULL",
-          onUpdate: "CASCADE",
-          allowNull: false
-        },
         nombre: {
           type: Sequelize.STRING
         },
@@ -112,7 +102,49 @@ module.exports = {
           allowNull: false
         }
       })
-      // queryInterface.createTable("User", {
+    ]).then(() => {
+      queryInterface.createTable("EmpresaUsuario", {
+        id: {
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.UUIDV4,
+          primaryKey: true,
+          allowNull: false
+        },
+        usuarioId: {
+          type: Sequelize.UUID,
+          references: {
+            model: "Usuario",
+            key: "id",
+          },
+          onDelete: "SET NULL",
+          onUpdate: "CASCADE",
+          allowNull: false
+        },
+        empresaId: {
+          type: Sequelize.UUID,
+          references: {
+            model: "Empresa",
+            key: "id",
+          },
+          onDelete: "SET NULL",
+          onUpdate: "CASCADE",
+          allowNull: false
+        },
+        activo: {
+          type: Sequelize.BOOLEAN,
+          allowNull: false
+        },
+        createdAt: {
+          type: Sequelize.DATE,
+          allowNull: false
+        },
+        updatedAt: {
+          type: Sequelize.DATE,
+          allowNull: false
+        }
+      })
+    })
+    // queryInterface.createTable("User", {
       //   id: {
       //     type: Sequelize.UUID,
       //     defaultValue: Sequelize.UUIDV4,
@@ -202,7 +234,6 @@ module.exports = {
       //     allowNull: false
       //   }
       // }), 
-    ])
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropAllTables()
