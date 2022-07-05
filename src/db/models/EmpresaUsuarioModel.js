@@ -2,15 +2,13 @@
 const { Model } = require("sequelize")
 
 module.exports = (sequelize, DataTypes) => {
-  class Empresa extends Model {
+  class EmpresaUsuario extends Model {
     static associate(models) {
-      this.hasOne(models.EmpresaUsuario, { foreignKey: 'empresaId', as: 'empresaUsuario' }, {
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE'
-      })
+      this.belongsTo(models.Usuario, { foreignKey: 'usuarioId' })
+      this.belongsTo(models.Empresa, { foreignKey: 'empresaId' })
     }
   }
-  Empresa.init(
+  EmpresaUsuario.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -18,9 +16,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.UUIDV4
       },
-      nombre: DataTypes.STRING,
-      direccion: DataTypes.STRING,
-      telefono: DataTypes.STRING,
       activo: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
@@ -29,8 +24,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       timestamps: true,
-      tableName: "Empresa"
+      tableName: "EmpresaUsuario"
     }
   )
-  return Empresa
+  return EmpresaUsuario
 }

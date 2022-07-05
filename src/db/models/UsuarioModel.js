@@ -6,7 +6,10 @@ const jwt = require('jsonwebtoken')
 module.exports = (sequelize, DataTypes) => {
   class Usuario extends Model {
     static associate(models) {
-      this.belongsTo(models.Empresa, { foreignKey: 'empresaId', as: 'empresa' })
+      this.hasOne(models.EmpresaUsuario, { foreignKey: 'usuarioId', as: 'empresaUsuario' }, {
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE'
+      })
     }
     setPassword = async () => {
       const salt = await bcrypt.genSalt(10)
@@ -15,8 +18,8 @@ module.exports = (sequelize, DataTypes) => {
     comparePassword = async (password) => {
       return await bcrypt.compare(password, this.password)
     }
-    createJWT = () => {
-      return jwt.sign( { userId: this.id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_LIFETIME } )    
+    createJWT = (empresaId) => {
+      return jwt.sign( { userId: this.id, empresaId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_LIFETIME } )    
     }
     getFullName = () => {
       return `${this.nombre} ${this.apePaterno} ${this.apeMaterno}`
