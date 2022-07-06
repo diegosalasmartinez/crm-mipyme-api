@@ -3,38 +3,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return Promise.all([
-      queryInterface.createTable("Producto", {
-        id: {
-          type: Sequelize.UUID,
-          defaultValue: Sequelize.UUIDV4,
-          primaryKey: true,
-          allowNull: false
-        },
-        nombre: {
-          type: Sequelize.STRING
-        },
-        codigo: {
-          type: Sequelize.STRING
-        },
-        descripcion: {
-          type: Sequelize.STRING
-        },
-        precioUnidad: {
-          type: Sequelize.FLOAT
-        },
-        activo: {
-          type: Sequelize.BOOLEAN,
-          allowNull: false
-        },
-        createdAt: {
-          type: Sequelize.DATE,
-          allowNull: false
-        },
-        updatedAt: {
-          type: Sequelize.DATE,
-          allowNull: false
-        }
-      }),
       queryInterface.createTable("Empresa", {
         id: {
           type: Sequelize.UUID,
@@ -129,6 +97,48 @@ module.exports = {
           onDelete: "SET NULL",
           onUpdate: "CASCADE",
           allowNull: false
+        },
+        activo: {
+          type: Sequelize.BOOLEAN,
+          allowNull: false
+        },
+        createdAt: {
+          type: Sequelize.DATE,
+          allowNull: false
+        },
+        updatedAt: {
+          type: Sequelize.DATE,
+          allowNull: false
+        }
+      }),
+      queryInterface.createTable("Producto", {
+        id: {
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.UUIDV4,
+          primaryKey: true,
+          allowNull: false
+        },
+        empresaId: {
+          type: Sequelize.UUID,
+          references: {
+            model: "Empresa",
+            key: "id",
+          },
+          onDelete: "SET NULL",
+          onUpdate: "CASCADE",
+          allowNull: false
+        },
+        nombre: {
+          type: Sequelize.STRING
+        },
+        codigo: {
+          type: Sequelize.STRING
+        },
+        descripcion: {
+          type: Sequelize.STRING
+        },
+        precioUnidad: {
+          type: Sequelize.FLOAT
         },
         activo: {
           type: Sequelize.BOOLEAN,

@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE'
       })
+      this.hasMany(models.Producto, { foreignKey: 'empresaId', as: 'productos' }, {
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE'
+      })
     }
   }
   Empresa.init(
