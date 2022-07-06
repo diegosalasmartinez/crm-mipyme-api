@@ -27,11 +27,13 @@ const mostrarProducto = async (req, res) => {
 
 const agregarProducto = async (req, res) => {
   const producto = req.body
+  const empresaId = req.usuario.empresaId
   await db.Producto.create({
     nombre: producto.nombre,
     codigo: producto.codigo,
     descripcion: producto.descripcion,
-    precioUnidad: producto.precioUnidad
+    precioUnidad: producto.precioUnidad,
+    empresaId
   })
   res.status(StatusCodes.CREATED).json({ message: `Producto (${producto.nombre}) creado` })
 }
