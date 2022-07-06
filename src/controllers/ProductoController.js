@@ -3,10 +3,13 @@ const { StatusCodes } = require("http-status-codes")
 
 const listarProductos = async (req, res) => {
   const { page = 0, rowsPerPage = 10 } = req.query
+  const empresaId = req.usuario.empresaId
+
   const productos = await db.Producto.findAll({
     offset: page * rowsPerPage,
     limit: rowsPerPage,
     where: {
+      empresaId,
       activo: true
     }
   })
