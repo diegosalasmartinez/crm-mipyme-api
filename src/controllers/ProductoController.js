@@ -3,10 +3,13 @@ const { StatusCodes } = require("http-status-codes")
 
 const listarProductos = async (req, res) => {
   const { page = 0, rowsPerPage = 10 } = req.query
+  const empresaId = req.usuario.empresaId
+
   const productos = await db.Producto.findAll({
     offset: page * rowsPerPage,
     limit: rowsPerPage,
     where: {
+      empresaId,
       activo: true
     }
   })
@@ -27,11 +30,13 @@ const mostrarProducto = async (req, res) => {
 
 const agregarProducto = async (req, res) => {
   const producto = req.body
+  const empresaId = req.usuario.empresaId
   await db.Producto.create({
     nombre: producto.nombre,
     codigo: producto.codigo,
     descripcion: producto.descripcion,
-    precioUnidad: producto.precioUnidad
+    precioUnidad: producto.precioUnidad,
+    empresaId
   })
   res.status(StatusCodes.CREATED).json({ message: `Producto (${producto.nombre}) creado` })
 }

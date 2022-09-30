@@ -11,7 +11,7 @@ const listarUsuarios = async (req, res) => {
       activo: true
     },
     attributes: {
-      exclude: [ 'password', 'activo' ]
+      exclude: [ 'password' ]
     }
     // include: {
     //   model: db.EmpresaUsuario,
