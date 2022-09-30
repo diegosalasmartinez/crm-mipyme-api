@@ -16,9 +16,13 @@ module.exports = (sequelize, DataTypes) => {
       return await bcrypt.compare(password, this.password);
     }
     async createJWT() {
-      return jwt.sign({ userId: this.id, companyId: this.companyId }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_LIFETIME,
-      });
+      return jwt.sign(
+        { userId: this.id, companyId: this.companyId },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: process.env.JWT_LIFETIME,
+        }
+      );
     }
     getFullName() {
       return `${this.name} ${this.lastName}`;

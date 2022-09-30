@@ -15,10 +15,18 @@ class UserService {
     return users;
   }
 
+  async getUserById(id) {
+    const user = await User.findOne({
+      where: { id, active: true },
+      attributes: ['id', 'companyId', 'active'],
+    });
+    return user;
+  }
+
   async getUserByEmail(email) {
     const user = await User.findOne({
       where: { email, active: true },
-      attributes: ['id', 'name', 'lastName', 'password'],
+      attributes: ['id', 'companyId', 'name', 'lastName', 'password'],
     });
     return user;
   }
