@@ -19,10 +19,31 @@ module.exports = {
         onUpdate: 'CASCADE',
         allowNull: false,
       },
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      lastName: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      birthday: Sequelize.DATE,
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      phone: Sequelize.STRING,
+      sex: Sequelize.STRING,
       points: {
         type: Sequelize.INTEGER,
         defaultValue: 0
       },
+      position: Sequelize.STRING,
+      companyName: Sequelize.STRING,
+      address: Sequelize.STRING,
+      city: Sequelize.STRING,
+      maritalStatus: Sequelize.STRING,
+      notes: Sequelize.STRING,
       active: {
         type: Sequelize.BOOLEAN,
         defaultValue: true
