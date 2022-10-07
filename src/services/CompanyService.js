@@ -1,6 +1,6 @@
-const { BadRequestError } = require('../errors');
 const { sequelize } = require('../models/index');
 const { Company, User } = require('../models/index');
+const { BadRequestError } = require('../errors');
 
 class CompanyService {
   async registerCompanyAccount(companyDTO, userDTO) {
@@ -35,10 +35,14 @@ class CompanyService {
   }
 
   async getCompanyById(id) {
-    const company = await Company.findOne({
-      where: { id, active: true },
-    })
-    return company;
+    try {
+      const company = await Company.findOne({
+        where: { id, active: true },
+      });
+      return company;
+    } catch (e) {
+      throw new BadRequestError(e.message)
+    }
   }
 }
 
