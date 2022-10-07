@@ -1,18 +1,25 @@
 const { User } = require('../models/index');
 
 class UserService {
-  async getUsers(page, rowsPerPage) {
+  async getUsers(companyId, page, rowsPerPage) {
     const users = await User.findAll({
       offset: page * rowsPerPage,
       limit: rowsPerPage,
       where: {
+        companyId,
         active: true,
       },
       attributes: {
         exclude: ['password'],
       },
     });
-    return users;
+    const count = await User.count({
+      where: {
+        companyId,
+        active: true,
+      },
+    });
+    return { users, count };
   }
 
   async getUserById(id) {
@@ -29,15 +36,6 @@ class UserService {
       attributes: ['id', 'companyId', 'name', 'lastName', 'password'],
     });
     return user;
-  }
-
-  async countUsers() {
-    const count = await User.count({
-      where: {
-        active: true,
-      },
-    });
-    return count;
   }
 }
 

@@ -60,7 +60,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       timestamps: true,
-      tableName: 'Users',
+      tableName: 'users',
     }
   );
   return User;
