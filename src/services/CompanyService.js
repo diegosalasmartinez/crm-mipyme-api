@@ -33,6 +33,13 @@ class CompanyService {
       );
     }
   }
+
+  async getCompanyById(id) {
+    const company = await Company.findOne({
+      where: { id, active: true },
+    })
+    return company;
+  }
 }
 
 module.exports = CompanyService;

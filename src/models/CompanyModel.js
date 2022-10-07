@@ -12,6 +12,14 @@ module.exports = (sequelize, DataTypes) => {
           onUpdate: 'CASCADE',
         }
       );
+      this.hasMany(
+        models.Lead,
+        { foreignKey: 'companyId', as: 'leads' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
     }
   }
   Company.init(
@@ -42,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       timestamps: true,
-      tableName: 'Companies',
+      tableName: 'companies',
     }
   );
   return Company;
