@@ -7,6 +7,7 @@ class LeadService {
       const leads = await Lead.findAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
+        attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone'],
         where: {
           companyId,
           active: true,

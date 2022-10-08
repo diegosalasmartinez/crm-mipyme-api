@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.Company, { foreignKey: 'companyId' });
       this.belongsTo(models.User, { foreignKey: 'createdBy' });
+      this.belongsTo(models.List, { foreignKey: 'listId' });
     }
   }
   Lead.init(
