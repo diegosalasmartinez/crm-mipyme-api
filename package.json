@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "migrate": "npx sequelize-cli db:migrate",
-    "migrate-down": "npx sequelize-cli db:migrate:undo",
-    "seeds": "npx sequelize-cli db:seed:all",
-    "seeds-down": "npx sequelize-cli db:seed:undo:all",
+    "migration:generate": "npx sequelize-cli migration:generate --name",
+    "migration:run": "npx sequelize-cli db:migrate",
+    "migration:rollback": "npx sequelize-cli db:migrate:undo",
+    "migration:rollback:all": "npx sequelize-cli db:migrate:undo:all",
+    "seed:run": "npx sequelize-cli db:seed:all",
+    "seed:rollback": "npx sequelize-cli db:seed:undo:all",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
     "start": "node index.js"
@@ -34,7 +36,10 @@
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
+    "eslint": "^8.24.0",
+    "eslint-config-prettier": "^8.5.0",
     "nodemon": "^2.0.16",
+    "prettier": "^2.7.1",
     "sequelize-cli": "^6.4.1"
   }
 }

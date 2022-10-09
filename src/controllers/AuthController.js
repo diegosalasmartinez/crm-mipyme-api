@@ -1,30 +1,31 @@
-const db = require("../db/models/index")
-const { StatusCodes } = require("http-status-codes")
-const { BadRequestError } = require("../errors")
+const CompanyService = require('../services/CompanyService');
+const AuthService = require('../services/AuthService');
+const { StatusCodes } = require('http-status-codes');
+const { BadRequestError } = require('../errors');
 
 const login = async (req, res) => {
-  const { username, password } = req.body
-  if (!username || !password) {
-    throw new BadRequestError('Por favor, ingrese el usuario y contraseña')
+  const { email, password } = req.body;
+  if (!email || !password) {
+    throw new BadRequestError('Por favor, ingrese el correo y contraseña');
   }
-  const usuario = await db.Usuario.findOne({ where: { usuario: username }})
-  if (!usuario) {
-    throw new BadRequestError(`No existe el usuario ${username}`)
-  }
-  const correctPassword = await usuario.comparePassword(password)
-  if (!correctPassword) {
-    throw new BadRequestError('Credenciales inválidas')
-  }
-  const empresaUsuario = await usuario.getEmpresaUsuario()
-  const token = usuario.createJWT(empresaUsuario.empresaId)
-  const userResponse = {
-    id: usuario.id,
-    empresaId: empresaUsuario.empresaId,
-    nombre: usuario.getFullName()
-  }
-  res.status(StatusCodes.OK).json({ usuario: userResponse, token })
-}
+  
+  const userService = new AuthService()
+  const { user, token } = await userService.login(email, password)
+  const response = {
+    id: user.id,
+    fullName: user.getFullName(),
+  };
+  res.status(StatusCodes.OK).json({ usuario: response, token });
+};
+
+const register = async (req, res) => {
+  const companyService = new CompanyService();
+  const { company, user } = req.body;
+  const userCreated = await companyService.registerCompanyAccount(company, user);
+  res.status(StatusCodes.OK).json(userCreated);
+};
 
 module.exports = {
-  login
-}
+  login,
+  register,
+};

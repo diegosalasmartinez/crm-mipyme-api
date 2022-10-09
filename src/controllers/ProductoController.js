@@ -1,64 +1,69 @@
-const db = require("../db/models/index")
-const { StatusCodes } = require("http-status-codes")
+// const db = require("../models/index")
+// const { StatusCodes } = require("http-status-codes")
 
-const listarProductos = async (req, res) => {
-  const { page = 0, rowsPerPage = 10 } = req.query
-  const productos = await db.Producto.findAll({
-    offset: page * rowsPerPage,
-    limit: rowsPerPage,
-    where: {
-      activo: true
-    }
-  })
-  const count = await db.Producto.count({
-    where: {
-      activo: true
-    }
-  })
+// const listarProductos = async (req, res) => {
+//   const { page = 0, rowsPerPage = 10 } = req.query
+//   const empresaId = req.usuario.empresaId
 
-  res.status(StatusCodes.OK).json({ data: productos, count })
-}
+//   const productos = await db.Producto.findAll({
+//     offset: page * rowsPerPage,
+//     limit: rowsPerPage,
+//     where: {
+//       empresaId,
+//       activo: true
+//     }
+//   })
+//   const count = await db.Producto.count({
+//     where: {
+//       activo: true
+//     }
+//   })
 
-const mostrarProducto = async (req, res) => {
-  const { idProducto } = req.params
-  const producto = await db.Producto.findByPk(idProducto)
-  res.status(StatusCodes.OK).json(producto)
-}
+//   res.status(StatusCodes.OK).json({ data: productos, count })
+// }
 
-const agregarProducto = async (req, res) => {
-  const producto = req.body
-  await db.Producto.create({
-    nombre: producto.nombre,
-    codigo: producto.codigo,
-    descripcion: producto.descripcion,
-    precioUnidad: producto.precioUnidad
-  })
-  res.status(StatusCodes.CREATED).json({ message: `Producto (${producto.nombre}) creado` })
-}
+// const mostrarProducto = async (req, res) => {
+//   const { idProducto } = req.params
+//   const producto = await db.Producto.findByPk(idProducto)
+//   res.status(StatusCodes.OK).json(producto)
+// }
 
-const editarProducto = async (req, res) => {
-  const producto = req.body
-  const updateValues = {
-    nombre: producto.nombre,
-    codigo: producto.codigo,
-    descripcion: producto.descripcion,
-    precioUnidad: producto.precioUnidad
-  }
-  await db.Producto.update(updateValues, { where: { id: producto.id }})
-  res.status(StatusCodes.OK).json({ message: `Producto (${producto.nombre}) actualizado` })
-}
+// const agregarProducto = async (req, res) => {
+//   const producto = req.body
+//   const empresaId = req.usuario.empresaId
+//   await db.Producto.create({
+//     nombre: producto.nombre,
+//     codigo: producto.codigo,
+//     descripcion: producto.descripcion,
+//     precioUnidad: producto.precioUnidad,
+//     empresaId
+//   })
+//   res.status(StatusCodes.CREATED).json({ message: `Producto (${producto.nombre}) creado` })
+// }
 
-const eliminarProducto = async (req, res) => {
-  const { idProducto } = req.params
-  const { nombre } = req.query
-  await db.Producto.update({ activo: false }, { where: { id: idProducto }})
-  res.status(StatusCodes.OK).json({ message: `Producto (${nombre}) eliminado` })
-}
+// const editarProducto = async (req, res) => {
+//   const producto = req.body
+//   const updateValues = {
+//     nombre: producto.nombre,
+//     codigo: producto.codigo,
+//     descripcion: producto.descripcion,
+//     precioUnidad: producto.precioUnidad
+//   }
+//   await db.Producto.update(updateValues, { where: { id: producto.id }})
+//   res.status(StatusCodes.OK).json({ message: `Producto (${producto.nombre}) actualizado` })
+// }
 
-module.exports = {
-  listarProductos,
-  mostrarProducto,
-  agregarProducto,
-  editarProducto,
-  eliminarProducto
-}
+// const eliminarProducto = async (req, res) => {
+//   const { idProducto } = req.params
+//   const { nombre } = req.query
+//   await db.Producto.update({ activo: false }, { where: { id: idProducto }})
+//   res.status(StatusCodes.OK).json({ message: `Producto (${nombre}) eliminado` })
+// }
+
+// module.exports = {
+//   listarProductos,
+//   mostrarProducto,
+//   agregarProducto,
+//   editarProducto,
+//   eliminarProducto
+// }
