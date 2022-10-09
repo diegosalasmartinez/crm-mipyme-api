@@ -7,7 +7,7 @@ class LeadService {
       const { rows: leads, count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
-        attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone'],
+        attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone', 'birthday', 'companyName'],
         include: [
           {
             model: User,
@@ -28,7 +28,7 @@ class LeadService {
 
   async getLeadById(id) {
     try {
-      const lead = await Lead.findAll({
+      const lead = await Lead.findOne({
         include: [
           {
             model: ListXLead,
@@ -38,6 +38,13 @@ class LeadService {
               {
                 model: List,
                 as: 'list',
+                include: [
+                  {
+                    model: ListXLead,
+                    as: 'leads',
+                    attributes: ['id'],
+                  }
+                ]
               },
             ],
           },
