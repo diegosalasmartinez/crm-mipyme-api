@@ -3,10 +3,10 @@ const ListService = require('../services/ListService');
 
 const getLists = async (req, res) => {
   const { page = 0, rowsPerPage = 10 } = req.query;
-  const { companyId } = req.user;
+  const { idCompany } = req.user;
   const listService = new ListService();
   const { lists, count } = await listService.getLists(
-    companyId,
+    idCompany,
     page,
     rowsPerPage
   );
@@ -14,7 +14,6 @@ const getLists = async (req, res) => {
 };
 
 const getListDetail = async (req, res) => {
-  console.log(req);
   const { idList } = req.params;
   const listService = new ListService();
   const list = await listService.getListById(idList);
@@ -22,15 +21,25 @@ const getListDetail = async (req, res) => {
 };
 
 const addList = async (req, res) => {
-  const { companyId } = req.user;
+  const { id: idUser } = req.user;
   const list = req.body;
-  const listService = new ListService(companyId, list);
-  const listCreated = await listService.addList(companyId, list);
+  const listService = new ListService();
+  const listCreated = await listService.addList(idUser, list);
   res.status(StatusCodes.OK).json(listCreated);
+};
+
+const addLeadsToList = async (req, res) => {
+  const { idList, leadsId } = req.body;
+  const listService = new ListService();
+  await listService.addLeadsToList(idList, leadsId);
+  res
+    .status(StatusCodes.OK)
+    .json({ message: 'Se agregaron los clientes potenciales a la lista' });
 };
 
 module.exports = {
   getLists,
   getListDetail,
   addList,
+  addLeadsToList,
 };
