@@ -9,10 +9,10 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
-      companyId: {
+      createdBy: {
         type: Sequelize.UUID,
         references: {
-          model: 'companies',
+          model: 'users',
           key: 'id',
         },
         onDelete: 'SET NULL',

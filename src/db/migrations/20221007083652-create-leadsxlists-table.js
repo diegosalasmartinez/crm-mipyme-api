@@ -1,26 +1,32 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
-    return queryInterface.createTable('lists', {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable('listsxleads', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
         allowNull: false,
       },
-      createdBy: {
+      idList: {
         type: Sequelize.UUID,
         references: {
-          model: 'users',
+          model: 'lists',
           key: 'id',
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
         allowNull: false,
       },
-      name: {
-        type: Sequelize.STRING,
+      idLead: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'leads',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
         allowNull: false,
       },
       active: {
@@ -35,10 +41,10 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
       },
-    })
+    });
   },
   // eslint-disable-next-line no-unused-vars
-  async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('lists');
-  }
+  async down(queryInterface, Sequelize) {
+    return queryInterface.dropTable('listsxleads');
+  },
 };

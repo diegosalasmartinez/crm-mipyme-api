@@ -2,7 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    return queryInterface.addColumn('users', 'companyId', {
+    return queryInterface.addColumn('users', 'idCompany', {
       type: Sequelize.UUID,
       references: {
         model: 'companies',
@@ -15,6 +15,6 @@ module.exports = {
   },
   // eslint-disable-next-line no-unused-vars
   async down(queryInterface, Sequelize) {
-    return queryInterface.removeColumn('users', 'companyId');
+    return queryInterface.removeColumn('users', 'idCompany');
   },
 };
