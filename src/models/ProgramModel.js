@@ -2,20 +2,12 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class Plan extends Model {
+  class Program extends Model {
     static associate(models) {
-      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'user' });
-      this.hasMany(
-        models.Program,
-        { foreignKey: 'idPlan', as: 'programs' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.belongsTo(models.Plan, { foreignKey: 'idPlan' });
     }
   }
-  Plan.init(
+  Program.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -27,14 +19,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      objetive: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
-      },
-      budget: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
-      },
       description: DataTypes.STRING,
       active: {
         type: DataTypes.BOOLEAN,
@@ -44,8 +28,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       timestamps: true,
-      tableName: 'plans',
+      tableName: 'programs',
     }
   );
-  return Plan;
+  return Program;
 };

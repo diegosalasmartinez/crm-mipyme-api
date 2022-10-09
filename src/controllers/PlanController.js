@@ -16,7 +16,15 @@ const addPlan = async (req, res) => {
   res.status(StatusCodes.OK).json(planCreated);
 };
 
+const addProgram = async (req, res) => {
+  const { idPlan, program } = req.body
+  const planService = new PlanService();
+  const programCreated = await planService.addProgram(idPlan, program);
+  res.status(StatusCodes.OK).json(programCreated);
+}
+
 module.exports = {
   getPlan,
   addPlan,
+  addProgram
 };
