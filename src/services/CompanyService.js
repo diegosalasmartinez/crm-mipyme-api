@@ -14,7 +14,7 @@ class CompanyService {
         },
         { transaction: t }
       );
-      const userBulk = await User.build({
+      const userBulk = User.build({
         name: userDTO.name,
         lastName: userDTO.lastName,
         email: userDTO.email,
