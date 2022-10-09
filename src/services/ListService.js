@@ -43,7 +43,14 @@ class ListService {
               {
                 model: Lead,
                 as: 'lead',
-                attributes: [ 'id', 'name', 'lastName', 'email', 'birthday', 'phone' ],
+                attributes: [
+                  'id',
+                  'name',
+                  'lastName',
+                  'email',
+                  'birthday',
+                  'phone',
+                ],
               },
             ],
           },
