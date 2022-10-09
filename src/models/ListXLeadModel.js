@@ -2,30 +2,19 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class List extends Model {
+  class ListXLead extends Model {
     static associate(models) {
-      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'user' });
-      this.hasMany(
-        models.ListXLead,
-        { foreignKey: 'idList', as: 'leads' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.belongsTo(models.List, { foreignKey: 'idList', as: 'list' });
+      this.belongsTo(models.Lead, { foreignKey: 'idLead', as: 'lead' });
     }
   }
-  List.init(
+  ListXLead.init(
     {
       id: {
         type: DataTypes.UUID,
         primaryKey: true,
         allowNull: false,
         defaultValue: DataTypes.UUIDV4,
-      },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
       },
       active: {
         type: DataTypes.BOOLEAN,
@@ -35,8 +24,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       timestamps: true,
-      tableName: 'lists',
+      tableName: 'listsxleads',
     }
   );
-  return List;
+  return ListXLead;
 };

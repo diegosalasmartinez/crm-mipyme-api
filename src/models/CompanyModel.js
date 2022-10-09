@@ -6,15 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.hasMany(
         models.User,
-        { foreignKey: 'companyId', as: 'users' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
-      this.hasMany(
-        models.Lead,
-        { foreignKey: 'companyId', as: 'leads' },
+        { foreignKey: 'idCompany', as: 'users' },
         {
           onDelete: 'SET NULL',
           onUpdate: 'CASCADE',

@@ -6,7 +6,15 @@ const jwt = require('jsonwebtoken');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      this.belongsTo(models.Company, { foreignKey: 'companyId' });
+      this.belongsTo(models.Company, { foreignKey: 'idCompany' });
+      this.hasMany(
+        models.List,
+        { foreignKey: 'createdBy' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
     }
     async setPassword() {
       const salt = await bcrypt.genSalt(10);
@@ -17,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     }
     async createJWT() {
       return jwt.sign(
-        { userId: this.id, companyId: this.companyId },
+        { userId: this.id, idCompany: this.idCompany },
         process.env.JWT_SECRET,
         {
           expiresIn: process.env.JWT_LIFETIME,
