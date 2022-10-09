@@ -19,7 +19,7 @@ class CompanyService {
         lastName: userDTO.lastName,
         email: userDTO.email,
         password: userDTO.password,
-        companyId: company.id,
+        idCompany: company.id,
       });
       await userBulk.setPassword();
       const user = await userBulk.save({ transaction: t });
@@ -41,7 +41,7 @@ class CompanyService {
       });
       return company;
     } catch (e) {
-      throw new BadRequestError(e.message)
+      throw new BadRequestError(e.message);
     }
   }
 }

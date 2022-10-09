@@ -1,21 +1,22 @@
-const { Lead } = require('../models/index');
+const { Lead, User, ListXLead, List } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class LeadService {
-  async getLeads(companyId, page, rowsPerPage) {
+  async getLeads(idCompany, page, rowsPerPage) {
     try {
-      const leads = await Lead.findAll({
+      const { rows: leads, count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
         attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone'],
+        include: [
+          {
+            model: User,
+            as: 'user',
+            where: { idCompany },
+            attributes: [],
+          },
+        ],
         where: {
-          companyId,
-          active: true,
-        },
-      });
-      const count = await Lead.count({
-        where: {
-          companyId,
           active: true,
         },
       });
@@ -25,12 +26,38 @@ class LeadService {
     }
   }
 
-  async addLead(companyId, userId, leadDTO) {
+  async getLeadById(id) {
+    try {
+      const lead = await Lead.findAll({
+        include: [
+          {
+            model: ListXLead,
+            as: 'lists',
+            attributes: ['id'],
+            include: [
+              {
+                model: List,
+                as: 'list',
+              },
+            ],
+          },
+        ],
+        where: {
+          id,
+          active: true,
+        },
+      });
+      return lead;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async addLead(userId, leadDTO) {
     try {
       const lead = await Lead.create({
-        ...leadDTO,
-        companyId,
         createdBy: userId,
+        ...leadDTO,
       });
       return lead;
     } catch (e) {

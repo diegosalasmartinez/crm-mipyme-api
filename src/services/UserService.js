@@ -2,13 +2,13 @@ const { User } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class UserService {
-  async getUsers(companyId, page, rowsPerPage) {
+  async getUsers(idCompany, page, rowsPerPage) {
     try {
       const users = await User.findAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
         where: {
-          companyId,
+          idCompany,
           active: true,
         },
         attributes: {
@@ -17,7 +17,7 @@ class UserService {
       });
       const count = await User.count({
         where: {
-          companyId,
+          idCompany,
           active: true,
         },
       });
@@ -31,7 +31,7 @@ class UserService {
     try {
       const user = await User.findOne({
         where: { id, active: true },
-        attributes: ['id', 'companyId', 'active'],
+        attributes: ['id', 'name', 'lastName', 'email', 'idCompany', 'active'],
       });
       return user;
     } catch (e) {
@@ -43,7 +43,7 @@ class UserService {
     try {
       const user = await User.findOne({
         where: { email, active: true },
-        attributes: ['id', 'companyId', 'name', 'lastName', 'password'],
+        attributes: ['id', 'idCompany', 'name', 'lastName', 'password'],
       });
       return user;
     } catch (e) {

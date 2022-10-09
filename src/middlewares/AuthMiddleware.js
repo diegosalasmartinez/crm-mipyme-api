@@ -13,7 +13,7 @@ const auth = async (req, res, next) => {
     const payload = await authService.auth(token)
     req.user = {
       id: payload.userId,
-      companyId: payload.companyId
+      idCompany: payload.idCompany
     }
     next()
   } catch (error) {
