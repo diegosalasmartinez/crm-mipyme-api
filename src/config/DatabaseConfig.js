@@ -6,7 +6,8 @@ module.exports = {
     "password": process.env.DEV_DB_PASSWORD,
     "database": process.env.DEV_DB_NAME,
     "host": parseInt(process.env.DEV_DB_HOST),
-    "dialect": process.env.DEV_DB_DIALECT
+    "dialect": process.env.DEV_DB_DIALECT,
+    "seederStorage": "sequelize",
   },
   // "test": {
   //   "username": process.env.TEST_DB_USER,
