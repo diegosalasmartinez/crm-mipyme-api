@@ -24,8 +24,8 @@ module.exports = {
         allowNull: false,
       },
       objetive: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
+        type: Sequelize.STRING,
+        allowNull: true,
       }, 
       budget: {
         type: Sequelize.FLOAT,

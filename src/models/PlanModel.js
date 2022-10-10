@@ -27,10 +27,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      objetive: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
-      },
+      objetive: DataTypes.STRING,
       budget: {
         type: DataTypes.FLOAT,
         allowNull: false,
