@@ -8,6 +8,14 @@ const getProgram = async (req, res) => {
   res.status(StatusCodes.OK).json(program);
 };
 
+const addProgram = async (req, res) => {
+  const { idPlan, program } = req.body
+  const programService = new ProgramService();
+  const programCreated = await programService.addProgram(idPlan, program);
+  res.status(StatusCodes.OK).json(programCreated);
+}
+
 module.exports = {
-  getProgram
+  getProgram,
+  addProgram
 };

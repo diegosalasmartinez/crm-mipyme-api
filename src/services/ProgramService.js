@@ -1,4 +1,4 @@
-const { Plan, Program, User } = require('../models/index');
+const { Program } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class ProgramService {
@@ -8,6 +8,18 @@ class ProgramService {
         where: {
           id
         },
+      });
+      return program;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async addProgram(idPlan, programDTO) {
+    try {
+      const program = await Program.create({
+        ...programDTO,
+        idPlan
       });
       return program;
     } catch (e) {
