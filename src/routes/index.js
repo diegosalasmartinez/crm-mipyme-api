@@ -12,11 +12,13 @@ const usersRoutes = require('./UserRoutes');
 const leadRoutes = require('./LeadRoutes');
 const listRoutes = require('./ListRoutes');
 const planRoutes = require('./PlanRoutes');
+const programRoutes = require('./ProgramRoutes');
 authenticatedRoutes.use(baseUrl + 'companies', companyRoutes);
 authenticatedRoutes.use(baseUrl + 'users', usersRoutes);
 authenticatedRoutes.use(baseUrl + 'leads', leadRoutes);
 authenticatedRoutes.use(baseUrl + 'lists', listRoutes);
 authenticatedRoutes.use(baseUrl + 'plans', planRoutes);
+authenticatedRoutes.use(baseUrl + 'programs', programRoutes);
 
 module.exports = {
   basicRoutes,
