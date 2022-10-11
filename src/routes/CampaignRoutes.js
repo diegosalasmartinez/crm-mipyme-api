@@ -1,14 +1,12 @@
 const express = require('express');
 const {
-  getPlan,
-  addPlan,
-  addProgram
-} = require('../controllers/PlanController');
+  getCampaignsByCompany,
+  addCampaign
+} = require('../controllers/CampaignController');
 
 const router = express.Router();
 
-router.get('/', getPlan);
-router.post('/', addPlan);
-router.post('/program', addProgram);
+router.get('/', getCampaignsByCompany);
+router.post('/', addCampaign);
 
 module.exports = router;

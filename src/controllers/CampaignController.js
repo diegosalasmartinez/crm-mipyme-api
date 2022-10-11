@@ -1,30 +1,23 @@
 const { StatusCodes } = require('http-status-codes');
-const PlanService = require('../services/PlanService');
+const CampaignService = require('../services/CampaignService');
+const campaignService = new CampaignService();
 
-const getPlan = async (req, res) => {
+const getCampaignsByCompany = async (req, res) => {
   const { idCompany } = req.user;
-  const planService = new PlanService();
-  const plan = await planService.getPlan(idCompany);
-  res.status(StatusCodes.OK).json(plan);
+  const campaign = await campaignService.getCampaignsByCompany(idCompany);
+  res.status(StatusCodes.OK).json(campaign);
 };
 
-const addPlan = async (req, res) => {
-  const { id: idUser } = req.user;
-  const plan = req.body;
-  const planService = new PlanService();
-  const planCreated = await planService.addPlan(idUser, plan);
-  res.status(StatusCodes.OK).json(planCreated);
+const addCampaign = async (req, res) => {
+  const { idProgram, campaign } = req.body;
+  const campaignCreated = await campaignService.addCampaign(
+    idProgram,
+    campaign
+  );
+  res.status(StatusCodes.OK).json(campaignCreated);
 };
-
-const addProgram = async (req, res) => {
-  const { idPlan, program } = req.body
-  const planService = new PlanService();
-  const programCreated = await planService.addProgram(idPlan, program);
-  res.status(StatusCodes.OK).json(programCreated);
-}
 
 module.exports = {
-  getPlan,
-  addPlan,
-  addProgram
+  getCampaignsByCompany,
+  addCampaign,
 };
