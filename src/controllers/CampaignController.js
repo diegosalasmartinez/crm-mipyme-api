@@ -10,6 +10,9 @@ const getCampaignsByCompany = async (req, res) => {
 
 const addCampaign = async (req, res) => {
   const { idProgram, campaign } = req.body;
+  console.log(idProgram)
+  console.log(campaign)
+
   const campaignCreated = await campaignService.addCampaign(
     idProgram,
     campaign

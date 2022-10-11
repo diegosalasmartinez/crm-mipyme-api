@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       timestamps: true,
-      tableName: 'programs',
+      tableName: 'campaigns',
     }
   );
   return Campaign;
