@@ -1,7 +1,13 @@
-const { Lead, User, ListXLead, List } = require('../models/index');
+const {
+  Lead,
+  User,
+  ListXLead,
+  List,
+  ClassificationMarketing,
+} = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');
-const classificationService = new ClassificationMarketingService()
+const classificationService = new ClassificationMarketingService();
 
 class LeadService {
   async getLeads(idCompany, page, rowsPerPage) {
@@ -26,13 +32,16 @@ class LeadService {
             where: { idCompany },
             attributes: [],
           },
+          {
+            model: ClassificationMarketing,
+            as: 'marketingClassification',
+            attributes: ['key', 'name'],
+          },
         ],
         where: {
           active: true,
         },
-        order: [
-          ['createdAt', 'DESC']
-        ]
+        order: [['createdAt', 'DESC']],
       });
       return { data, count };
     } catch (e) {
@@ -68,7 +77,7 @@ class LeadService {
           active: true,
         },
       });
-      if (!lead) return null
+      if (!lead) return null;
       const leadJSON = lead.toJSON();
       const leadFormatted = {
         ...leadJSON,
@@ -82,16 +91,16 @@ class LeadService {
 
   async addLead(userId, leadDTO) {
     try {
-      const classifications = await classificationService.getDefault()
+      const classifications = await classificationService.getDefault();
       console.log(classifications[0].id);
       const lead = await Lead.create({
         ...leadDTO,
         createdBy: userId,
-        idClassificationMarketing: classifications[0].id
+        idClassificationMarketing: classifications[0].id,
       });
       return lead;
     } catch (e) {
-      console.log(e)
+      console.log(e);
       throw new BadRequestError(e.message);
     }
   }

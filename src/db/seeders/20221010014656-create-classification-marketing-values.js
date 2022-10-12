@@ -8,28 +8,28 @@ module.exports = {
     const companies = await queryInterface.bulkInsert('classification_marketing', [
       {
         id: process.env.MARKETING_CLASSIFICATION_DEFAULT,
-        code: 'started',
+        key: 'started',
         name: 'Sin procesar',
         minPoints: 0,
         maxPoints: 20
       },
       {
         id: uuidv4(),
-        code: 'ready_marketing',
+        key: 'ready_marketing',
         name: 'Listo para marketing',
         minPoints: 20,
         maxPoints: 50
       },
       {
         id: uuidv4(),
-        code: 'marketing_engaged',
+        key: 'marketing_engaged',
         name: 'Marketing comprometido',
         minPoints: 50,
         maxPoints: 200
       },
       {
         id: uuidv4(),
-        code: 'ready_sales',
+        key: 'ready_sales',
         name: 'Listo para venta',
         minPoints: 200,
         maxPoints: 500

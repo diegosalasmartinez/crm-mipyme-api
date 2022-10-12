@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.UUIDV4,
       },
-      code: {
+      key: {
         type: DataTypes.STRING,
         allowNull: false,
       },
