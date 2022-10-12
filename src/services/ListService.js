@@ -1,11 +1,11 @@
-const { sequelize } = require('../models/index');
+const { sequelize, Sequelize } = require('../models/index');
 const { List, Lead, User, ListXLead } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class ListService {
   async getLists(idCompany, page, rowsPerPage) {
     try {
-      const { rows: lists, count } = await List.findAndCountAll({
+      const { rows: data, count } = await List.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
         include: [
@@ -25,7 +25,7 @@ class ListService {
           active: true,
         },
       });
-      return { lists, count };
+      return { data, count };
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -38,20 +38,20 @@ class ListService {
           {
             model: ListXLead,
             as: 'leads',
-            attributes: ['id'],
             include: [
               {
                 model: Lead,
                 as: 'lead',
-                attributes: [
-                  'id',
-                  'name',
-                  'lastName',
-                  'email',
-                  'birthday',
-                  'phone',
-                ],
+                attributes: [],
               },
+            ],
+            attributes: [
+              [Sequelize.literal('"leads->lead"."id"'), 'id'],
+              [Sequelize.literal('"leads->lead"."name"'), 'name'],
+              [Sequelize.literal('"leads->lead"."lastName"'), 'lastName'],
+              [Sequelize.literal('"leads->lead"."email"'), 'email'],
+              [Sequelize.literal('"leads->lead"."birthday"'), 'birthday'],
+              [Sequelize.literal('"leads->lead"."phone"'), 'phone'],
             ],
           },
         ],

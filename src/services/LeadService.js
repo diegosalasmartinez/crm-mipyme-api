@@ -1,13 +1,22 @@
-const { Lead, User, ListXLead, List } = require('../models/index');
+const { Lead, User, ListXLead, List, Sequelize } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class LeadService {
   async getLeads(idCompany, page, rowsPerPage) {
     try {
-      const { rows: leads, count } = await Lead.findAndCountAll({
+      const { rows: data, count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
-        attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone', 'birthday', 'companyName'],
+        attributes: [
+          'id',
+          'name',
+          'lastName',
+          'email',
+          'birthday',
+          'phone',
+          'birthday',
+          'companyName',
+        ],
         include: [
           {
             model: User,
@@ -20,7 +29,7 @@ class LeadService {
           active: true,
         },
       });
-      return { leads, count };
+      return { data, count };
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -33,7 +42,6 @@ class LeadService {
           {
             model: ListXLead,
             as: 'lists',
-            attributes: ['id'],
             include: [
               {
                 model: List,
@@ -43,10 +51,11 @@ class LeadService {
                     model: ListXLead,
                     as: 'leads',
                     attributes: ['id'],
-                  }
-                ]
+                  },
+                ],
               },
             ],
+            attributes: ['id'],
           },
         ],
         where: {
@@ -54,7 +63,12 @@ class LeadService {
           active: true,
         },
       });
-      return lead;
+      const leadJSON = lead.toJSON();
+      const leadFormatted = {
+        ...leadJSON,
+        lists: leadJSON.lists.map((l) => l.list),
+      };
+      return leadFormatted;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
