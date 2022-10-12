@@ -1,4 +1,4 @@
-const { Campaign, Program, Plan, User } = require('../models/index');
+const { Campaign, Program, Plan, Company, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class CampaignService {
@@ -14,13 +14,12 @@ class CampaignService {
               {
                 model: Plan,
                 as: 'plan',
-                attributes: ['createdBy'],
+                attributes: ['id'],
                 include: [
                   {
-                    model: User,
-                    as: 'creator',
-                    attributes: ['idCompany'],
-                    where: { idCompany },
+                    model: Company,
+                    as: 'company',
+                    where: { id: idCompany },
                   },
                 ],
               },
@@ -45,7 +44,15 @@ class CampaignService {
   async addCampaign(idUser, idProgram, campaignDTO) {
     try {
       const campaign = await Campaign.create({
-        ...campaignDTO,
+        name: campaignDTO.name,
+        lists: campaignDTO.lists ?? [],
+        segments: campaignDTO.segments ?? [],
+        step: campaignDTO.step ?? 0,
+        html: campaignDTO.html ?? '',
+        goal: campaignDTO.goal,
+        budget: campaignDTO.budget,
+        startDate: campaignDTO.startDate,
+        endDate: campaignDTO.endDate,
         createdBy: idUser,
         idProgram,
       });

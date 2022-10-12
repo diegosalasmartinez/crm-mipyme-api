@@ -68,12 +68,13 @@ class LeadService {
           active: true,
         },
       });
-      const leadJSON = lead.toJSON();
-      const leadFormatted = {
-        ...leadJSON,
-        lists: leadJSON.lists.map((l) => l.list),
-      };
-      return leadFormatted;
+      // const leadJSON = lead.toJSON();
+      // const leadFormatted = {
+      //   ...leadJSON,
+      //   lists: leadJSON.lists.map((l) => l.list),
+      // };
+      // return leadFormatted;
+      return lead
     } catch (e) {
       throw new BadRequestError(e.message);
     }

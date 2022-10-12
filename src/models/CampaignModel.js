@@ -33,6 +33,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      html: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+      },
+      status: {
+        type: DataTypes.ENUM('CREATED', 'PENDING', 'REJECTED', 'APPROVED', 'RUNNING', 'FINISHED'),
+        defaultValue: 'CREATED',
+      },
       startDate: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,

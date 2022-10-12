@@ -36,7 +36,7 @@ module.exports = {
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        allowNull: false,
+        allowNull: true,
       },
       name: {
         type: Sequelize.STRING,
