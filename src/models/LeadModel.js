@@ -4,7 +4,11 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Lead extends Model {
     static associate(models) {
-      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'user' });
+      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
+      this.belongsTo(models.ClassificationMarketing, {
+        foreignKey: 'idClassificationMarketing',
+        as: 'marketingClassification',
+      });
       this.hasMany(
         models.ListXLead,
         { foreignKey: 'idLead', as: 'lists' },

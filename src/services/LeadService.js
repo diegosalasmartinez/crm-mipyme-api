@@ -1,5 +1,7 @@
-const { Lead, User, ListXLead, List, Sequelize } = require('../models/index');
+const { Lead, User, ListXLead, List } = require('../models/index');
 const { BadRequestError } = require('../errors');
+const ClassificationMarketingService = require('./ClassificationMarketingService');
+const classificationService = new ClassificationMarketingService()
 
 class LeadService {
   async getLeads(idCompany, page, rowsPerPage) {
@@ -20,7 +22,7 @@ class LeadService {
         include: [
           {
             model: User,
-            as: 'user',
+            as: 'creator',
             where: { idCompany },
             attributes: [],
           },
@@ -28,6 +30,9 @@ class LeadService {
         where: {
           active: true,
         },
+        order: [
+          ['createdAt', 'DESC']
+        ]
       });
       return { data, count };
     } catch (e) {
@@ -76,12 +81,16 @@ class LeadService {
 
   async addLead(userId, leadDTO) {
     try {
+      const classifications = await classificationService.getDefault()
+      console.log(classifications[0].id);
       const lead = await Lead.create({
-        createdBy: userId,
         ...leadDTO,
+        createdBy: userId,
+        idClassificationMarketing: classifications[0].id
       });
       return lead;
     } catch (e) {
+      console.log(e)
       throw new BadRequestError(e.message);
     }
   }

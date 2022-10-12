@@ -18,7 +18,7 @@ class CampaignService {
                 include: [
                   {
                     model: User,
-                    as: 'user',
+                    as: 'creator',
                     attributes: ['idCompany'],
                     where: { idCompany },
                   },
@@ -28,7 +28,7 @@ class CampaignService {
           },
           {
             model: User,
-            as: 'user',
+            as: 'creator',
             attributes: ['name', 'lastName'],
           }
         ],

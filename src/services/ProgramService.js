@@ -13,7 +13,7 @@ class ProgramService {
             include: [
               {
                 model: User,
-                as: 'user',
+                as: 'creator',
                 attributes: ['name', 'lastName'],
               },
             ],

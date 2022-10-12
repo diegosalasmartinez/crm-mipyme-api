@@ -9,9 +9,9 @@ const getPlan = async (req, res) => {
 };
 
 const addPlan = async (req, res) => {
-  const { id: idUser } = req.user;
+  const { idCompany } = req.user;
   const plan = req.body;
-  const planCreated = await planService.addPlan(idUser, plan);
+  const planCreated = await planService.addPlan(idCompany, plan);
   res.status(StatusCodes.OK).json(planCreated);
 };
 

@@ -11,7 +11,7 @@ class ListService {
         include: [
           {
             model: User,
-            as: 'user',
+            as: 'creator',
             where: { idCompany },
             attributes: [],
           },

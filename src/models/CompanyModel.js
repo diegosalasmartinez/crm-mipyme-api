@@ -12,6 +12,14 @@ module.exports = (sequelize, DataTypes) => {
           onUpdate: 'CASCADE',
         }
       );
+      this.hasMany(
+        models.Plan,
+        { foreignKey: 'idCompany' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
     }
   }
   Company.init(

@@ -1,4 +1,4 @@
-const { Plan, Program, Campaign, User } = require('../models/index');
+const { Plan, Program, Campaign, Company } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class PlanService {
@@ -7,10 +7,10 @@ class PlanService {
       const plan = await Plan.findOne({
         include: [
           {
-            model: User,
-            as: 'user',
-            attributes: ['idCompany'],
-            where: { idCompany },
+            model: Company,
+            as: 'company',
+            attributes: [],
+            where: { id: idCompany },
           },
           {
             model: Program,
@@ -35,11 +35,11 @@ class PlanService {
     }
   }
 
-  async addPlan(idUser, planDTO) {
+  async addPlan(idCompany, planDTO) {
     try {
       const plan = await Plan.create({
         ...planDTO,
-        createdBy: idUser,
+        idCompany,
       });
       return plan;
     } catch (e) {

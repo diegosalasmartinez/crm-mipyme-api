@@ -5,7 +5,8 @@ module.exports = (sequelize, DataTypes) => {
   class Campaign extends Model {
     static associate(models) {
       this.belongsTo(models.Program, { foreignKey: 'idProgram', as: 'program' });
-      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'user' });
+      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
+      this.belongsTo(models.User, { foreignKey: 'approvedBy', as: 'approver' });
     }
   }
   Campaign.init(
@@ -40,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
-      objetive: DataTypes.STRING,
+      goal: DataTypes.STRING,
       budget: DataTypes.FLOAT,
       active: {
         type: DataTypes.BOOLEAN,
