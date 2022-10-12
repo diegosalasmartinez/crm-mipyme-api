@@ -4,7 +4,7 @@ const { BadRequestError } = require('../errors');
 class CampaignService {
   async getCampaignsByCompany(idCompany) {
     try {
-      const { rows: data, count } = await Campaign.findAndCountAll({
+      const { rows: data = [], count } = await Campaign.findAndCountAll({
         include: [
           {
             model: Program,

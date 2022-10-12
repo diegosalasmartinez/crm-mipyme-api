@@ -5,7 +5,7 @@ const { BadRequestError } = require('../errors');
 class ListService {
   async getLists(idCompany, page, rowsPerPage) {
     try {
-      const { rows: data, count } = await List.findAndCountAll({
+      const { rows: data = [], count } = await List.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
         include: [

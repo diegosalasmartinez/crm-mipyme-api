@@ -6,7 +6,7 @@ const classificationService = new ClassificationMarketingService()
 class LeadService {
   async getLeads(idCompany, page, rowsPerPage) {
     try {
-      const { rows: data, count } = await Lead.findAndCountAll({
+      const { rows: data = [], count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
         attributes: [

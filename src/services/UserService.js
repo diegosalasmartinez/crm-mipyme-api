@@ -4,7 +4,7 @@ const { BadRequestError } = require('../errors');
 class UserService {
   async getUsers(idCompany, page, rowsPerPage) {
     try {
-      const { data, count } = await User.findAndCountAll({
+      const { data = [], count } = await User.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
         where: {
