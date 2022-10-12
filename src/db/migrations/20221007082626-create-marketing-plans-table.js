@@ -8,10 +8,10 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      createdBy: {
+      idCompany: {
         type: Sequelize.UUID,
         references: {
-          model: 'users',
+          model: 'companies',
           key: 'id',
         },
         onDelete: 'SET NULL',
@@ -22,7 +22,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      objetive: Sequelize.STRING,
+      goal: Sequelize.STRING,
       budget: Sequelize.FLOAT,
       description: Sequelize.STRING,
       active: {
@@ -31,10 +31,12 @@ module.exports = {
       },
       createdAt: {
         type: Sequelize.DATE,
+        allowNull: false,
         defaultValue: Sequelize.NOW,
       },
       updatedAt: {
         type: Sequelize.DATE,
+        allowNull: false,
         defaultValue: Sequelize.NOW,
       },
     })

@@ -13,6 +13,8 @@ module.exports = {
         id: idCompany,
         name: 'Tambo',
         email: 'tambo@gmail.com',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ]);
     await queryInterface.bulkInsert('users', [
@@ -23,6 +25,8 @@ module.exports = {
         email: 'diesalasmart@gmail.com',
         password: process.env.ADMIN_USER_PASSWORD,
         idCompany,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     ]);
   },

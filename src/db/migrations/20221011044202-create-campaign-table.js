@@ -28,6 +28,16 @@ module.exports = {
         onUpdate: 'CASCADE',
         allowNull: false,
       },
+      approvedBy: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        allowNull: false,
+      },
       name: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -40,10 +50,6 @@ module.exports = {
         type: Sequelize.ARRAY(Sequelize.JSONB),
         allowNull: false,
       },
-      step: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
       startDate: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
@@ -52,7 +58,19 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
-      objetive: Sequelize.STRING,
+      step: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
+      html: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      status: {
+        type: Sequelize.ENUM('CREATED', 'PENDING', 'REJECTED', 'APPROVED', 'RUNNING', 'FINISHED'),
+        defaultValue: 'CREATED',
+      },
+      goal: Sequelize.STRING,
       budget: Sequelize.FLOAT,
       active: {
         type: Sequelize.BOOLEAN,
@@ -60,10 +78,12 @@ module.exports = {
       },
       createdAt: {
         type: Sequelize.DATE,
+        allowNull: false,
         defaultValue: Sequelize.NOW,
       },
       updatedAt: {
         type: Sequelize.DATE,
+        allowNull: false,
         defaultValue: Sequelize.NOW,
       },
     });

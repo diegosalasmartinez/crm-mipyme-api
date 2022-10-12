@@ -17,6 +17,9 @@ module.exports = {
         phone: faker.phone.number(),
         address: faker.address.secondaryAddress(),
         createdBy: process.env.ADMIN_USER_ID,
+        idClassificationMarketing: process.env.MARKETING_CLASSIFICATION_DEFAULT,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       leadsInfo.push(info);
     }
