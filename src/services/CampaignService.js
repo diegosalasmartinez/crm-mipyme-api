@@ -4,41 +4,50 @@ const { BadRequestError } = require('../errors');
 class CampaignService {
   async getCampaignsByCompany(idCompany) {
     try {
-      const campaigns = await Campaign.findAndCountAll({
+      const { rows: data, count } = await Campaign.findAndCountAll({
         include: [
           {
             model: Program,
             as: 'program',
+            attributes: ['id', 'name', 'idPlan'],
             include: [
               {
                 model: Plan,
                 as: 'plan',
+                attributes: ['createdBy'],
                 include: [
                   {
                     model: User,
                     as: 'user',
+                    attributes: ['idCompany'],
                     where: { idCompany },
                   },
                 ],
               },
             ],
           },
+          {
+            model: User,
+            as: 'user',
+            attributes: ['name', 'lastName'],
+          }
         ],
         where: {
           active: true,
         },
       });
-      return campaigns;
+      return { data, count };
     } catch (e) {
       throw new BadRequestError(e.message);
     }
   }
 
-  async addCampaign(idProgram, campaignDTO) {
+  async addCampaign(idUser, idProgram, campaignDTO) {
     try {
       const campaign = await Campaign.create({
         ...campaignDTO,
-        idProgram
+        createdBy: idUser,
+        idProgram,
       });
       return campaign;
     } catch (e) {

@@ -8,7 +8,23 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.Company, { foreignKey: 'idCompany' });
       this.hasMany(
+        models.Plan,
+        { foreignKey: 'createdBy' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
+      this.hasMany(
         models.List,
+        { foreignKey: 'createdBy' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
+      this.hasMany(
+        models.Campaign,
         { foreignKey: 'createdBy' },
         {
           onDelete: 'SET NULL',

@@ -4,16 +4,18 @@ const campaignService = new CampaignService();
 
 const getCampaignsByCompany = async (req, res) => {
   const { idCompany } = req.user;
-  const campaign = await campaignService.getCampaignsByCompany(idCompany);
-  res.status(StatusCodes.OK).json(campaign);
+  const { data, count } = await campaignService.getCampaignsByCompany(
+    idCompany
+  );
+  res.status(StatusCodes.OK).json({ data, count });
 };
 
 const addCampaign = async (req, res) => {
+  const { id: idUser } = req.user;
   const { idProgram, campaign } = req.body;
-  console.log(idProgram)
-  console.log(campaign)
 
   const campaignCreated = await campaignService.addCampaign(
+    idUser,
     idProgram,
     campaign
   );

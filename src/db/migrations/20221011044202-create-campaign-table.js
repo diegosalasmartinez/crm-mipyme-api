@@ -18,11 +18,20 @@ module.exports = {
         onUpdate: 'CASCADE',
         allowNull: false,
       },
+      createdBy: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        allowNull: false,
+      },
       name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-
       lists: {
         type: Sequelize.ARRAY(Sequelize.STRING),
         allowNull: false,

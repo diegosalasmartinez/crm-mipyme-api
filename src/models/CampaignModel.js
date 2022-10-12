@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   class Campaign extends Model {
     static associate(models) {
       this.belongsTo(models.Program, { foreignKey: 'idProgram', as: 'program' });
+      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'user' });
     }
   }
   Campaign.init(
