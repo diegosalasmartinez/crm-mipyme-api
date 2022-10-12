@@ -9,14 +9,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'idClassificationMarketing',
         as: 'marketingClassification',
       });
-      this.hasMany(
-        models.ListXLead,
-        { foreignKey: 'idLead', as: 'lists' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.belongsToMany(models.List, {
+        foreignKey: 'idLead',
+        as: 'lists',
+        through: 'listsxleads',
+      });
     }
   }
   Lead.init(

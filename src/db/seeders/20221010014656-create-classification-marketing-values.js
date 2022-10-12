@@ -1,13 +1,12 @@
 /* eslint-disable no-unused-vars */
 'use strict';
-require('dotenv').config();
 const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
   async up (queryInterface, Sequelize) {
     const companies = await queryInterface.bulkInsert('classification_marketing', [
       {
-        id: process.env.MARKETING_CLASSIFICATION_DEFAULT,
+        id: uuidv4(),
         key: 'started',
         name: 'Sin procesar',
         minPoints: 0,

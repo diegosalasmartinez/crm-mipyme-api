@@ -1,4 +1,4 @@
-const { User } = require('../models/index');
+const { User, Role } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class UserService {
@@ -17,7 +17,7 @@ class UserService {
       });
       return { data, count };
     } catch (e) {
-      throw new BadRequestError(e.message)
+      throw new BadRequestError(e.message);
     }
   }
 
@@ -26,10 +26,16 @@ class UserService {
       const user = await User.findOne({
         where: { id, active: true },
         attributes: ['id', 'name', 'lastName', 'email', 'idCompany', 'active'],
+        include: [
+          {
+            model: Role,
+            as: 'roles',
+          },
+        ],
       });
       return user;
     } catch (e) {
-      throw new BadRequestError(e.message)
+      throw new BadRequestError(e.message);
     }
   }
 
@@ -41,7 +47,7 @@ class UserService {
       });
       return user;
     } catch (e) {
-      throw new BadRequestError(e.message)
+      throw new BadRequestError(e.message);
     }
   }
 }

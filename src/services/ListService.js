@@ -1,6 +1,7 @@
-const { sequelize, Sequelize } = require('../models/index');
-const { List, Lead, User, ListXLead } = require('../models/index');
+const { sequelize } = require('../models/index');
+const { List, Lead, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
+const LeadService = require('./LeadService');
 
 class ListService {
   async getLists(idCompany, page, rowsPerPage) {
@@ -16,7 +17,7 @@ class ListService {
             attributes: [],
           },
           {
-            model: ListXLead,
+            model: Lead,
             as: 'leads',
             attributes: ['id'],
           },
@@ -31,27 +32,34 @@ class ListService {
     }
   }
 
+  async getListByIdSimple(id) {
+    try {
+      const list = await List.findOne({
+        include: [],
+        where: {
+          id,
+        },
+      });
+      return list;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async getListById(id) {
     try {
       const list = await List.findOne({
         include: [
           {
-            model: ListXLead,
+            model: Lead,
             as: 'leads',
-            include: [
-              {
-                model: Lead,
-                as: 'lead',
-                attributes: [],
-              },
-            ],
             attributes: [
-              [Sequelize.literal('"leads->lead"."id"'), 'id'],
-              [Sequelize.literal('"leads->lead"."name"'), 'name'],
-              [Sequelize.literal('"leads->lead"."lastName"'), 'lastName'],
-              [Sequelize.literal('"leads->lead"."email"'), 'email'],
-              [Sequelize.literal('"leads->lead"."birthday"'), 'birthday'],
-              [Sequelize.literal('"leads->lead"."phone"'), 'phone'],
+              'id',
+              'name',
+              'lastName',
+              'email',
+              'birthday',
+              'phone',
             ],
           },
         ],
@@ -71,23 +79,25 @@ class ListService {
         name: listDTO.name,
         createdBy: idUser,
       });
-      await this.addLeadsToList(list.id, listDTO.leadsId);
+      if (listDTO.leadsId && listDTO.leadsId.length > 0) {
+        await this.addLeadsToList(list.id, listDTO.leadsId);
+      }
       return list;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
   }
 
-  async addLeadsToList(idList, leadsId) {
+  async addLeadsToList(idList, leadsId = []) {
     const t = await sequelize.transaction();
+    const list = await this.getListByIdSimple(idList);
+    const leadService = new LeadService();
 
     try {
-      const leadsBulk = [];
-      for (let idLead of leadsId) {
-        const leadBulk = { idList, idLead };
-        leadsBulk.push(leadBulk);
+      for (const idLead of leadsId) {
+        const lead = await leadService.getLeadByIdSimple(idLead);
+        await list.addLead(lead, { transaction: t });
       }
-      await ListXLead.bulkCreate(leadsBulk, { transaction: t });
 
       await t.commit();
     } catch (e) {

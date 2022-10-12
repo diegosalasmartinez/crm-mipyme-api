@@ -2,17 +2,12 @@
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
-  class List extends Model {
+  class Role extends Model {
     static associate(models) {
-      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
-      this.belongsToMany(models.Lead, {
-        foreignKey: 'idList',
-        as: 'leads',
-        through: 'listsxleads',
-      });
+      this.belongsToMany(models.User, { foreignKey: 'idRole', as: 'users', through: 'usersxroles' });
     }
   }
-  List.init(
+  Role.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -20,20 +15,20 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: DataTypes.UUIDV4,
       },
+      key: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      active: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
     },
     {
       sequelize,
-      timestamps: true,
-      tableName: 'lists',
+      timestamps: false,
+      tableName: 'roles',
     }
   );
-  return List;
+  return Role;
 };

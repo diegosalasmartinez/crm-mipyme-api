@@ -1,6 +1,7 @@
 const { sequelize } = require('../models/index');
 const { Company, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
+const RoleService = require('./RoleService');
 
 class CompanyService {
   async registerCompanyAccount(companyDTO, userDTO) {
@@ -23,6 +24,11 @@ class CompanyService {
       });
       await userBulk.setPassword();
       const user = await userBulk.save({ transaction: t });
+
+      const roleService = new RoleService()
+      const roles = await roleService.getRoles()
+      await user.addRole(roles[0], { transaction: t})
+
       await t.commit();
 
       return user;

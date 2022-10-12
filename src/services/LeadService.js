@@ -1,7 +1,6 @@
 const {
   Lead,
   User,
-  ListXLead,
   List,
   ClassificationMarketing,
 } = require('../models/index');
@@ -49,27 +48,33 @@ class LeadService {
     }
   }
 
+  async getLeadByIdSimple(id) {
+    try {
+      const lead = await Lead.findOne({
+        where: {
+          id,
+          active: true,
+        },
+      });
+      return lead;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async getLeadById(id) {
     try {
       const lead = await Lead.findOne({
         include: [
           {
-            model: ListXLead,
+            model: List,
             as: 'lists',
-            include: [
-              {
-                model: List,
-                as: 'list',
-                include: [
-                  {
-                    model: ListXLead,
-                    as: 'leads',
-                    attributes: ['id'],
-                  },
-                ],
-              },
-            ],
-            attributes: ['id'],
+            include: [{ model: Lead, as: 'leads', attributes: ['id'] }],
+          },
+          {
+            model: ClassificationMarketing,
+            as: 'marketingClassification',
+            attributes: ['key', 'name'],
           },
         ],
         where: {
@@ -77,13 +82,7 @@ class LeadService {
           active: true,
         },
       });
-      if (!lead) return null;
-      const leadJSON = lead.toJSON();
-      const leadFormatted = {
-        ...leadJSON,
-        lists: leadJSON.lists.map((l) => l.list),
-      };
-      return leadFormatted;
+      return lead;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
