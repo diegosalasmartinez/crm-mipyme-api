@@ -5,12 +5,12 @@ const leadService = new LeadService();
 const getLeads = async (req, res) => {
   const { page = 0, rowsPerPage = 10 } = req.query;
   const { idCompany } = req.user;
-  const { leads, count } = await leadService.getLeads(
+  const { data, count } = await leadService.getLeads(
     idCompany,
     page,
     rowsPerPage
   );
-  res.status(StatusCodes.OK).json({ data: leads, count });
+  res.status(StatusCodes.OK).json({ data, count });
 };
 
 const getLeadById = async (req, res) => {

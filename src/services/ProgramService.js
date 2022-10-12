@@ -1,12 +1,26 @@
-const { Program } = require('../models/index');
+const { Program, Campaign, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class ProgramService {
   async getProgram(id) {
     try {
       const program = await Program.findOne({
+        include: [
+          {
+            model: Campaign,
+            as: 'campaigns',
+            attributes: ['id', 'name', 'startDate', 'endDate'],
+            include: [
+              {
+                model: User,
+                as: 'user',
+                attributes: ['name', 'lastName'],
+              },
+            ],
+          },
+        ],
         where: {
-          id
+          id,
         },
       });
       return program;
@@ -19,7 +33,7 @@ class ProgramService {
     try {
       const program = await Program.create({
         ...programDTO,
-        idPlan
+        idPlan,
       });
       return program;
     } catch (e) {

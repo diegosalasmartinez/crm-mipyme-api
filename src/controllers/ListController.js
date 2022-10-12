@@ -5,12 +5,12 @@ const listService = new ListService();
 const getLists = async (req, res) => {
   const { page = 0, rowsPerPage = 10 } = req.query;
   const { idCompany } = req.user;
-  const { lists, count } = await listService.getLists(
+  const { data, count } = await listService.getLists(
     idCompany,
     page,
     rowsPerPage
   );
-  res.status(StatusCodes.OK).json({ data: lists, count });
+  res.status(StatusCodes.OK).json({ data, count });
 };
 
 const getListDetail = async (req, res) => {

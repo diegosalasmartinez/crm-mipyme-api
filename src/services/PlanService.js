@@ -1,4 +1,4 @@
-const { Plan, Program, User } = require('../models/index');
+const { Plan, Program, Campaign, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class PlanService {
@@ -9,13 +9,21 @@ class PlanService {
           {
             model: User,
             as: 'user',
+            attributes: ['idCompany'],
             where: { idCompany },
-            attributes: [],
           },
           {
             model: Program,
-            as: 'programs'
-          }
+            as: 'programs',
+            attributes: ['id', 'name', 'createdAt'],
+            include: [
+              {
+                model: Campaign,
+                as: 'campaigns',
+                attributes: ['id'],
+              },
+            ],
+          },
         ],
         where: {
           active: true,
