@@ -23,7 +23,7 @@ module.exports = {
       };
       leadsInfo.push(info);
     }
-    const companies = await queryInterface.bulkInsert('leads', leadsInfo);
+    await queryInterface.bulkInsert('leads', leadsInfo);
   },
 
   async down(queryInterface, Sequelize) {
