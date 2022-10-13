@@ -11,11 +11,12 @@ const getCampaignsByCompany = async (req, res) => {
 };
 
 const addCampaign = async (req, res) => {
-  const { id: idUser } = req.user;
+  const { id: idUser, idCompany } = req.user;
   const { idProgram, campaign } = req.body;
 
   const campaignCreated = await campaignService.addCampaign(
     idUser,
+    idCompany,
     idProgram,
     campaign
   );

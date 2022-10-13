@@ -20,6 +20,21 @@ class ProductService {
     }
   }
 
+  async getProductBySku(idCompany, sku) {
+    try {
+      const product = await Product.findOne({
+        where: {
+          idCompany,
+          code: sku,
+          active: true,
+        },
+      });
+      return product;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async addProduct(idCompany, productDTO) {
     try {
       const product = await Product.create({
