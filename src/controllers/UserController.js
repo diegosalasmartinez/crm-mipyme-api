@@ -19,7 +19,15 @@ const getUserById = async (req, res) => {
   res.status(StatusCodes.OK).json(user);
 };
 
+const addUser = async (req, res) => {
+  const { idCompany } = req.user;
+  const user = req.body
+  const userCreated = await userService.addUser(idCompany, user);
+  res.status(StatusCodes.OK).json(userCreated);
+};
+
 module.exports = {
   getUsers,
-  getUserById
+  getUserById,
+  addUser
 };

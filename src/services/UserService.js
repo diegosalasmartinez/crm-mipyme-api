@@ -4,9 +4,15 @@ const { BadRequestError } = require('../errors');
 class UserService {
   async getUsers(idCompany, page, rowsPerPage) {
     try {
-      const { data = [], count } = await User.findAndCountAll({
+      const { rows: data = [], count } = await User.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
+        include: [
+          {
+            model: Role,
+            as: 'roles',
+          },
+        ],
         where: {
           idCompany,
           active: true,
@@ -15,6 +21,7 @@ class UserService {
           exclude: ['password'],
         },
       });
+
       return { data, count };
     } catch (e) {
       throw new BadRequestError(e.message);
@@ -44,6 +51,18 @@ class UserService {
       const user = await User.findOne({
         where: { email, active: true },
         attributes: ['id', 'idCompany', 'name', 'lastName', 'password'],
+      });
+      return user;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async addUser(idCompany, userDTO) {
+    try {
+      const user = await User.create({
+        ...userDTO,
+        idCompany,
       });
       return user;
     } catch (e) {
