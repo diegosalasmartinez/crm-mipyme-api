@@ -1,7 +1,6 @@
 const { sequelize } = require('../models/index');
 const { List, Lead, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
-const LeadService = require('./LeadService');
 
 class ListService {
   async getLists(idCompany, page, rowsPerPage) {
