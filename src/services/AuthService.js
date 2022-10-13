@@ -1,6 +1,8 @@
+const { sequelize } = require('../models/index');
 const jwt = require('jsonwebtoken');
 const UserService = require('./UserService');
 const { BadRequestError, AuthExpiredError } = require('../errors');
+const CompanyService = require('./CompanyService');
 
 class AuthService {
   async login(email, password) {
@@ -32,6 +34,24 @@ class AuthService {
       return payload;
     } catch (error) {
       throw new AuthExpiredError('El tiempo de sesión terminó');
+    }
+  }
+
+  async registerAccount(companyDTO, userDTO) {
+    const t = await sequelize.transaction();
+    try {
+      const companyService = new CompanyService();
+      const company = await companyService.addCompany(companyDTO, t);
+
+      const userService = new UserService();
+      const user = await userService.addAdminUser(company.id, userDTO, t);
+
+      await t.commit();
+
+      return user;
+    } catch (e) {
+      await t.rollback();
+      throw new BadRequestError(e.message);
     }
   }
 }

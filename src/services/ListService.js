@@ -80,7 +80,7 @@ class ListService {
         createdBy: idUser,
       });
       if (listDTO.leadsId && listDTO.leadsId.length > 0) {
-        await this.addLeadsToList(list.id, listDTO.leadsId);
+        await this.addLeadsToList(list, listDTO.leadsId);
       }
       return list;
     } catch (e) {
@@ -88,15 +88,12 @@ class ListService {
     }
   }
 
-  async addLeadsToList(idList, leadsId = []) {
+  async addLeadsToList(list, leadsId = []) {
     const t = await sequelize.transaction();
-    const list = await this.getListByIdSimple(idList);
-    const leadService = new LeadService();
 
     try {
       for (const idLead of leadsId) {
-        const lead = await leadService.getLeadByIdSimple(idLead);
-        await list.addLead(lead, { transaction: t });
+        await list.addLead(idLead, { transaction: t });
       }
 
       await t.commit();

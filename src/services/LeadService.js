@@ -91,7 +91,6 @@ class LeadService {
   async addLead(userId, leadDTO) {
     try {
       const classifications = await classificationService.getDefault();
-      console.log(classifications[0].id);
       const lead = await Lead.create({
         ...leadDTO,
         createdBy: userId,
@@ -99,7 +98,6 @@ class LeadService {
       });
       return lead;
     } catch (e) {
-      console.log(e);
       throw new BadRequestError(e.message);
     }
   }
