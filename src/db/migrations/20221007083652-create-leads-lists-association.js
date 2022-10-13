@@ -5,22 +5,20 @@ module.exports = {
     await queryInterface.createTable('listsxleads', {
       idList: {
         type: Sequelize.UUID,
+        primaryKey: true,
         references: {
           model: 'lists',
           key: 'id',
         },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
         allowNull: false,
       },
       idLead: {
         type: Sequelize.UUID,
+        primaryKey: true,
         references: {
           model: 'leads',
           key: 'id',
         },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
         allowNull: false,
       },
       createdAt: {
@@ -35,6 +33,7 @@ module.exports = {
       },
     });
   },
+  // eslint-disable-next-line no-unused-vars
   async down(queryInterface, Sequelize) {
     return queryInterface.dropTable('listsxleads');
   },

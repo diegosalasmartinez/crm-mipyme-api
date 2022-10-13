@@ -5,22 +5,20 @@ module.exports = {
     await queryInterface.createTable('usersxcampaigns', {
       idUser: {
         type: Sequelize.UUID,
+        primaryKey: true,
         references: {
           model: 'users',
           key: 'id',
         },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
         allowNull: false,
       },
       idCampaign: {
         type: Sequelize.UUID,
+        primaryKey: true,
         references: {
           model: 'campaigns',
           key: 'id',
         },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
         allowNull: false,
       },
       createdAt: {

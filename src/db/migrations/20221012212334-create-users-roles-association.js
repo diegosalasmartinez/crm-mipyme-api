@@ -5,13 +5,21 @@ module.exports = {
     await queryInterface.createTable('usersxroles', {
       idUser: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        allowNull: false,
       },
       idRole: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
+        references: {
+          model: 'roles',
+          key: 'id',
+        },
+        allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
