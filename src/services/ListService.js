@@ -3,7 +3,7 @@ const { List, Lead, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class ListService {
-  async getLists(idCompany, page, rowsPerPage) {
+  async getLists(idCompany, page = 0, rowsPerPage = 10) {
     try {
       const { rows: data = [], count } = await List.findAndCountAll({
         offset: page * rowsPerPage,

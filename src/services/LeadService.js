@@ -7,9 +7,10 @@ const {
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');
 const classificationService = new ClassificationMarketingService();
+const { faker } = require('@faker-js/faker');
 
 class LeadService {
-  async getLeads(idCompany, page, rowsPerPage) {
+  async getLeads(idCompany, page = 0, rowsPerPage = 10) {
     try {
       const { rows: data = [], count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
@@ -90,13 +91,36 @@ class LeadService {
 
   async addLead(userId, leadDTO) {
     try {
-      const classifications = await classificationService.getDefault();
+      const classification = await classificationService.getDefault();
       const lead = await Lead.create({
         ...leadDTO,
         createdBy: userId,
-        idClassificationMarketing: classifications[0].id,
+        idClassificationMarketing: classification.id,
       });
       return lead;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async seed_addLeads(idUser, number) {
+    try {
+      const leadsInfo = [];
+      const classification = await classificationService.getDefault();
+      for (let i = 0; i < number; i++) {
+        const info = {
+          name: faker.name.firstName(),
+          lastName: faker.name.lastName(),
+          birthday: faker.date.birthdate({ min: 18, max: 65, mode: 'age' }),
+          email: faker.internet.email(),
+          phone: faker.phone.number(),
+          address: faker.address.secondaryAddress(),
+          createdBy: idUser,
+          idClassificationMarketing: classification.id,
+        };
+        leadsInfo.push(info);
+      }
+      await Lead.bulkCreate(leadsInfo);
     } catch (e) {
       throw new BadRequestError(e.message);
     }

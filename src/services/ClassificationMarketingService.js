@@ -7,9 +7,8 @@ class ClassificationMarketingService {
       const classifications = await ClassificationMarketing.findAll({
         order: [['minPoints', 'ASC']]
       });
-      return classifications;
+      return classifications[0];
     } catch (e) {
-      console.log(e)
       throw new BadRequestError(e.message);
     }
   }

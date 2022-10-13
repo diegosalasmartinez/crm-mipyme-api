@@ -3,7 +3,7 @@ const RoleService = require('./RoleService');
 const { BadRequestError } = require('../errors');
 
 class UserService {
-  async getUsers(idCompany, page, rowsPerPage) {
+  async getUsers(idCompany, page = 0, rowsPerPage = 10) {
     try {
       const { rows: data = [], count } = await User.findAndCountAll({
         offset: page * rowsPerPage,
