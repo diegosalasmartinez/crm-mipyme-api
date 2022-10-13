@@ -3,7 +3,7 @@ const LeadService = require('../services/LeadService');
 const leadService = new LeadService();
 
 const getLeads = async (req, res) => {
-  const { page = 0, rowsPerPage = 10 } = req.query;
+  const { page, rowsPerPage } = req.query;
   const { idCompany } = req.user;
   const { data, count } = await leadService.getLeads(
     idCompany,
@@ -26,8 +26,16 @@ const addLead = async (req, res) => {
   res.status(StatusCodes.OK).json(leadCreated);
 };
 
+const seed_addLeads = async (req, res) => {
+  const { id } = req.user;
+  const { number } = req.query;
+  await leadService.seed_addLeads(id, number);
+  res.status(StatusCodes.OK).json({ message: 'Done'});
+};
+
 module.exports = {
   getLeads,
   getLeadById,
   addLead,
+  seed_addLeads
 };
