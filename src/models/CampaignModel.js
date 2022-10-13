@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Program, { foreignKey: 'idProgram', as: 'program' });
       this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
       this.belongsTo(models.User, { foreignKey: 'approvedBy', as: 'approver' });
+      this.hasMany(models.Discount, { foreignKey: 'idCampaign', as: 'discounts' });
     }
   }
   Campaign.init(
@@ -38,7 +39,14 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: '',
       },
       status: {
-        type: DataTypes.ENUM('CREATED', 'PENDING', 'REJECTED', 'APPROVED', 'RUNNING', 'FINISHED'),
+        type: DataTypes.ENUM(
+          'CREATED',
+          'PENDING',
+          'REJECTED',
+          'APPROVED',
+          'RUNNING',
+          'FINISHED'
+        ),
         defaultValue: 'CREATED',
       },
       startDate: {
