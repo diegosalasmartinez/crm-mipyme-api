@@ -1,6 +1,7 @@
 const { Campaign, Program, Plan, Company, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
-
+const DiscountService = require('./DiscountService');
+const discountService = new DiscountService();
 class CampaignService {
   async getCampaignsByCompany(idCompany) {
     try {
@@ -29,7 +30,7 @@ class CampaignService {
             model: User,
             as: 'creator',
             attributes: ['name', 'lastName'],
-          }
+          },
         ],
         where: {
           active: true,
@@ -41,7 +42,28 @@ class CampaignService {
     }
   }
 
-  async addCampaign(idUser, idProgram, campaignDTO) {
+  async getCampaignsById(id) {
+    try {
+      const campaign = await Campaign.findAndCountAll({
+        include: [
+          {
+            model: User,
+            as: 'creator',
+            attributes: ['name', 'lastName'],
+          },
+        ],
+        where: {
+          id,
+          active: true,
+        },
+      });
+      return campaign
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async addCampaign(idUser, idCompany, idProgram, campaignDTO) {
     try {
       const campaign = await Campaign.create({
         name: campaignDTO.name,
@@ -56,6 +78,12 @@ class CampaignService {
         createdBy: idUser,
         idProgram,
       });
+      await discountService.addDiscount(
+        campaign.id,
+        idCompany,
+        campaignDTO.discounts,
+        'MARKETING'
+      );
       return campaign;
     } catch (e) {
       throw new BadRequestError(e.message);
