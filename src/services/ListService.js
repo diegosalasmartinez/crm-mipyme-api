@@ -8,6 +8,7 @@ class ListService {
       const { rows: data = [], count } = await List.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
+        required: true,
         include: [
           {
             model: User,

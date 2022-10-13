@@ -2,7 +2,7 @@ const { Program, Campaign, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class ProgramService {
-  async getProgram(id) {
+  async getProgramById(id) {
     try {
       const program = await Program.findOne({
         include: [

@@ -25,6 +25,7 @@ class LeadService {
           'birthday',
           'companyName',
         ],
+        required: true,
         include: [
           {
             model: User,

@@ -5,6 +5,7 @@ class PlanService {
   async getPlan(idCompany) {
     try {
       const plan = await Plan.findOne({
+        required: true,
         include: [
           {
             model: Company,

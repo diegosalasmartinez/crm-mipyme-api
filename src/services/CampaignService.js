@@ -11,15 +11,18 @@ class CampaignService {
             model: Program,
             as: 'program',
             attributes: ['id', 'name', 'idPlan'],
+            required: true,
             include: [
               {
                 model: Plan,
                 as: 'plan',
-                attributes: ['id'],
+                attributes: [],
+                required: true,
                 include: [
                   {
                     model: Company,
                     as: 'company',
+                    attributes: [],
                     where: { id: idCompany },
                   },
                 ],
