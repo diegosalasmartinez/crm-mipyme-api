@@ -52,6 +52,12 @@ class UserService {
       const user = await User.findOne({
         where: { email, active: true },
         attributes: ['id', 'idCompany', 'name', 'lastName', 'password'],
+        include: [
+          {
+            model: Role,
+            as: 'roles',
+          },
+        ],
       });
       return user;
     } catch (e) {

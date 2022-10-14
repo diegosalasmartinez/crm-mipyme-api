@@ -13,9 +13,9 @@ const login = async (req, res) => {
   const response = {
     id: user.id,
     fullName: user.getFullName(),
-    roles: []
+    roles: user.roles
   };
-  res.status(StatusCodes.OK).json({ usuario: response, token });
+  res.status(StatusCodes.OK).json({ user: response, token });
 };
 
 const register = async (req, res) => {
