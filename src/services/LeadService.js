@@ -24,6 +24,7 @@ class LeadService {
           'phone',
           'birthday',
           'companyName',
+          'createdAt'
         ],
         required: true,
         include: [
