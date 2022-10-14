@@ -3,9 +3,14 @@ const CampaignService = require('../services/CampaignService');
 const campaignService = new CampaignService();
 
 const getCampaignsByCompany = async (req, res) => {
-  const { idCompany } = req.user;
+  const { status } = req.query;
+  const { id: idUser, idCompany, roles } = req.user;
+  const allRecords = roles.filter(r => (r.key === 'admin' || r.key === 'admin_marketing')).length > 0
   const { data, count } = await campaignService.getCampaignsByCompany(
-    idCompany
+    idUser,
+    idCompany,
+    status,
+    allRecords
   );
   res.status(StatusCodes.OK).json({ data, count });
 };

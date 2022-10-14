@@ -12,8 +12,14 @@ const { BadRequestError } = require('../errors');
 const DiscountService = require('./DiscountService');
 const discountService = new DiscountService();
 class CampaignService {
-  async getCampaignsByCompany(idCompany) {
+  async getCampaignsByCompany(idUser, idCompany, status, allRecords = false) {
     try {
+      let whereByRol = {}
+      if (!allRecords) {
+        whereByRol.createdBy = idUser
+      }
+      console.log(whereByRol)
+
       const { rows: data = [], count } = await Campaign.findAndCountAll({
         include: [
           {
@@ -45,6 +51,8 @@ class CampaignService {
           },
         ],
         where: {
+          ...whereByRol,
+          status,
           active: true,
         },
       });
