@@ -16,9 +16,13 @@ class AuthService {
     if (!passwordMatches) {
       throw new BadRequestError('Credenciales inválidas');
     }
-
-    const token = await user.createJWT();
-
+    const token = jwt.sign(
+      { idUser: user.id, idCompany: user.idCompany, roles: user.roles },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_LIFETIME,
+      }
+    )
     return { user, token };
   }
 
@@ -27,7 +31,7 @@ class AuthService {
       const userService = new UserService();
       const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-      const user = await userService.getUserById(payload.userId);
+      const user = await userService.getUserById(payload.idUser);
       if (!user.active) {
         throw new AuthExpiredError('El usuario ya no está disponible');
       }

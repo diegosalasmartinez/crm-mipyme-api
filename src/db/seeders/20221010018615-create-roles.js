@@ -12,7 +12,7 @@ module.exports = {
       },
       {
         id: uuidv4(),
-        key: 'marketing_admin',
+        key: 'admin_marketing',
         name: 'Jefe de marketing',
       },
       {
@@ -22,7 +22,7 @@ module.exports = {
       },
       {
         id: uuidv4(),
-        key: 'sales_admin',
+        key: 'admin_sales',
         name: 'Jefe de ventas',
       },
       {
@@ -32,7 +32,7 @@ module.exports = {
       },
       {
         id: uuidv4(),
-        key: 'services_admin',
+        key: 'admin_services',
         name: 'Jefe de servicios',
       },
       {
