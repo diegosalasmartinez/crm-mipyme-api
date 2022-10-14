@@ -1,5 +1,4 @@
 const { Discount } = require('../models/index');
-const moment = require('moment');
 const { BadRequestError } = require('../errors');
 const ProductService = require('./ProductService');
 const productService = new ProductService();
@@ -8,12 +7,6 @@ class DiscountService {
   async addDiscounts(idCampaign, idCompany, data, type) {
     try {
       for (const row of data) {
-        // console.log(row['Inicio'])
-        // console.log(moment(row['Inicio'], 'DD/MM/YYYY'))
-        // console.log(moment(row['Inicio'], 'DD/MM/YYYY').toDate());
-
-        // const startDate = moment(row['Inicio'], 'DD/MM/YYYY').toDate();
-        // const endDate = moment(row['Fin'], 'DD/MM/YYYY').toDate();
         const startDate = row.startDate;
         const endDate = row.endDate;
 

@@ -91,12 +91,12 @@ class LeadService {
     }
   }
 
-  async addLead(userId, leadDTO) {
+  async addLead(idUser, leadDTO) {
     try {
       const classification = await classificationService.getDefault();
       const lead = await Lead.create({
         ...leadDTO,
-        createdBy: userId,
+        createdBy: idUser,
         idClassificationMarketing: classification.id,
       });
       return lead;

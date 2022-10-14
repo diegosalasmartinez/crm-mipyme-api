@@ -12,8 +12,9 @@ const auth = async (req, res, next) => {
   try {
     const payload = await authService.auth(token)
     req.user = {
-      id: payload.userId,
-      idCompany: payload.idCompany
+      id: payload.idUser,
+      idCompany: payload.idCompany,
+      roles: payload.roles
     }
     next()
   } catch (error) {
