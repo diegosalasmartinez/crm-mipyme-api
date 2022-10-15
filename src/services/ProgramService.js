@@ -9,7 +9,7 @@ class ProgramService {
           {
             model: Campaign,
             as: 'campaigns',
-            attributes: ['id', 'name', 'startDate', 'endDate'],
+            attributes: ['id', 'name', 'status', 'startDate', 'endDate'],
             include: [
               {
                 model: User,

@@ -90,7 +90,6 @@ class ListService {
 
   async addLeadsToList(list, leadsId = []) {
     const t = await sequelize.transaction();
-
     try {
       for (const idLead of leadsId) {
         await list.addLead(idLead, { transaction: t });

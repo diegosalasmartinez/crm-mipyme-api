@@ -1,3 +1,5 @@
+const { Op } = require('sequelize');
+const { faker } = require('@faker-js/faker');
 const {
   Lead,
   User,
@@ -7,7 +9,6 @@ const {
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');
 const classificationService = new ClassificationMarketingService();
-const { faker } = require('@faker-js/faker');
 
 class LeadService {
   async getLeads(idCompany, page = 0, rowsPerPage = 10) {
@@ -24,7 +25,7 @@ class LeadService {
           'phone',
           'birthday',
           'companyName',
-          'createdAt'
+          'createdAt',
         ],
         required: true,
         include: [
@@ -100,6 +101,49 @@ class LeadService {
         idClassificationMarketing: classification.id,
       });
       return lead;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async executeSegments(idCompany, segments, lists) {
+    try {
+      const whereClausses = {};
+      for (const s of segments) {
+        const criteria = {};
+        if (s.rule === 'exist') {
+          criteria[Op.not] = null;
+        } else if (s.rule === 'is') {
+          criteria[Op.is] = s.detail;
+        } else {
+          criteria[Op.ne] = s.detail;
+        }
+        whereClausses[s.field] = criteria;
+      }
+
+      const leads = await Lead.findAll({
+        attributes: ['id'],
+        required: true,
+        include: [
+          {
+            model: User,
+            as: 'creator',
+            where: { idCompany },
+            attributes: [],
+          },
+          {
+            model: List,
+            as: 'lists',
+            where: { id: lists },
+            attributes: [],
+          },
+        ],
+        where: {
+          ...whereClausses,
+          active: true,
+        },
+      });
+      return leads;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
