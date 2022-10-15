@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
         as: 'assigned',
         through: 'usersxcampaigns',
       });
+      this.belongsToMany(models.Lead, {
+        foreignKey: 'idCampaign',
+        as: 'leads',
+        through: 'leadsxcampaigns',
+      });
     }
   }
   Campaign.init(

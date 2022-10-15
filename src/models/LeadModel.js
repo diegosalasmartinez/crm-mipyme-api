@@ -14,6 +14,11 @@ module.exports = (sequelize, DataTypes) => {
         as: 'lists',
         through: 'listsxleads',
       });
+      this.belongsToMany(models.Campaign, {
+        foreignKey: 'idLead',
+        as: 'campaigns',
+        through: 'leadsxcampaigns',
+      });
     }
   }
   Lead.init(
