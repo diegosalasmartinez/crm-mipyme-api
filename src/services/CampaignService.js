@@ -3,6 +3,7 @@ const {
   Program,
   Discount,
   Product,
+  Lead,
   Plan,
   Company,
   User,
@@ -11,6 +12,8 @@ const {
 const { BadRequestError } = require('../errors');
 const DiscountService = require('./DiscountService');
 const discountService = new DiscountService();
+const LeadService = require('./LeadService');
+const leadService = new LeadService();
 const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
 
 class CampaignService {
@@ -153,7 +156,7 @@ class CampaignService {
     } catch (e) {
       throw new BadRequestError(e.message);
     }
-  } 
+  }
 
   async getCampaignById(id) {
     try {
@@ -180,6 +183,11 @@ class CampaignService {
           {
             model: User,
             as: 'creator',
+            attributes: ['name', 'lastName'],
+          },
+          {
+            model: Lead,
+            as: 'leads',
             attributes: ['name', 'lastName'],
           },
         ],
@@ -259,7 +267,9 @@ class CampaignService {
     }
   }
 
-  async approveCampaign(campaignDTO) {
+  async approveCampaign(idCompany, campaignDTO) {
+    const t = await sequelize.transaction();
+
     try {
       await Campaign.update(
         {
@@ -274,24 +284,12 @@ class CampaignService {
           endDate: campaignDTO.endDate,
           status: 'APPROVED',
         },
-        { where: { id: campaignDTO.id } }
+        { where: { id: campaignDTO.id }, transaction: t }
       );
-      if (campaignDTO.assigned && campaignDTO.assigned.length > 0) {
-        await this.addUsersToCampaign(campaignDTO.id, campaignDTO.assigned);
-      }
-    } catch (e) {
-      throw new BadRequestError(e.message);
-    }
-  }
 
-  async addUsersToCampaign(idCampaign, assigned = []) {
-    const t = await sequelize.transaction();
-    const campaign = await Campaign.findOne({ id: idCampaign })
-
-    try {
-      for (const idUser of assigned) {
-        await campaign.addUser(idUser, { transaction: t});
-      }
+      const campaign = await Campaign.findByPk(campaignDTO.id);
+      await this.addUsersToCampaign(campaign, campaignDTO.assigned, t);
+      await this.executeSegments(idCompany, campaign, t);
 
       await t.commit();
     } catch (e) {
@@ -300,6 +298,38 @@ class CampaignService {
     }
   }
 
+  async addUsersToCampaign(campaign, assigned = [], t) {
+    try {
+      for (const idUser of assigned) {
+        await campaign.addAssigned(
+          idUser,
+          { through: 'usersxcampaigns' },
+          { transaction: t }
+        );
+      }
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async executeSegments(idCompany, campaign, t) {
+    try {
+      const leads = await leadService.executeSegments(
+        idCompany,
+        campaign.segments,
+        campaign.lists
+      );
+      for (const idLead of leads) {
+        await campaign.addLead(
+          idLead,
+          { through: 'leadsxcampaigns' },
+          { transaction: t }
+        );
+      }
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
 }
 
 module.exports = CampaignService;

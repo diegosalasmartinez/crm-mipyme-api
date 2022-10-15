@@ -54,8 +54,9 @@ const updateCampaign = async (req, res) => {
 };
 
 const approveCampaign = async (req, res) => {
+  const { idCompany } = req.user;
   const campaign = req.body;
-  await campaignService.approveCampaign(campaign);
+  await campaignService.approveCampaign(idCompany, campaign);
   res.status(StatusCodes.OK).json({
     message: `La campaña ${campaign.name} ha sido aprobada`,
   });
