@@ -5,14 +5,24 @@ const campaignService = new CampaignService();
 const getCampaignsByCompany = async (req, res) => {
   const { status } = req.query;
   const { id: idUser, idCompany, roles } = req.user;
-  const allRecords = roles.filter(r => (r.key === 'admin' || r.key === 'admin_marketing')).length > 0
-  const { data, count } = await campaignService.getCampaignsByCompany(
-    idUser,
-    idCompany,
-    status,
-    allRecords
-  );
-  res.status(StatusCodes.OK).json({ data, count });
+  const isAdmin =
+    roles.filter((r) => r.key === 'admin' || r.key === 'admin_marketing')
+      .length > 0;
+
+  let obj = {
+    data: [],
+    count: 0,
+  };
+  if (isAdmin) {
+    obj = await campaignService.getCampaigns(idCompany, status);
+  } else {
+    if (status === 'CREATED') {
+    obj = await campaignService.getCampaignsByUser(idUser, idCompany, status);
+    } else if (status === 'APPROVED') {
+      obj = await campaignService.getAssignedCampaignsByUser(idUser, idCompany, status);
+    }
+  }
+  res.status(StatusCodes.OK).json({ data: obj.data, count: obj.count });
 };
 
 const getCampaignById = async (req, res) => {
@@ -43,9 +53,18 @@ const updateCampaign = async (req, res) => {
   });
 };
 
+const approveCampaign = async (req, res) => {
+  const campaign = req.body;
+  await campaignService.approveCampaign(campaign);
+  res.status(StatusCodes.OK).json({
+    message: `La campaña ${campaign.name} ha sido aprobada`,
+  });
+};
+
 module.exports = {
   getCampaignsByCompany,
   getCampaignById,
   addCampaign,
   updateCampaign,
+  approveCampaign,
 };

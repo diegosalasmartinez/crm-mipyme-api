@@ -23,6 +23,11 @@ module.exports = (sequelize, DataTypes) => {
           onUpdate: 'CASCADE',
         }
       );
+      this.belongsToMany(models.Campaign, {
+        foreignKey: 'idUser',
+        as: 'campaigns',
+        through: 'usersxcampaigns',
+      });
     }
     async setPassword() {
       const salt = await bcrypt.genSalt(10);
