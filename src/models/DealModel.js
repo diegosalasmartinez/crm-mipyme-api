@@ -23,30 +23,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      probability: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
-      },
-      expectedAmount: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
-      },
-      expectedCloseDate: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-      },
-      description: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      realAmount: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
-      },
-      realCloseDate: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-      },
+      probability: DataTypes.FLOAT,
+      expectedAmount: DataTypes.FLOAT,
+      expectedCloseDate: DataTypes.DATE,
+      description: DataTypes.STRING,
+      realAmount: DataTypes.FLOAT,
+      realCloseDate: DataTypes.DATE,
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

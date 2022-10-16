@@ -68,6 +68,10 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
+      numConversions: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
       step: {
         type: Sequelize.INTEGER,
         defaultValue: 0,

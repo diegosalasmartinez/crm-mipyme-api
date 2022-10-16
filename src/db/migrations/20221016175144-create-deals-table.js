@@ -58,30 +58,16 @@ module.exports = {
         onUpdate: 'CASCADE',
         allowNull: false,
       },
-      probability: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-      expectedAmount: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-      expectedCloseDate: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW,
-      },
-      description: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      realAmount: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-      realCloseDate: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW,
-      },
+      probability: Sequelize.FLOAT,
+      expectedAmount: Sequelize.FLOAT,
+      expectedCloseDate: Sequelize.DATE,
+      description: Sequelize.STRING,
+      realAmount: Sequelize.FLOAT,
+      realCloseDate: Sequelize.DATE,
       active: {
         type: Sequelize.BOOLEAN,
         defaultValue: true,

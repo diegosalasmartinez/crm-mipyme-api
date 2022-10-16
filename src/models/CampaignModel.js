@@ -41,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.ARRAY(DataTypes.JSONB),
         allowNull: false,
       },
+      numConversions: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       step: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
