@@ -114,12 +114,25 @@ class LeadService {
         if (s.rule === 'exist') {
           criteria[Op.not] = null;
         } else if (s.rule === 'is') {
-          criteria[Op.is] = s.detail;
+          criteria[Op.eq] = s.detail;
+        } else if (s.rule === 'isnt') {
+          if (s.detail && s.detail.length > 0) {
+            criteria[Op.or] = {
+              [Op.is]: null,
+              [Op.ne]: s.detail ?? '',
+            };
+          } else {
+            criteria[Op.or] = {
+              [Op.not]: null,
+              [Op.ne]: s.detail ?? '',
+            };
+          }
         } else {
-          criteria[Op.ne] = s.detail;
+          console.log(s.field, s.rule, s.detail);
         }
         whereClausses[s.field] = criteria;
       }
+      console.log('class', whereClausses);
 
       const leads = await Lead.findAll({
         attributes: ['id'],
