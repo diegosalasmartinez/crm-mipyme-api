@@ -1,5 +1,9 @@
 const { Deal } = require('../models/index');
 const { BadRequestError } = require('../errors');
+const DealOriginService = require('./DealOriginService')
+const dealOriginService = new DealOriginService()
+const DealStepService = require('./DealStepService')
+const dealStepService = new DealStepService()
 
 class DealService {
   async addDeal(idLead, dealDTO, t) {
@@ -18,11 +22,14 @@ class DealService {
 
   async addDealThroughCampaign(idUser, idContact, dealDTO, idCampaign, t) {
     try {
+      const origin = await dealOriginService.get('campaign')
+      const step = await dealStepService.getDefault()
+
       await Deal.create(
         {
           ...dealDTO,
-          origin: 'CAMPAIGN',
-          step: 'CLASIFICATION',
+          idOrigin: origin.id,
+          idStep: step.id,
           idContact,
           idCampaign,
           createdBy: idUser

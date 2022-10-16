@@ -18,9 +18,9 @@ const getCampaignsByCompany = async (req, res) => {
   if (isAdmin) {
     obj = await campaignService.getCampaigns(idCompany, status);
   } else {
-    if (status === 'CREATED') {
+    if (status === 'bulk') {
       obj = await campaignService.getCampaignsByUser(idUser, idCompany, status);
-    } else if (status === 'APPROVED') {
+    } else if (status === 'approved') {
       obj = await campaignService.getAssignedCampaignsByUser(
         idUser,
         idCompany,

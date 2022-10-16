@@ -6,7 +6,8 @@ const LeadService = require('./LeadService');
 const leadService = new LeadService();
 const ClassificationSalesService = require('./ClassificationSalesService');
 const classificationSalesService = new ClassificationSalesService();
-
+const CampaignService = require('./CampaignService');
+const campaignService = new CampaignService();
 
 class ContactService {
   async convertLead(lead, registerDeal, deal) {
@@ -38,6 +39,7 @@ class ContactService {
         await dealService.addDealThroughCampaign(idUser, contact.id, deal, idCampaign, t);
       }
       await leadService.convertLead(idLead, t)
+      await campaignService.increaseConvertNumber(idCampaign, t)
       await t.commit();
     } catch (e) {
       await t.rollback();

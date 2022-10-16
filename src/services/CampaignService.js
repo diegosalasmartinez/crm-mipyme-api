@@ -62,9 +62,9 @@ class CampaignService {
             model: CampaignStatus,
             as: 'status',
             where: {
-              key: status
-            }
-          }
+              key: status,
+            },
+          },
         ],
         where: {
           active: true,
@@ -112,9 +112,9 @@ class CampaignService {
             model: CampaignStatus,
             as: 'status',
             where: {
-              key: status
-            }
-          }
+              key: status,
+            },
+          },
         ],
         where: {
           createdBy: idUser,
@@ -158,6 +158,9 @@ class CampaignService {
             model: User,
             as: 'assigned',
             attributes: ['name', 'lastName'],
+            where: {
+              '$assigned.usersxcampaigns.idUser$': idUser,
+            },
           },
           {
             model: User,
@@ -168,12 +171,11 @@ class CampaignService {
             model: CampaignStatus,
             as: 'status',
             where: {
-              key: status
-            }
-          }
+              key: status,
+            },
+          },
         ],
         where: {
-          createdBy: idUser,
           active: true,
         },
       });
@@ -231,7 +233,7 @@ class CampaignService {
           {
             model: CampaignStatus,
             as: 'status',
-          }
+          },
         ],
         where: {
           id,
@@ -376,6 +378,18 @@ class CampaignService {
           { transaction: t }
         );
       }
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async increaseConvertNumber(idCampaign, t) {
+    try {
+      console.log(idCampaign)
+      await Campaign.increment(
+        { numConversions: 1 },
+        { where: { id: idCampaign }, transaction: t }
+      );
     } catch (e) {
       throw new BadRequestError(e.message);
     }

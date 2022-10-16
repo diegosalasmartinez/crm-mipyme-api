@@ -5,8 +5,8 @@ module.exports = (sequelize, DataTypes) => {
   class DealStep extends Model {
     static associate(models) {
       this.hasMany(
-        models.Campaign,
-        { foreignKey: 'step', as: 'deals' },
+        models.Deal,
+        { foreignKey: 'idStep', as: 'deals' },
         {
           onDelete: 'SET NULL',
           onUpdate: 'CASCADE',
