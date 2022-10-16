@@ -1,5 +1,10 @@
 const { sequelize } = require('../models/index');
-const { List, Lead, User } = require('../models/index');
+const {
+  List,
+  Lead,
+  User,
+  ClassificationMarketing,
+} = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class ListService {
@@ -60,6 +65,12 @@ class ListService {
               'birthday',
               'phone',
             ],
+            include: [
+              {
+                model: ClassificationMarketing,
+                as: 'marketingClassification',
+              },
+            ],
           },
         ],
         where: {
@@ -99,7 +110,6 @@ class ListService {
 
       await t.commit();
     } catch (e) {
-      console.log(e);
       await t.rollback();
       throw new BadRequestError(e.message);
     }

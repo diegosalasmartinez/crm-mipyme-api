@@ -1,12 +1,10 @@
-const { ClassificationMarketing } = require('../models/index');
+const { ClassificationSales } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
-class ClassificationMarketingService {
+class ClassificationSalesService {
   async getDefault() {
     try {
-      const classifications = await ClassificationMarketing.findAll({
-        order: [['minPoints', 'ASC']],
-      });
+      const classifications = await ClassificationSales.findAll({});
       return classifications[0];
     } catch (e) {
       throw new BadRequestError(e.message);
@@ -15,7 +13,7 @@ class ClassificationMarketingService {
 
   async getClassification(key) {
     try {
-      const classification = await ClassificationMarketing.findOne({
+      const classification = await ClassificationSales.findOne({
         key,
       });
       return classification;
@@ -25,4 +23,4 @@ class ClassificationMarketingService {
   }
 }
 
-module.exports = ClassificationMarketingService;
+module.exports = ClassificationSalesService;

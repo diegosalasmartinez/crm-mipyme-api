@@ -7,6 +7,7 @@ const {
   Plan,
   Company,
   User,
+  ClassificationMarketing,
   sequelize,
 } = require('../models/index');
 const { BadRequestError } = require('../errors');
@@ -196,6 +197,12 @@ class CampaignService {
               'birthday',
               'phone',
             ],
+            include: [
+              {
+                model: ClassificationMarketing,
+                as: 'marketingClassification',
+              },
+            ],
           },
         ],
         where: {
@@ -274,7 +281,7 @@ class CampaignService {
     }
   }
 
-  async approveCampaign(idCompany, campaignDTO) {
+  async approveCampaign(idUser, idCompany, campaignDTO) {
     const t = await sequelize.transaction();
 
     try {
@@ -289,6 +296,7 @@ class CampaignService {
           budget: campaignDTO.budget,
           startDate: campaignDTO.startDate,
           endDate: campaignDTO.endDate,
+          approvedBy: idUser,
           status: 'APPROVED',
         },
         { where: { id: campaignDTO.id }, transaction: t }

@@ -162,6 +162,23 @@ class LeadService {
     }
   }
 
+  async convertLead(idLead, t) {
+    try {
+      const classification = await classificationService.getClassification(
+        'marketing_engaged'
+      );
+      
+      await Lead.update(
+        {
+          idClassificationMarketing: classification.id,
+        },
+        { where: { id: idLead }, transaction: t }
+      );
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async seed_addLeads(idUser, number) {
     try {
       const leadsInfo = [];

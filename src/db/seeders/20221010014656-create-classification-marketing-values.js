@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    const companies = await queryInterface.bulkInsert('classification_marketing', [
+    await queryInterface.bulkInsert('classification_marketing', [
       {
         id: uuidv4(),
         key: 'started',
