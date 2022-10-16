@@ -38,6 +38,16 @@ module.exports = {
         onUpdate: 'CASCADE',
         allowNull: true,
       },
+      idStatus: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'campaign_status',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        allowNull: false,
+      },
       name: {
         type: Sequelize.STRING,
         allowNull: false,
@@ -65,10 +75,6 @@ module.exports = {
       html: {
         type: Sequelize.STRING,
         allowNull: false,
-      },
-      status: {
-        type: Sequelize.ENUM('CREATED', 'PENDING', 'REJECTED', 'APPROVED', 'RUNNING', 'FINISHED'),
-        defaultValue: 'CREATED',
       },
       goal: Sequelize.STRING,
       budget: Sequelize.FLOAT,

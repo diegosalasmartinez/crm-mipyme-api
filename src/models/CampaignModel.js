@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Program, { foreignKey: 'idProgram', as: 'program' });
       this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
       this.belongsTo(models.User, { foreignKey: 'approvedBy', as: 'approver' });
+      this.belongsTo(models.CampaignStatus, { foreignKey: 'idStatus', as: 'status' });
       this.hasMany(models.Discount, { foreignKey: 'idCampaign', as: 'discounts' });
       this.belongsToMany(models.User, {
         foreignKey: 'idCampaign',
@@ -47,17 +48,6 @@ module.exports = (sequelize, DataTypes) => {
       html: {
         type: DataTypes.STRING,
         defaultValue: '',
-      },
-      status: {
-        type: DataTypes.ENUM(
-          'CREATED',
-          'PENDING',
-          'REJECTED',
-          'APPROVED',
-          'RUNNING',
-          'FINISHED'
-        ),
-        defaultValue: 'CREATED',
       },
       startDate: {
         type: DataTypes.DATE,

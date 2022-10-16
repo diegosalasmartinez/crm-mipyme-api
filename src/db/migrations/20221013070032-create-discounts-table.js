@@ -26,10 +26,16 @@ module.exports = {
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
-        allowNull: true,
+        allowNull: false,
       },
-      type: {
-        type: Sequelize.ENUM('MARKETING', 'SALES'),
+      idType: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'discount_type',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
         allowNull: false,
       },
       discount: {

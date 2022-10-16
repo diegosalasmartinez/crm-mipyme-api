@@ -1,5 +1,6 @@
 const {
   Campaign,
+  CampaignStatus,
   Program,
   Discount,
   Product,
@@ -11,6 +12,8 @@ const {
   sequelize,
 } = require('../models/index');
 const { BadRequestError } = require('../errors');
+const CampaignStatusService = require('./CampaignStatusService');
+const campaignStatusService = new CampaignStatusService();
 const DiscountService = require('./DiscountService');
 const discountService = new DiscountService();
 const LeadService = require('./LeadService');
@@ -21,6 +24,7 @@ class CampaignService {
   async getCampaigns(idCompany, status) {
     try {
       const { rows: data = [], count } = await Campaign.findAndCountAll({
+        required: true,
         include: [
           {
             model: Program,
@@ -54,9 +58,15 @@ class CampaignService {
             as: 'creator',
             attributes: ['name', 'lastName'],
           },
+          {
+            model: CampaignStatus,
+            as: 'status',
+            where: {
+              key: status
+            }
+          }
         ],
         where: {
-          status,
           active: true,
         },
       });
@@ -69,6 +79,7 @@ class CampaignService {
   async getCampaignsByUser(idUser, idCompany, status) {
     try {
       const { rows: data = [], count } = await Campaign.findAndCountAll({
+        required: true,
         include: [
           {
             model: Program,
@@ -97,10 +108,16 @@ class CampaignService {
             as: 'creator',
             attributes: ['name', 'lastName'],
           },
+          {
+            model: CampaignStatus,
+            as: 'status',
+            where: {
+              key: status
+            }
+          }
         ],
         where: {
           createdBy: idUser,
-          status,
           active: true,
         },
       });
@@ -113,6 +130,7 @@ class CampaignService {
   async getAssignedCampaignsByUser(idUser, idCompany, status) {
     try {
       const { rows: data = [], count } = await Campaign.findAndCountAll({
+        required: true,
         include: [
           {
             model: Program,
@@ -146,10 +164,16 @@ class CampaignService {
             as: 'creator',
             attributes: ['name', 'lastName'],
           },
+          {
+            model: CampaignStatus,
+            as: 'status',
+            where: {
+              key: status
+            }
+          }
         ],
         where: {
           createdBy: idUser,
-          status,
           active: true,
         },
       });
@@ -200,10 +224,14 @@ class CampaignService {
             include: [
               {
                 model: ClassificationMarketing,
-                as: 'marketingClassification',
+                as: 'classificationMarketing',
               },
             ],
           },
+          {
+            model: CampaignStatus,
+            as: 'status',
+          }
         ],
         where: {
           id,
@@ -218,10 +246,11 @@ class CampaignService {
 
   async addCampaign(idUser, idCompany, idProgram, campaignDTO) {
     try {
-      let status = 'CREATED';
+      let statusValue = 'bulk';
       if (campaignDTO.step === CAMPAIGN_STEP_SEND_TO_PENDING) {
-        status = 'PENDING';
+        statusValue = 'pending';
       }
+      const status = await campaignStatusService.getStatus(statusValue);
 
       const campaign = await Campaign.create({
         name: campaignDTO.name,
@@ -234,14 +263,15 @@ class CampaignService {
         startDate: campaignDTO.startDate,
         endDate: campaignDTO.endDate,
         createdBy: idUser,
-        status,
+        idStatus: status.id,
         idProgram,
       });
+
       await discountService.addDiscounts(
         campaign.id,
         idCompany,
         campaignDTO.discounts,
-        'MARKETING'
+        'marketing'
       );
       return campaign;
     } catch (e) {
@@ -252,10 +282,12 @@ class CampaignService {
   async updateCampaign(idCompany, campaignDTO) {
     try {
       const id = campaignDTO.id;
-      let status = 'CREATED';
+      let statusValue = 'bulk';
       if (campaignDTO.step === CAMPAIGN_STEP_SEND_TO_PENDING) {
-        status = 'PENDING';
+        statusValue = 'pending';
       }
+      const status = await campaignStatusService.getStatus(statusValue);
+
       await Campaign.update(
         {
           name: campaignDTO.name,
@@ -267,14 +299,15 @@ class CampaignService {
           budget: campaignDTO.budget,
           startDate: campaignDTO.startDate,
           endDate: campaignDTO.endDate,
-          status,
+          idStatus: status.id,
         },
         { where: { id } }
       );
+
       await discountService.updateDiscounts(
         idCompany,
         campaignDTO,
-        'MARKETING'
+        'marketing'
       );
     } catch (e) {
       throw new BadRequestError(e.message);
@@ -285,6 +318,8 @@ class CampaignService {
     const t = await sequelize.transaction();
 
     try {
+      const status = await campaignStatusService.getStatus('approved');
+
       await Campaign.update(
         {
           name: campaignDTO.name,
@@ -297,7 +332,7 @@ class CampaignService {
           startDate: campaignDTO.startDate,
           endDate: campaignDTO.endDate,
           approvedBy: idUser,
-          status: 'APPROVED',
+          idStatus: status.id,
         },
         { where: { id: campaignDTO.id }, transaction: t }
       );

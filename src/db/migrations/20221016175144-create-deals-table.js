@@ -38,6 +38,26 @@ module.exports = {
         onUpdate: 'CASCADE',
         allowNull: false,
       },
+      idOrigin: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'deal_origin',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        allowNull: false,
+      },
+      idStep: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'deal_step',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        allowNull: false,
+      },
       probability: {
         type: Sequelize.FLOAT,
         allowNull: false,
@@ -50,26 +70,8 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW,
       },
-      origin: {
-        type: Sequelize.ENUM(
-          'TICKET',
-          'CAMPAIGN',
-        ),
-        allowNull: false,
-      },
       description: {
         type: Sequelize.STRING,
-        allowNull: false,
-      },
-      step: {
-        type: Sequelize.ENUM(
-          'CLASIFICATION',
-          'QUOTATED',
-          'REJECTED',
-          'NEGOTIATIONS',
-          'WON',
-          'LOST',
-        ),
         allowNull: false,
       },
       realAmount: {

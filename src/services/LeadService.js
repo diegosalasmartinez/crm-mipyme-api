@@ -37,7 +37,7 @@ class LeadService {
           },
           {
             model: ClassificationMarketing,
-            as: 'marketingClassification',
+            as: 'classificationMarketing',
             attributes: ['key', 'name'],
           },
         ],
@@ -77,7 +77,7 @@ class LeadService {
           },
           {
             model: ClassificationMarketing,
-            as: 'marketingClassification',
+            as: 'classificationMarketing',
             attributes: ['key', 'name'],
           },
         ],
@@ -132,7 +132,6 @@ class LeadService {
         }
         whereClausses[s.field] = criteria;
       }
-      console.log('class', whereClausses);
 
       const leads = await Lead.findAll({
         attributes: ['id'],

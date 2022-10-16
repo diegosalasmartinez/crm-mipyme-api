@@ -1,4 +1,4 @@
-const { Program, Campaign, User } = require('../models/index');
+const { Program, Campaign, CampaignStatus, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class ProgramService {
@@ -9,12 +9,16 @@ class ProgramService {
           {
             model: Campaign,
             as: 'campaigns',
-            attributes: ['id', 'name', 'status', 'startDate', 'endDate'],
+            attributes: ['id', 'name', 'startDate', 'endDate'],
             include: [
               {
                 model: User,
                 as: 'creator',
                 attributes: ['name', 'lastName'],
+              },
+              {
+                model: CampaignStatus,
+                as: 'status',
               },
             ],
           },

@@ -4,6 +4,8 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Deal extends Model {
     static associate(models) {
+      this.belongsTo(models.DealOrigin, { foreignKey: 'idOrigin', as: 'origin' });
+      this.belongsTo(models.DealStep, { foreignKey: 'idStep', as: 'step' });
       this.belongsTo(models.Campaign, { foreignKey: 'idCampaign', as: 'campaign' });
       this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
       this.belongsTo(models.Contact, { foreignKey: 'idContact', as: 'contact' });
@@ -33,25 +35,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
-      origin: {
-        type: DataTypes.ENUM(
-          'TICKET',
-          'CAMPAIGN',
-        ),
-      },
       description: {
         type: DataTypes.STRING,
-        allowNull: false,
-      },
-      step: {
-        type: DataTypes.ENUM(
-          'CLASIFICATION',
-          'QUOTATED',
-          'REJECTED',
-          'NEGOTIATIONS',
-          'WON',
-          'LOST',
-        ),
         allowNull: false,
       },
       realAmount: {
@@ -70,7 +55,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       timestamps: true,
-      tableName: 'contacts',
+      tableName: 'deals',
     }
   );
   return Deal;

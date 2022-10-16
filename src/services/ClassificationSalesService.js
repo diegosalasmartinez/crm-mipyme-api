@@ -14,7 +14,7 @@ class ClassificationSalesService {
   async getClassification(key) {
     try {
       const classification = await ClassificationSales.findOne({
-        key,
+        where: { key },
       });
       return classification;
     } catch (e) {

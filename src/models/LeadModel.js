@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
       this.belongsTo(models.ClassificationMarketing, {
         foreignKey: 'idClassificationMarketing',
-        as: 'marketingClassification',
+        as: 'classificationMarketing',
       });
       this.belongsToMany(models.List, {
         foreignKey: 'idLead',

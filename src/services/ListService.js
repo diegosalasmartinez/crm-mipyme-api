@@ -68,7 +68,7 @@ class ListService {
             include: [
               {
                 model: ClassificationMarketing,
-                as: 'marketingClassification',
+                as: 'classificationMarketing',
               },
             ],
           },

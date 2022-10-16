@@ -7,23 +7,18 @@ module.exports = {
     await queryInterface.bulkInsert('classification_sales', [
       {
         id: uuidv4(),
-        key: 'started',
-        name: 'Sin procesar',
+        key: 'low',
+        name: 'Bajo',
       },
       {
         id: uuidv4(),
-        key: 'ready_marketing',
-        name: 'Listo para marketing',
+        key: 'medium',
+        name: 'Medio',
       },
       {
         id: uuidv4(),
-        key: 'marketing_engaged',
-        name: 'Marketing comprometido',
-      },
-      {
-        id: uuidv4(),
-        key: 'ready_sales',
-        name: 'Listo para venta',
+        key: 'high',
+        name: 'Alto',
       },
     ]);
   },
