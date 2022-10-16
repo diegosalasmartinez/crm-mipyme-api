@@ -35,7 +35,6 @@ class ListService {
   async getListByIdSimple(id) {
     try {
       const list = await List.findOne({
-        include: [],
         where: {
           id,
         },
@@ -98,6 +97,26 @@ class ListService {
       await t.commit();
     } catch (e) {
       await t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getListsByArrayId(ids) {
+    try {
+      const lists = await List.findAll({
+        include: [
+          {
+            model: Lead,
+            as: 'leads',
+            attributes: ['id'],
+          },
+        ],
+        where: {
+          id: ids,
+        },
+      });
+      return lists;
+    } catch (e) {
       throw new BadRequestError(e.message);
     }
   }

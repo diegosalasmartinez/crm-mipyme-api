@@ -188,7 +188,14 @@ class CampaignService {
           {
             model: Lead,
             as: 'leads',
-            attributes: ['name', 'lastName'],
+            attributes: [
+              'id',
+              'name',
+              'lastName',
+              'email',
+              'birthday',
+              'phone',
+            ],
           },
         ],
         where: {

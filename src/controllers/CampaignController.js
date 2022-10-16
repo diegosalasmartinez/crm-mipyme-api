@@ -1,6 +1,8 @@
 const { StatusCodes } = require('http-status-codes');
 const CampaignService = require('../services/CampaignService');
 const campaignService = new CampaignService();
+const ListService = require('../services/ListService');
+const listService = new ListService();
 
 const getCampaignsByCompany = async (req, res) => {
   const { status } = req.query;
@@ -17,9 +19,13 @@ const getCampaignsByCompany = async (req, res) => {
     obj = await campaignService.getCampaigns(idCompany, status);
   } else {
     if (status === 'CREATED') {
-    obj = await campaignService.getCampaignsByUser(idUser, idCompany, status);
+      obj = await campaignService.getCampaignsByUser(idUser, idCompany, status);
     } else if (status === 'APPROVED') {
-      obj = await campaignService.getAssignedCampaignsByUser(idUser, idCompany, status);
+      obj = await campaignService.getAssignedCampaignsByUser(
+        idUser,
+        idCompany,
+        status
+      );
     }
   }
   res.status(StatusCodes.OK).json({ data: obj.data, count: obj.count });
@@ -28,7 +34,8 @@ const getCampaignsByCompany = async (req, res) => {
 const getCampaignById = async (req, res) => {
   const { idCampaign } = req.params;
   const campaign = await campaignService.getCampaignById(idCampaign);
-  res.status(StatusCodes.OK).json(campaign);
+  const lists = await listService.getListsByArrayId(campaign.lists);
+  res.status(StatusCodes.OK).json({ campaign, lists });
 };
 
 const addCampaign = async (req, res) => {
