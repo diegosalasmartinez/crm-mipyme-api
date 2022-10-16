@@ -78,24 +78,28 @@ class ListService {
         name: listDTO.name,
         createdBy: idUser,
       });
-      if (listDTO.leadsId && listDTO.leadsId.length > 0) {
-        await this.addLeadsToList(list, listDTO.leadsId);
-      }
+      await this.addLeadsToList(list.id, listDTO.leadsId);
       return list;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
   }
 
-  async addLeadsToList(list, leadsId = []) {
+  async addLeadsToList(idList, leadsId = []) {
     const t = await sequelize.transaction();
     try {
+      const list = await List.findByPk(idList);
       for (const idLead of leadsId) {
-        await list.addLead(idLead, { transaction: t });
+        await list.addLead(
+          idLead,
+          { through: 'listsxleads' },
+          { transaction: t }
+        );
       }
 
       await t.commit();
     } catch (e) {
+      console.log(e);
       await t.rollback();
       throw new BadRequestError(e.message);
     }
