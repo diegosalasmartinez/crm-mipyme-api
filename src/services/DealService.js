@@ -1,4 +1,12 @@
-const { Deal, DealStep, User, Contact, Lead } = require('../models/index');
+const {
+  Deal,
+  DealStep,
+  User,
+  Contact,
+  Lead,
+  Activity,
+  ActivityType
+} = require('../models/index');
 const { BadRequestError } = require('../errors');
 const DealOriginService = require('./DealOriginService');
 const dealOriginService = new DealOriginService();
@@ -9,7 +17,7 @@ class DealService {
   async getDeals(idCompany) {
     try {
       const steps = await dealStepService.getAll();
-      const data = []
+      const data = [];
       for (const step of steps) {
         const deals = await Deal.findAll({
           required: true,
@@ -30,7 +38,7 @@ class DealService {
                   model: Lead,
                   as: 'lead',
                 },
-              ]
+              ],
             },
           ],
           where: {
@@ -39,7 +47,7 @@ class DealService {
           },
           order: [['createdAt', 'DESC']],
         });
-        data.push(deals)
+        data.push(deals);
       }
       return data;
     } catch (e) {
@@ -68,7 +76,17 @@ class DealService {
                 model: Lead,
                 as: 'lead',
               },
-            ]
+            ],
+          },
+          {
+            model: Activity,
+            as: 'activities',
+            include: [
+              {
+                model: ActivityType,
+                as: 'type',
+              },
+            ],
           },
           {
             model: DealStep,

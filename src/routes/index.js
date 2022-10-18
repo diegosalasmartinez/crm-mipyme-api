@@ -18,6 +18,7 @@ const planRoutes = require('./PlanRoutes');
 const programRoutes = require('./ProgramRoutes');
 const campaignRoutes = require('./CampaignRoutes');
 const dealRoutes = require('./DealRoutes');
+const activityRoutes = require('./ActivityRoutes');
 authenticatedRoutes.use(baseUrl + 'account', accountRoutes);
 authenticatedRoutes.use(baseUrl + 'companies', companyRoutes);
 authenticatedRoutes.use(baseUrl + 'products', productRoutes);
@@ -29,6 +30,7 @@ authenticatedRoutes.use(baseUrl + 'plans', planRoutes);
 authenticatedRoutes.use(baseUrl + 'programs', programRoutes);
 authenticatedRoutes.use(baseUrl + 'campaigns', campaignRoutes);
 authenticatedRoutes.use(baseUrl + 'deals', dealRoutes);
+authenticatedRoutes.use(baseUrl + 'activities', activityRoutes);
 
 module.exports = {
   basicRoutes,
