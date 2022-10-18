@@ -11,6 +11,15 @@ class DealStepService {
     }
   }
 
+  async getAll() {
+    try {
+      const steps = await DealStep.findAll();
+      return steps;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async get(key) {
     try {
       const step = await DealStep.findOne({
