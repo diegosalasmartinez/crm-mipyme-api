@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   class Activity extends Model {
     static associate(models) {
       this.belongsTo(models.Deal, { foreignKey: 'idDeal', as: 'deal' });
-      this.belongsTo(models.DealType, { foreignKey: 'idType', as: 'type' });
+      this.belongsTo(models.ActivityType, { foreignKey: 'idType', as: 'type' });
     }
   }
   Activity.init(

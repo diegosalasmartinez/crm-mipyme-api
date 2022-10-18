@@ -7,18 +7,18 @@ module.exports = {
     await queryInterface.bulkInsert('activity_type', [
       {
         id: uuidv4(),
-        key: 'low',
-        name: 'Bajo',
+        key: 'meet',
+        name: 'Reunion',
       },
       {
         id: uuidv4(),
-        key: 'medium',
-        name: 'Medio',
+        key: 'task',
+        name: 'Tarea',
       },
       {
         id: uuidv4(),
-        key: 'high',
-        name: 'Alto',
+        key: 'call',
+        name: 'Llamada',
       },
     ]);
   },

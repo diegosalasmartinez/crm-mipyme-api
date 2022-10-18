@@ -10,6 +10,14 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
       this.belongsTo(models.User, { foreignKey: 'assignedTo', as: 'assigned' });
       this.belongsTo(models.Contact, { foreignKey: 'idContact', as: 'contact' });
+      this.hasMany(
+        models.Activity,
+        { foreignKey: 'idDeal', as: 'activities' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
     }
   }
   Deal.init(
