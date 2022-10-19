@@ -70,16 +70,16 @@ class TicketService {
               },
             ],
           },
-          {
-            model: Activity,
-            as: 'activities',
-            include: [
-              {
-                model: ActivityType,
-                as: 'type',
-              },
-            ],
-          },
+          // {
+          //   model: Activity,
+          //   as: 'activities',
+          //   include: [
+          //     {
+          //       model: ActivityType,
+          //       as: 'type',
+          //     },
+          //   ],
+          // },
           {
             model: TicketType,
             as: 'type',
