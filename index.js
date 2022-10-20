@@ -2,11 +2,7 @@ require('dotenv').config();
 require('express-async-errors');
 
 // Middlewares
-const {
-  authenticationMiddleware,
-  errorHandlerMiddleware,
-  notFoundMiddleware,
-} = require('./src/middlewares');
+const { authenticationMiddleware, errorHandlerMiddleware, notFoundMiddleware } = require('./src/middlewares');
 
 // Routes
 const { basicRoutes, authenticatedRoutes } = require('./src/routes');

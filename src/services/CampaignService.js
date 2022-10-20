@@ -215,14 +215,7 @@ class CampaignService {
           {
             model: Lead,
             as: 'leads',
-            attributes: [
-              'id',
-              'name',
-              'lastName',
-              'email',
-              'birthday',
-              'phone',
-            ],
+            attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone'],
             include: [
               {
                 model: ClassificationMarketing,
@@ -253,7 +246,7 @@ class CampaignService {
         statusValue = 'pending';
       }
       const status = await campaignStatusService.get(statusValue);
-      
+
       const campaign = await Campaign.create({
         name: campaignDTO.name,
         lists: campaignDTO.lists ?? [],
@@ -269,12 +262,7 @@ class CampaignService {
         idProgram,
       });
 
-      await discountService.addDiscounts(
-        campaign.id,
-        idCompany,
-        campaignDTO.discounts,
-        'marketing'
-      );
+      await discountService.addDiscounts(campaign.id, idCompany, campaignDTO.discounts, 'marketing');
       return campaign;
     } catch (e) {
       throw new BadRequestError(e.message);
@@ -306,11 +294,7 @@ class CampaignService {
         { where: { id } }
       );
 
-      await discountService.updateDiscounts(
-        idCompany,
-        campaignDTO,
-        'marketing'
-      );
+      await discountService.updateDiscounts(idCompany, campaignDTO, 'marketing');
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -353,11 +337,7 @@ class CampaignService {
   async addUsersToCampaign(campaign, assigned = [], t) {
     try {
       for (const idUser of assigned) {
-        await campaign.addAssigned(
-          idUser,
-          { through: 'usersxcampaigns' },
-          { transaction: t }
-        );
+        await campaign.addAssigned(idUser, { through: 'usersxcampaigns' }, { transaction: t });
       }
     } catch (e) {
       throw new BadRequestError(e.message);
@@ -366,17 +346,9 @@ class CampaignService {
 
   async executeSegments(idCompany, campaign, t) {
     try {
-      const leads = await leadService.executeSegments(
-        idCompany,
-        campaign.segments,
-        campaign.lists
-      );
+      const leads = await leadService.executeSegments(idCompany, campaign.segments, campaign.lists);
       for (const idLead of leads) {
-        await campaign.addLead(
-          idLead,
-          { through: 'leadsxcampaigns' },
-          { transaction: t }
-        );
+        await campaign.addLead(idLead, { through: 'leadsxcampaigns' }, { transaction: t });
       }
     } catch (e) {
       throw new BadRequestError(e.message);
@@ -385,10 +357,7 @@ class CampaignService {
 
   async increaseConvertNumber(idCampaign, t) {
     try {
-      await Campaign.increment(
-        { numConversions: 1 },
-        { where: { id: idCampaign }, transaction: t }
-      );
+      await Campaign.increment({ numConversions: 1 }, { where: { id: idCampaign }, transaction: t });
     } catch (e) {
       throw new BadRequestError(e.message);
     }

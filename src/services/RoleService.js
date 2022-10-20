@@ -4,8 +4,7 @@ const { BadRequestError } = require('../errors');
 class RoleService {
   async getRoles() {
     try {
-      const roles = await Role.findAll({
-      });
+      const roles = await Role.findAll({});
       return roles;
     } catch (e) {
       throw new BadRequestError(e.message);

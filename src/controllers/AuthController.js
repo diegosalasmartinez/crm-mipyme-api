@@ -1,19 +1,19 @@
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError } = require('../errors');
 const AuthService = require('../services/AuthService');
-const authService = new AuthService()
+const authService = new AuthService();
 
 const login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     throw new BadRequestError('Por favor, ingrese el correo y contraseña');
   }
-  
-  const { user, token } = await authService.login(email, password)
+
+  const { user, token } = await authService.login(email, password);
   const response = {
     id: user.id,
     fullName: user.getFullName(),
-    roles: user.roles
+    roles: user.roles,
   };
   res.status(StatusCodes.OK).json({ user: response, token });
 };

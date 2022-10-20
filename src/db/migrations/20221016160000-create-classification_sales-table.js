@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     return queryInterface.createTable('classification_sales', {
       id: {
         type: Sequelize.UUID,
@@ -19,7 +19,7 @@ module.exports = {
     });
   },
   // eslint-disable-next-line no-unused-vars
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('classification_sales');
-  }
+  },
 };

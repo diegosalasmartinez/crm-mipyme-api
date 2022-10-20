@@ -1,9 +1,5 @@
 const express = require('express');
-const {
-  getTickets,
-  getTicketDetail,
-  addTicket,
-} = require('../controllers/TicketController');
+const { getTickets, getTicketDetail, addTicket } = require('../controllers/TicketController');
 
 const router = express.Router();
 

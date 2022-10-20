@@ -4,7 +4,7 @@ const {
   getCampaignById,
   addCampaign,
   updateCampaign,
-  approveCampaign
+  approveCampaign,
 } = require('../controllers/CampaignController');
 
 const router = express.Router();

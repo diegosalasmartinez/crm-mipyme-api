@@ -1,10 +1,5 @@
 const express = require('express');
-const {
-  getLists,
-  getListDetail,
-  addList,
-  addLeadsToList,
-} = require('../controllers/ListController');
+const { getLists, getListDetail, addList, addLeadsToList } = require('../controllers/ListController');
 
 const router = express.Router();
 

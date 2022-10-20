@@ -114,14 +114,7 @@ class ContactService {
     }
   }
 
-  async convertLeadThroughCampaign(
-    idUser,
-    idLead,
-    assignedTo,
-    idCampaign,
-    registerDeal,
-    deal
-  ) {
+  async convertLeadThroughCampaign(idUser, idLead, assignedTo, idCampaign, registerDeal, deal) {
     const t = await sequelize.transaction();
     try {
       let contact = await this.getContactByLead(idLead);
@@ -138,13 +131,7 @@ class ContactService {
       }
 
       if (registerDeal) {
-        await dealService.addDealThroughCampaign(
-          idUser,
-          contact.id,
-          deal,
-          idCampaign,
-          t
-        );
+        await dealService.addDealThroughCampaign(idUser, contact.id, deal, idCampaign, t);
       }
       await leadService.convertLead(idLead, t);
       await campaignService.increaseConvertNumber(idCampaign, t);

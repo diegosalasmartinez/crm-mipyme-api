@@ -1,10 +1,5 @@
 const { sequelize } = require('../models/index');
-const {
-  List,
-  Lead,
-  User,
-  ClassificationMarketing,
-} = require('../models/index');
+const { List, Lead, User, ClassificationMarketing } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class ListService {
@@ -57,14 +52,7 @@ class ListService {
           {
             model: Lead,
             as: 'leads',
-            attributes: [
-              'id',
-              'name',
-              'lastName',
-              'email',
-              'birthday',
-              'phone',
-            ],
+            attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone'],
             include: [
               {
                 model: ClassificationMarketing,
@@ -101,11 +89,7 @@ class ListService {
     try {
       const list = await List.findByPk(idList);
       for (const idLead of leadsId) {
-        await list.addLead(
-          idLead,
-          { through: 'listsxleads' },
-          { transaction: t }
-        );
+        await list.addLead(idLead, { through: 'listsxleads' }, { transaction: t });
       }
 
       await t.commit();

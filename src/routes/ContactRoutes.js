@@ -1,9 +1,9 @@
-const express = require("express")
-const { getContacts, convertLead } = require("../controllers/ContactController")
+const express = require('express');
+const { getContacts, convertLead } = require('../controllers/ContactController');
 
-const router = express.Router()
+const router = express.Router();
 
-router.get("/", getContacts)
-router.post("/convert", convertLead)
+router.get('/', getContacts);
+router.post('/convert', convertLead);
 
-module.exports = router
+module.exports = router;

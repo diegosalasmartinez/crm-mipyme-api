@@ -1,12 +1,4 @@
-const {
-  Ticket,
-  TicketType,
-  User,
-  Contact,
-  Lead,
-  Activity,
-  ActivityType,
-} = require('../models/index');
+const { Ticket, TicketType, User, Contact, Lead, Activity, ActivityType } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const TicketTypeService = require('./TicketTypeService');
 const ticketTypeService = new TicketTypeService();

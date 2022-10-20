@@ -7,9 +7,7 @@ const listService = new ListService();
 const getCampaignsByCompany = async (req, res) => {
   const { status } = req.query;
   const { id: idUser, idCompany, roles } = req.user;
-  const isAdmin =
-    roles.filter((r) => r.key === 'admin' || r.key === 'admin_marketing')
-      .length > 0;
+  const isAdmin = roles.filter((r) => r.key === 'admin' || r.key === 'admin_marketing').length > 0;
 
   let obj = {
     data: [],
@@ -21,11 +19,7 @@ const getCampaignsByCompany = async (req, res) => {
     if (status === 'bulk') {
       obj = await campaignService.getCampaignsByUser(idUser, idCompany, status);
     } else if (status === 'approved') {
-      obj = await campaignService.getAssignedCampaignsByUser(
-        idUser,
-        idCompany,
-        status
-      );
+      obj = await campaignService.getAssignedCampaignsByUser(idUser, idCompany, status);
     }
   }
   res.status(StatusCodes.OK).json({ data: obj.data, count: obj.count });
@@ -42,12 +36,7 @@ const addCampaign = async (req, res) => {
   const { id: idUser, idCompany } = req.user;
   const { idProgram, campaign } = req.body;
 
-  const campaignCreated = await campaignService.addCampaign(
-    idUser,
-    idCompany,
-    idProgram,
-    campaign
-  );
+  const campaignCreated = await campaignService.addCampaign(idUser, idCompany, idProgram, campaign);
   res.status(StatusCodes.OK).json(campaignCreated);
 };
 

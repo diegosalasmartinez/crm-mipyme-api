@@ -1,10 +1,5 @@
 const express = require('express');
-const {
-  getLeads,
-  getLeadById,
-  addLead,
-  seed_addLeads,
-} = require('../controllers/LeadController');
+const { getLeads, getLeadById, addLead, seed_addLeads } = require('../controllers/LeadController');
 
 const router = express.Router();
 

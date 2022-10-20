@@ -14,10 +14,7 @@ class DiscountService {
         const startDate = row.startDate;
         const endDate = row.endDate;
 
-        const product = await productService.getProductBySku(
-          idCompany,
-          row.code
-        );
+        const product = await productService.getProductBySku(idCompany, row.code);
         if (product) {
           await Discount.create({
             idCampaign,

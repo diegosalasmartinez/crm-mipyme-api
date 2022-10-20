@@ -1,8 +1,8 @@
-const express = require("express")
-const { getCompanyByAdmin } = require("../controllers/CompanyController")
+const express = require('express');
+const { getCompanyByAdmin } = require('../controllers/CompanyController');
 
-const router = express.Router()
+const router = express.Router();
 
-router.get("/", getCompanyByAdmin)
+router.get('/', getCompanyByAdmin);
 
-module.exports = router
+module.exports = router;

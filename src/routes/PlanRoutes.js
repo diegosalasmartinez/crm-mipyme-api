@@ -1,8 +1,5 @@
 const express = require('express');
-const {
-  getPlan,
-  addPlan,
-} = require('../controllers/PlanController');
+const { getPlan, addPlan } = require('../controllers/PlanController');
 
 const router = express.Router();
 

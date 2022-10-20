@@ -1,13 +1,4 @@
-const {
-  Deal,
-  DealStep,
-  DealPriority,
-  User,
-  Contact,
-  Lead,
-  Activity,
-  ActivityType
-} = require('../models/index');
+const { Deal, DealStep, DealPriority, User, Contact, Lead, Activity, ActivityType } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const DealOriginService = require('./DealOriginService');
 const dealOriginService = new DealOriginService();
@@ -46,7 +37,7 @@ class DealService {
             {
               model: DealPriority,
               as: 'priority',
-            }
+            },
           ],
           where: {
             idStep: step.id,
@@ -104,7 +95,41 @@ class DealService {
           id,
           active: true,
         },
-        order: [['createdAt', 'DESC']],
+      });
+      return deal;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getDealByIdSimple(id) {
+    try {
+      const deal = await Deal.findOne({
+        required: true,
+        attributes: ['id', 'name'],
+        include: [
+          {
+            model: Contact,
+            as: 'contact',
+            attributes: ['id'],
+            include: [
+              {
+                model: Lead,
+                attributes: ['id', 'name', 'lastName'],
+                as: 'lead',
+              },
+              {
+                model: User,
+                as: 'assigned',
+                attributes: ['id', 'name', 'lastName'],
+              },
+            ],
+          },
+        ],
+        where: {
+          id,
+          active: true,
+        },
       });
       return deal;
     } catch (e) {

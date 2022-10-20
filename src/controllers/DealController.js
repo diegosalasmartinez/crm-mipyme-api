@@ -3,7 +3,7 @@ const DealService = require('../services/DealService');
 const dealService = new DealService();
 
 const getDeals = async (req, res) => {
-  const { id: idUser, idCompany } = req.user;
+  const { idCompany } = req.user;
   const data = await dealService.getDeals(idCompany);
   res.status(StatusCodes.OK).json(data);
 };
@@ -14,7 +14,14 @@ const getDealDetail = async (req, res) => {
   res.status(StatusCodes.OK).json(deal);
 };
 
+const getDealBasicInfo = async (req, res) => {
+  const { idDeal } = req.params;
+  const deal = await dealService.getDealByIdSimple(idDeal);
+  res.status(StatusCodes.OK).json(deal);
+};
+
 module.exports = {
   getDeals,
   getDealDetail,
+  getDealBasicInfo,
 };

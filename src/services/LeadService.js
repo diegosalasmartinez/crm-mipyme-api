@@ -1,11 +1,6 @@
 const { Op } = require('sequelize');
 const { faker } = require('@faker-js/faker');
-const {
-  Lead,
-  User,
-  List,
-  ClassificationMarketing,
-} = require('../models/index');
+const { Lead, User, List, ClassificationMarketing } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');
 const classificationService = new ClassificationMarketingService();
@@ -16,17 +11,7 @@ class LeadService {
       const { rows: data = [], count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
-        attributes: [
-          'id',
-          'name',
-          'lastName',
-          'email',
-          'birthday',
-          'phone',
-          'birthday',
-          'companyName',
-          'createdAt',
-        ],
+        attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone', 'birthday', 'companyName', 'createdAt'],
         required: true,
         include: [
           {
@@ -163,10 +148,8 @@ class LeadService {
 
   async convertLead(idLead, t) {
     try {
-      const classification = await classificationService.get(
-        'marketing_engaged'
-      );
-      
+      const classification = await classificationService.get('marketing_engaged');
+
       await Lead.update(
         {
           idClassificationMarketing: classification.id,

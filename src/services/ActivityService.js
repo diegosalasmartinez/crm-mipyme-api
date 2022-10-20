@@ -7,7 +7,7 @@ class ActivityService {
   async getActivities(idDeal) {
     try {
       const types = await activityTypeService.getAll();
-      const data = []
+      const data = [];
       for (const step of types) {
         const activities = await Activity.findAll({
           required: true,
@@ -27,7 +27,7 @@ class ActivityService {
           },
           order: [['createdAt', 'DESC']],
         });
-        data.push(activities)
+        data.push(activities);
       }
       return data;
     } catch (e) {
@@ -53,17 +53,15 @@ class ActivityService {
 
   async addActivity(idDeal, activityDTO) {
     try {
-      const type = await activityTypeService.get(activityDTO.type) 
-      await Activity.create(
-        {
-          name: activityDTO.name,
-          startDate: activityDTO.startDate,
-          endDate: activityDTO.endDate,
-          notes: activityDTO.notes,
-          idType: type.id,
-          idDeal,
-        }
-      );
+      const type = await activityTypeService.get(activityDTO.type);
+      await Activity.create({
+        name: activityDTO.name,
+        startDate: activityDTO.startDate,
+        endDate: activityDTO.endDate,
+        notes: activityDTO.notes,
+        idType: type.id,
+        idDeal,
+      });
     } catch (e) {
       throw new BadRequestError(e.message);
     }

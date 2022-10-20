@@ -5,7 +5,7 @@
     "sourceType": "module"
   },
   "extends": ["eslint:recommended", "prettier"],
-  "env": { 
+  "env": {
     "es2021": true,
     "node": true
   },

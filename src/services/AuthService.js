@@ -16,13 +16,9 @@ class AuthService {
     if (!passwordMatches) {
       throw new BadRequestError('Credenciales inválidas');
     }
-    const token = jwt.sign(
-      { idUser: user.id, idCompany: user.idCompany, roles: user.roles },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_LIFETIME,
-      }
-    )
+    const token = jwt.sign({ idUser: user.id, idCompany: user.idCompany, roles: user.roles }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_LIFETIME,
+    });
     return { user, token };
   }
 

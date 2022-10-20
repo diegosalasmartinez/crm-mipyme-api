@@ -16,14 +16,13 @@ const getTicketDetail = async (req, res) => {
 
 const addTicket = async (req, res) => {
   const { id: idUser } = req.user;
-  const ticket = req.body
+  const ticket = req.body;
   const ticketCreated = await ticketService.addTicket(idUser, ticket);
   res.status(StatusCodes.OK).json(ticketCreated);
 };
 
-
 module.exports = {
   getTickets,
   getTicketDetail,
-  addTicket
+  addTicket,
 };
