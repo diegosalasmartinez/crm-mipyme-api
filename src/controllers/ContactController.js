@@ -23,10 +23,10 @@ const getContacts = async (req, res) => {
 };
 
 const convertLead = async (req, res) => {
-  const { lead, registerDeal, deal } = req.body;
-  await contactService.convertLead(lead, registerDeal, deal);
+  const { contact, registerDeal, deal } = req.body;
+  await contactService.convertLead(contact, registerDeal, deal);
   res.status(StatusCodes.OK).json({
-    message: `El cliente potencial ${lead.name} ${lead.lastName} ha sido convertido a`,
+    message: `El cliente potencial ${contact.lead.name} ${contact.lead.lastName} ha sido convertido a`,
   });
 };
 
