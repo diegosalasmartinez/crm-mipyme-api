@@ -18,16 +18,6 @@ module.exports = {
         onUpdate: 'CASCADE',
         allowNull: true,
       },
-      assignedTo: {
-        type: Sequelize.UUID,
-        references: {
-          model: 'users',
-          key: 'id',
-        },
-        onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
-        allowNull: false,
-      },
       idContact: {
         type: Sequelize.UUID,
         references: {
@@ -62,6 +52,16 @@ module.exports = {
         type: Sequelize.UUID,
         references: {
           model: 'deal_step',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        allowNull: false,
+      },
+      idPriority: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'deal_priority',
           key: 'id',
         },
         onDelete: 'SET NULL',

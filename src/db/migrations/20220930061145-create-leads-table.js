@@ -26,16 +26,13 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
       points: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
-      birthday: Sequelize.DATE,
+      email: Sequelize.STRING,
       phone: Sequelize.STRING,
+      birthday: Sequelize.DATE,
       sex: Sequelize.STRING,
       position: Sequelize.STRING,
       companyName: Sequelize.STRING,

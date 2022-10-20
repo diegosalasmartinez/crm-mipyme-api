@@ -48,6 +48,16 @@ module.exports = {
         onUpdate: 'CASCADE',
         allowNull: false,
       },
+      idPriority: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'ticket_priority',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        allowNull: false,
+      },
       name: {
         type: Sequelize.STRING,
         allowNull: false,

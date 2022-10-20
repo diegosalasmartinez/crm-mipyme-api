@@ -77,7 +77,7 @@ module.exports = {
         defaultValue: 0,
       },
       html: {
-        type: Sequelize.STRING,
+        type: Sequelize.JSONB,
         allowNull: false,
       },
       goal: Sequelize.STRING,
