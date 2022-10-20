@@ -13,7 +13,7 @@ class ClassificationMarketingService {
     }
   }
 
-  async getClassification(key) {
+  async get(key) {
     try {
       const classification = await ClassificationMarketing.findOne({
         where: { key },

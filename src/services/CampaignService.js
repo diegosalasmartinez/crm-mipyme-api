@@ -252,14 +252,14 @@ class CampaignService {
       if (campaignDTO.step === CAMPAIGN_STEP_SEND_TO_PENDING) {
         statusValue = 'pending';
       }
-      const status = await campaignStatusService.getStatus(statusValue);
-
+      const status = await campaignStatusService.get(statusValue);
+      
       const campaign = await Campaign.create({
         name: campaignDTO.name,
         lists: campaignDTO.lists ?? [],
         segments: campaignDTO.segments ?? [],
         step: campaignDTO.step ?? 0,
-        html: campaignDTO.html ?? '',
+        html: campaignDTO.html ?? {},
         goal: campaignDTO.goal,
         budget: campaignDTO.budget,
         startDate: campaignDTO.startDate,
@@ -288,7 +288,7 @@ class CampaignService {
       if (campaignDTO.step === CAMPAIGN_STEP_SEND_TO_PENDING) {
         statusValue = 'pending';
       }
-      const status = await campaignStatusService.getStatus(statusValue);
+      const status = await campaignStatusService.get(statusValue);
 
       await Campaign.update(
         {
@@ -296,7 +296,7 @@ class CampaignService {
           lists: campaignDTO.lists ?? [],
           segments: campaignDTO.segments ?? [],
           step: campaignDTO.step ?? 0,
-          html: campaignDTO.html ?? '',
+          html: campaignDTO.html ?? {},
           goal: campaignDTO.goal,
           budget: campaignDTO.budget,
           startDate: campaignDTO.startDate,
@@ -320,7 +320,7 @@ class CampaignService {
     const t = await sequelize.transaction();
 
     try {
-      const status = await campaignStatusService.getStatus('approved');
+      const status = await campaignStatusService.get('approved');
 
       await Campaign.update(
         {
@@ -328,7 +328,7 @@ class CampaignService {
           lists: campaignDTO.lists ?? [],
           segments: campaignDTO.segments ?? [],
           step: campaignDTO.step ?? 0,
-          html: campaignDTO.html ?? '',
+          html: campaignDTO.html ?? {},
           goal: campaignDTO.goal,
           budget: campaignDTO.budget,
           startDate: campaignDTO.startDate,
@@ -385,7 +385,6 @@ class CampaignService {
 
   async increaseConvertNumber(idCampaign, t) {
     try {
-      console.log(idCampaign)
       await Campaign.increment(
         { numConversions: 1 },
         { where: { id: idCampaign }, transaction: t }

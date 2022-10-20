@@ -11,7 +11,7 @@ class ClassificationSalesService {
     }
   }
 
-  async getClassification(key) {
+  async get(key) {
     try {
       const classification = await ClassificationSales.findOne({
         where: { key },

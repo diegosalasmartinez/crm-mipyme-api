@@ -11,7 +11,7 @@ class CampaignStatusService {
     }
   }
 
-  async getStatus(key) {
+  async get(key) {
     try {
       const status = await CampaignStatus.findOne({
         where: { key },
