@@ -50,8 +50,8 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
       },
       html: {
-        type: DataTypes.STRING,
-        defaultValue: '',
+        type: DataTypes.JSONB,
+        allowNull: false,
       },
       startDate: {
         type: DataTypes.DATE,

@@ -23,6 +23,14 @@ module.exports = (sequelize, DataTypes) => {
           onUpdate: 'CASCADE',
         }
       );
+      this.hasMany(
+        models.Contact,
+        { foreignKey: 'assignedTo' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
       this.belongsToMany(models.Campaign, {
         foreignKey: 'idUser',
         as: 'campaigns',

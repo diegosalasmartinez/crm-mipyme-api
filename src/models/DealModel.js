@@ -6,9 +6,9 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.DealOrigin, { foreignKey: 'idOrigin', as: 'origin' });
       this.belongsTo(models.DealStep, { foreignKey: 'idStep', as: 'step' });
+      this.belongsTo(models.DealPriority, { foreignKey: 'idPriority', as: 'priority' });
       this.belongsTo(models.Campaign, { foreignKey: 'idCampaign', as: 'campaign' });
       this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
-      this.belongsTo(models.User, { foreignKey: 'assignedTo', as: 'assigned' });
       this.belongsTo(models.Contact, { foreignKey: 'idContact', as: 'contact' });
       this.hasMany(
         models.Activity,
