@@ -8,7 +8,7 @@ const productService = new ProductService();
 class DiscountService {
   async addDiscounts(idCampaign, idCompany, data, typeKey) {
     try {
-      const type = await discountTypeService.get(typeKey)
+      const type = await discountTypeService.get(typeKey);
 
       for (const row of data) {
         const startDate = row.startDate;
@@ -18,14 +18,16 @@ class DiscountService {
           idCompany,
           row.code
         );
-        await Discount.create({
-          idCampaign,
-          idProduct: product.id,
-          idType: type.id,
-          discount: row.discount,
-          startDate: startDate,
-          endDate: endDate,
-        });
+        if (product) {
+          await Discount.create({
+            idCampaign,
+            idProduct: product.id,
+            idType: type.id,
+            discount: row.discount,
+            startDate: startDate,
+            endDate: endDate,
+          });
+        }
       }
     } catch (e) {
       throw new BadRequestError(e.message);
@@ -38,8 +40,7 @@ class DiscountService {
       const discounts = campaign.discounts;
 
       await Discount.destroy({ where: { idCampaign } });
-      await this.addDiscounts(idCampaign, idCompany, discounts, typeKey)
-
+      await this.addDiscounts(idCampaign, idCompany, discounts, typeKey);
     } catch (e) {
       throw new BadRequestError(e.message);
     }

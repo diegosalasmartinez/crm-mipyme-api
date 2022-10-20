@@ -12,6 +12,8 @@ const DealOriginService = require('./DealOriginService');
 const dealOriginService = new DealOriginService();
 const DealStepService = require('./DealStepService');
 const dealStepService = new DealStepService();
+const DealPriorityService = require('./DealPriorityService');
+const dealPriorityService = new DealPriorityService();
 
 class DealService {
   async getDeals(idCompany) {
@@ -23,20 +25,20 @@ class DealService {
           required: true,
           include: [
             {
-              model: User,
-              as: 'creator',
-              required: true,
-              where: {
-                idCompany,
-              },
-            },
-            {
               model: Contact,
               as: 'contact',
               include: [
                 {
                   model: Lead,
                   as: 'lead',
+                },
+                {
+                  model: User,
+                  as: 'assigned',
+                  required: true,
+                  where: {
+                    idCompany,
+                  },
                 },
               ],
             },
@@ -65,16 +67,16 @@ class DealService {
             as: 'creator',
           },
           {
-            model: User,
-            as: 'assigned',
-          },
-          {
             model: Contact,
             as: 'contact',
             include: [
               {
                 model: Lead,
                 as: 'lead',
+              },
+              {
+                model: User,
+                as: 'assigned',
               },
             ],
           },
@@ -123,12 +125,14 @@ class DealService {
     try {
       const origin = await dealOriginService.get('campaign');
       const step = await dealStepService.getDefault();
+      const priority = await dealPriorityService.getDefault();
 
       await Deal.create(
         {
           ...dealDTO,
           idOrigin: origin.id,
           idStep: step.id,
+          idPriority: priority.id,
           idContact,
           idCampaign,
           createdBy: idUser,

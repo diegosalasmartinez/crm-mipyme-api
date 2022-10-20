@@ -17,29 +17,29 @@ const getContacts = async (req, res) => {
   if (isAdmin) {
     obj = await contactService.getContacts(idCompany, page, rowsPerPage);
   } else {
-    obj = await contactService.getContactsByPortfolio(idUser, idCompany, page, rowsPerPage);
+    obj = await contactService.getContactsByPortfolio(
+      idUser,
+      idCompany,
+      page,
+      rowsPerPage
+    );
   }
   res.status(StatusCodes.OK).json({ data: obj.data, count: obj.count });
 };
 
 const convertLead = async (req, res) => {
-  const { contact, registerDeal, deal } = req.body;
-  await contactService.convertLead(contact, registerDeal, deal);
-  res.status(StatusCodes.OK).json({
-    message: `El cliente potencial ${contact.lead.name} ${contact.lead.lastName} ha sido convertido a`,
-  });
-};
-
-const convertLeadThroughCampaign = async (req, res) => {
   const { id: idUser } = req.user;
-  const { idCampaign, lead, registerDeal, deal } = req.body;
-  await contactService.convertLeadThroughCampaign(
-    idUser,
-    lead.id,
-    idCampaign,
-    registerDeal,
-    deal
-  );
+  const { idCampaign, lead, assignedTo, registerDeal, deal } = req.body;
+  if (idCampaign) {
+    await contactService.convertLeadThroughCampaign(
+      idUser,
+      lead.id,
+      assignedTo,
+      idCampaign,
+      registerDeal,
+      deal
+    );
+  }
   res.status(StatusCodes.OK).json({
     message: `El cliente potencial ${lead.name} ${lead.lastName} ha sido convertido a contacto`,
   });
@@ -48,5 +48,4 @@ const convertLeadThroughCampaign = async (req, res) => {
 module.exports = {
   getContacts,
   convertLead,
-  convertLeadThroughCampaign,
 };

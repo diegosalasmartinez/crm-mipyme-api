@@ -101,7 +101,7 @@ class ContactService {
     try {
       await Contact.create({
         idLead: contact.lead.id,
-        assignedTo: contact.assignedTo
+        assignedTo: contact.assignedTo,
       });
       if (registerDeal) {
         await dealService.addDeal(contact.lead.id, deal, t);
@@ -117,19 +117,24 @@ class ContactService {
   async convertLeadThroughCampaign(
     idUser,
     idLead,
+    assignedTo,
     idCampaign,
     registerDeal,
     deal
   ) {
     const t = await sequelize.transaction();
     try {
-      let contact = await this.getContactByLead(idLead)
+      let contact = await this.getContactByLead(idLead);
       if (!contact) {
         const classification = await classificationSalesService.getDefault();
-        await Contact.create({
-          idLead,
-          idClassificationSales: classification.id,
-        });
+        contact = await Contact.create(
+          {
+            idLead,
+            assignedTo,
+            idClassificationSales: classification.id,
+          },
+          { transaction: t }
+        );
       }
 
       if (registerDeal) {
