@@ -1,6 +1,7 @@
 const {
   Deal,
   DealStep,
+  DealPriority,
   User,
   Contact,
   Lead,
@@ -42,6 +43,10 @@ class DealService {
                 },
               ],
             },
+            {
+              model: DealPriority,
+              as: 'priority',
+            }
           ],
           where: {
             idStep: step.id,
