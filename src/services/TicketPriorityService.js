@@ -1,10 +1,10 @@
-const { DiscountType } = require('../models/index');
+const { TicketPriority } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
-class DiscountTypeService {
+class TicketPriorityService {
   async getDefault() {
     try {
-      const types = await DiscountType.findAll();
+      const types = await TicketPriority.findAll();
       return types[0];
     } catch (e) {
       throw new BadRequestError(e.message);
@@ -13,7 +13,7 @@ class DiscountTypeService {
 
   async get(key) {
     try {
-      const type = await DiscountType.findOne({
+      const type = await TicketPriority.findOne({
         where: { key },
       });
       return type;
@@ -23,4 +23,4 @@ class DiscountTypeService {
   }
 }
 
-module.exports = DiscountTypeService;
+module.exports = TicketPriorityService;

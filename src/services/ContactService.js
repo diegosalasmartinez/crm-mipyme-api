@@ -96,16 +96,17 @@ class ContactService {
     }
   }
 
-  async convertLead(lead, registerDeal, deal) {
+  async convertLead(contact, registerDeal, deal) {
     const t = await sequelize.transaction();
     try {
       await Contact.create({
-        idLead: lead.id,
+        idLead: contact.lead.id,
+        assignedTo: contact.assignedTo
       });
       if (registerDeal) {
-        await dealService.addDeal(lead.id, deal, t);
+        await dealService.addDeal(contact.lead.id, deal, t);
       }
-      await leadService.convertLead(lead.id, t);
+      await leadService.convertLead(contact.lead.id, t);
       await t.commit();
     } catch (e) {
       await t.rollback();

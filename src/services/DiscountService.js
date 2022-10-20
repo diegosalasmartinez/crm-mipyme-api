@@ -8,7 +8,7 @@ const productService = new ProductService();
 class DiscountService {
   async addDiscounts(idCampaign, idCompany, data, typeKey) {
     try {
-      const type = await discountTypeService.getType(typeKey)
+      const type = await discountTypeService.get(typeKey)
 
       for (const row of data) {
         const startDate = row.startDate;

@@ -163,7 +163,7 @@ class LeadService {
 
   async convertLead(idLead, t) {
     try {
-      const classification = await classificationService.getClassification(
+      const classification = await classificationService.get(
         'marketing_engaged'
       );
       
