@@ -3,6 +3,8 @@ const CampaignService = require('../services/CampaignService');
 const campaignService = new CampaignService();
 const ListService = require('../services/ListService');
 const listService = new ListService();
+const DealService = require('../services/DealService');
+const dealService = new DealService();
 
 const getCampaignsByCompany = async (req, res) => {
   const { status } = req.query;
@@ -15,12 +17,10 @@ const getCampaignsByCompany = async (req, res) => {
   };
   if (isAdmin) {
     obj = await campaignService.getCampaigns(idCompany, status);
-  } else {
-    if (status === 'bulk') {
-      obj = await campaignService.getCampaignsByUser(idUser, idCompany, status);
-    } else if (status === 'approved') {
-      obj = await campaignService.getAssignedCampaignsByUser(idUser, idCompany, status);
-    }
+  } else if (status === 'bulk') {
+    obj = await campaignService.getCampaignsByUser(idUser, idCompany, status);
+  } else if (status === 'approved') {
+    obj = await campaignService.getAssignedCampaignsByUser(idUser, idCompany, status);
   }
   res.status(StatusCodes.OK).json({ data: obj.data, count: obj.count });
 };
@@ -29,7 +29,9 @@ const getCampaignById = async (req, res) => {
   const { idCampaign } = req.params;
   const campaign = await campaignService.getCampaignById(idCampaign);
   const lists = await listService.getListsByArrayId(campaign.lists);
-  res.status(StatusCodes.OK).json({ campaign, lists });
+  const leadsId = campaign.leads.map((lead) => lead.id);
+  const deals = await dealService.getDealsOfLeads(leadsId)
+  res.status(StatusCodes.OK).json({ campaign, lists, numDeals: deals.length });
 };
 
 const addCampaign = async (req, res) => {
