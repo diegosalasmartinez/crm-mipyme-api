@@ -6,9 +6,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.Lead, { foreignKey: 'idLead', as: 'lead' });
       this.belongsTo(models.User, { foreignKey: 'assignedTo', as: 'assigned' });
-      this.belongsTo(
-        models.ClassificationSales,
-        { foreignKey: 'idClassificationSales', as: 'classificationSales' },
+      this.belongsTo(models.ClassificationSales, { foreignKey: 'idClassificationSales', as: 'classificationSales' });
+      this.hasMany(
+        models.Deal,
+        { foreignKey: 'idContact', as: 'deals' },
         {
           onDelete: 'SET NULL',
           onUpdate: 'CASCADE',
