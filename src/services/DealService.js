@@ -1,4 +1,16 @@
-const { Deal, DealStep, DealPriority, User, Contact, Lead, Activity, ActivityType } = require('../models/index');
+const {
+  Deal,
+  DealStep,
+  DealPriority,
+  User,
+  Contact,
+  Lead,
+  Activity,
+  ActivityType,
+  Quotation,
+  QuotationDetail,
+  QuotationStatus,
+} = require('../models/index');
 const { BadRequestError } = require('../errors');
 const DealOriginService = require('./DealOriginService');
 const dealOriginService = new DealOriginService();
@@ -19,14 +31,18 @@ class DealService {
             {
               model: Contact,
               as: 'contact',
+              attributes: ['id'],
+              required: true,
               include: [
                 {
                   model: Lead,
                   as: 'lead',
+                  attributes: ['id', 'name', 'lastName'],
                 },
                 {
                   model: User,
                   as: 'assigned',
+                  attributes: ['id', 'name', 'lastName'],
                   required: true,
                   where: {
                     idCompany,
@@ -61,18 +77,22 @@ class DealService {
           {
             model: User,
             as: 'creator',
+            attributes: ['id', 'name', 'lastName'],
           },
           {
             model: Contact,
             as: 'contact',
+            attributes: ['id'],
             include: [
               {
                 model: Lead,
                 as: 'lead',
+                attributes: ['id', 'name', 'lastName'],
               },
               {
                 model: User,
                 as: 'assigned',
+                attributes: ['id', 'name', 'lastName'],
               },
             ],
           },
@@ -83,6 +103,21 @@ class DealService {
               {
                 model: ActivityType,
                 as: 'type',
+              },
+            ],
+          },
+          {
+            model: Quotation,
+            as: 'quotations',
+            attributes: ['id', 'startDate', 'limitDate'],
+            include: [
+              {
+                model: QuotationDetail,
+                as: 'detail',
+              },
+              {
+                model: QuotationStatus,
+                as: 'status',
               },
             ],
           },
