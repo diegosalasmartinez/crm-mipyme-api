@@ -1,8 +1,14 @@
 const express = require('express');
-const { addQuotation } = require('../controllers/QuotationController');
+const {
+  getQuotationById,
+  addQuotation,
+  updateQuotation,
+} = require('../controllers/QuotationController');
 
 const router = express.Router();
 
+router.get('/:idQuotation', getQuotationById);
 router.post('/', addQuotation);
+router.patch('/', updateQuotation);
 
 module.exports = router;

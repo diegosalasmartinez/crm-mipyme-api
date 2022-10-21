@@ -25,6 +25,15 @@ class QuotationService {
       throw new BadRequestError(e.message);
     }
   }
+
+  async updateQuotationDetail(idCompany, idQuotation, detail, t) {
+    try {
+      await QuotationDetail.destroy({ where: { idQuotation }, transaction: t });
+      await this.addQuotationDetail(idCompany, idQuotation, detail, t)
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
 }
 
 module.exports = QuotationService;

@@ -1,6 +1,13 @@
-const { Op } = require('sequelize');
-const { faker } = require('@faker-js/faker');
-const { Quotation, QuotationDetail, Deal, sequelize } = require('../models/index');
+const {
+  Quotation,
+  QuotationDetail,
+  Deal,
+  Contact,
+  Lead,
+  User,
+  Product,
+  sequelize,
+} = require('../models/index');
 const { BadRequestError } = require('../errors');
 const QuotationStatusService = require('./QuotationStatusService');
 const quotationStatusService = new QuotationStatusService();
@@ -53,31 +60,41 @@ class QuotationService {
   //   }
   // }
 
-  // async getQuotationById(id) {
-  //   try {
-  //     const lead = await Quotation.findOne({
-  //       include: [
-  //         {
-  //           model: List,
-  //           as: 'lists',
-  //           include: [{ model: Quotation, as: 'leads', attributes: ['id'] }],
-  //         },
-  //         {
-  //           model: ClassificationMarketing,
-  //           as: 'classificationMarketing',
-  //           attributes: ['key', 'name'],
-  //         },
-  //       ],
-  //       where: {
-  //         id,
-  //         active: true,
-  //       },
-  //     });
-  //     return lead;
-  //   } catch (e) {
-  //     throw new BadRequestError(e.message);
-  //   }
-  // }
+  async getQuotationById(id) {
+    try {
+      const quotation = await Quotation.findOne({
+        include: [
+          {
+            model: Deal,
+            as: 'deal',
+            include: [
+              {
+                model: Contact,
+                as: 'contact',
+                attributes: ['id'],
+                include: [
+                  { model: Lead, as: 'lead', attributes: ['id', 'name', 'lastName'] },
+                  { model: User, as: 'assigned', attributes: ['id', 'name', 'lastName'] },
+                ],
+              },
+            ],
+          },
+          {
+            model: QuotationDetail,
+            as: 'detail',
+            include: [{ model: Product, as: 'product', attributes: ['id', 'code', 'name'] }],
+          },
+        ],
+        where: {
+          id,
+          active: true,
+        },
+      });
+      return quotation;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
 
   async addQuotation(idCompany, quotationDTO) {
     const t = await sequelize.transaction();
@@ -93,9 +110,39 @@ class QuotationService {
         },
         { transaction: t }
       );
-      await quotationDetailService.addQuotationDetail(idCompany, quotation.id, quotationDTO.items, t);
+      await quotationDetailService.addQuotationDetail(
+        idCompany,
+        quotation.id,
+        quotationDTO.items,
+        t
+      );
       await t.commit();
       return quotation;
+    } catch (e) {
+      await t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async updateQuotation(idCompany, quotation) {
+    const t = await sequelize.transaction();
+    try {
+      await Quotation.update(
+        {
+          startDate: quotation.startDate,
+          limitDate: quotation.limitDate,
+          notes: quotation.notes,
+        },
+        { where: { id: quotation.id }, transaction: t }
+      );
+
+      await quotationDetailService.updateQuotationDetail(
+        idCompany,
+        quotation.id,
+        quotation.items,
+        t
+      );
+      await t.commit();
     } catch (e) {
       await t.rollback();
       throw new BadRequestError(e.message);
