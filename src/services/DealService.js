@@ -137,6 +137,37 @@ class DealService {
     }
   }
 
+  async getDealsOfLeads(leadsId) {
+    try {
+      const deals = await Deal.findAll({
+        required: true,
+        include: [
+          {
+            model: Contact,
+            as: 'contact',
+            attributes: ['id'],
+            include: [
+              {
+                model: Lead,
+                as: 'lead',
+                attributes: ['id', 'name', 'lastName'],
+                where: {
+                  id: leadsId
+                }
+              },
+            ],
+          },
+        ],
+        where: {
+          active: true,
+        },
+      });
+      return deals;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async getDealByIdSimple(id) {
     try {
       const deal = await Deal.findOne({
