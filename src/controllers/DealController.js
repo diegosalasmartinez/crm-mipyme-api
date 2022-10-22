@@ -20,8 +20,15 @@ const getDealBasicInfo = async (req, res) => {
   res.status(StatusCodes.OK).json(deal);
 };
 
+const updateDealStep = async (req, res) => {
+  const { deal, step } = req.body;
+  await dealService.updateStep(deal, step)
+  res.status(StatusCodes.OK).json({ message: 'La oportunidad se ha actualizado' });
+};
+
 module.exports = {
   getDeals,
   getDealDetail,
   getDealBasicInfo,
+  updateDealStep,
 };
