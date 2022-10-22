@@ -5,7 +5,11 @@ const planService = new PlanService();
 const getPlan = async (req, res) => {
   const { idCompany } = req.user;
   const plan = await planService.getPlan(idCompany);
-  res.status(StatusCodes.OK).json(plan);
+  let stats = {} 
+  if (plan) {
+    stats = await planService.getPlanStats(plan);
+  }
+  res.status(StatusCodes.OK).json({ plan, stats });
 };
 
 const addPlan = async (req, res) => {

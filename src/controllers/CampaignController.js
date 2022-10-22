@@ -29,9 +29,8 @@ const getCampaignById = async (req, res) => {
   const { idCampaign } = req.params;
   const campaign = await campaignService.getCampaignById(idCampaign);
   const lists = await listService.getListsByArrayId(campaign.lists);
-  const leadsId = campaign.leads.map((lead) => lead.id);
-  const deals = await dealService.getDealsOfLeads(leadsId)
-  res.status(StatusCodes.OK).json({ campaign, lists, numDeals: deals.length });
+  const stats = await campaignService.getCampaignStats(campaign);
+  res.status(StatusCodes.OK).json({ campaign, lists, stats });
 };
 
 const addCampaign = async (req, res) => {

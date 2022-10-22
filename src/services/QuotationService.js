@@ -190,14 +190,52 @@ class QuotationService {
     const t = await sequelize.transaction();
     try {
       const quotationStatus = await quotationStatusService.get('approved');
-      await Quotation.update({ idStatus: quotationStatus.id }, { where: { id: quotation.id }, transaction: t });
-      const quotationStored = await Quotation.findByPk(quotation.id)
-      const deal = await quotationStored.getDeal()
+      await Quotation.update(
+        { idStatus: quotationStatus.id },
+        { where: { id: quotation.id }, transaction: t }
+      );
+      const quotationStored = await Quotation.findByPk(quotation.id);
+      const deal = await quotationStored.getDeal();
       const step = await dealStepService.get('negotiations');
       await Deal.update({ idStep: step.id }, { where: { id: deal.id }, transaction: t });
       t.commit();
     } catch (e) {
       t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getSalesOfDeals(dealsId) {
+    try {
+      const quotations = await Quotation.findAll({
+        required: true,
+        include: [
+          {
+            model: QuotationDetail,
+            as: 'detail',
+            include: [{ model: Product, as: 'product', attributes: ['id', 'code', 'name'] }],
+          },
+          {
+            model: QuotationStatus,
+            as: 'status',
+            where: {
+              key: 'accepted',
+            },
+          },
+        ],
+        where: {
+          idDeal: dealsId,
+          active: true,
+        },
+      });
+      let totalSales = 0;
+      for (let qt of quotations) {
+        for (let detail of qt.detail) {
+          totalSales += detail.finalPrice;
+        }
+      }
+      return totalSales;
+    } catch (e) {
       throw new BadRequestError(e.message);
     }
   }

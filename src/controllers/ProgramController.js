@@ -5,7 +5,8 @@ const programService = new ProgramService();
 const getProgram = async (req, res) => {
   const { idProgram } = req.params;
   const program = await programService.getProgramById(idProgram);
-  res.status(StatusCodes.OK).json(program);
+  const stats = await programService.getProgramStats(program);
+  res.status(StatusCodes.OK).json({ program, stats });
 };
 
 const addProgram = async (req, res) => {

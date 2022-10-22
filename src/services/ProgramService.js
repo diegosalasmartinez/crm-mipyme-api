@@ -1,6 +1,7 @@
 const { Program, Campaign, CampaignStatus, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
-
+const CampaignService = require('./CampaignService');
+const campaignService = new CampaignService();
 class ProgramService {
   async getProgramById(id) {
     try {
@@ -9,7 +10,7 @@ class ProgramService {
           {
             model: Campaign,
             as: 'campaigns',
-            attributes: ['id', 'name', 'startDate', 'endDate'],
+            attributes: ['id', 'name', 'numConversions', 'startDate', 'endDate'],
             include: [
               {
                 model: User,
@@ -40,6 +41,23 @@ class ProgramService {
         idPlan,
       });
       return program;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getProgramStats(program) {
+    try {
+      let numConversions = 0;
+      let numDeals = 0;
+      let sales = 0;
+      for (let campaign of program.campaigns) {
+        const stats = await campaignService.getCampaignStats(campaign);
+        numConversions += stats.numConversions;
+        numDeals += stats.numDeals;
+        sales += stats.sales;
+      }
+      return { numConversions, numDeals, sales };
     } catch (e) {
       throw new BadRequestError(e.message);
     }

@@ -18,6 +18,11 @@ const DiscountService = require('./DiscountService');
 const discountService = new DiscountService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
+const DealService = require('./DealService');
+const dealService = new DealService();
+const QuotationService = require('./QuotationService');
+const quotationService = new QuotationService();
+
 const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
 
 class CampaignService {
@@ -25,6 +30,9 @@ class CampaignService {
     try {
       const { rows: data = [], count } = await Campaign.findAndCountAll({
         required: true,
+        attributes: {
+          exclude: ['html', 'segments', 'lists'],
+        },
         include: [
           {
             model: Program,
@@ -80,6 +88,9 @@ class CampaignService {
     try {
       const { rows: data = [], count } = await Campaign.findAndCountAll({
         required: true,
+        attributes: {
+          exclude: ['html', 'segments', 'lists'],
+        },
         include: [
           {
             model: Program,
@@ -131,6 +142,9 @@ class CampaignService {
     try {
       const { rows: data = [], count } = await Campaign.findAndCountAll({
         required: true,
+        attributes: {
+          exclude: ['html', 'segments', 'lists'],
+        },
         include: [
           {
             model: Program,
@@ -239,6 +253,19 @@ class CampaignService {
     }
   }
 
+  async getCampaignStats(campaign) {
+    try {
+      const leads = await campaign.getLeads()
+      const leadsId = leads.map((lead) => lead.id);
+      const deals = await dealService.getDealsOfLeads(leadsId);
+      const dealsId = deals.map(deal => deal.id)
+      const sales = await quotationService.getSalesOfDeals(dealsId)
+      return { numConversions: campaign.numConversions, numDeals: deals.length, sales };
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async addCampaign(idUser, idCompany, idProgram, campaignDTO) {
     try {
       let statusValue = 'bulk';
@@ -262,7 +289,12 @@ class CampaignService {
         idProgram,
       });
 
-      await discountService.addDiscounts(campaign.id, idCompany, campaignDTO.discounts, 'marketing');
+      await discountService.addDiscounts(
+        campaign.id,
+        idCompany,
+        campaignDTO.discounts,
+        'marketing'
+      );
       return campaign;
     } catch (e) {
       throw new BadRequestError(e.message);
@@ -357,7 +389,10 @@ class CampaignService {
 
   async increaseConvertNumber(idCampaign, t) {
     try {
-      await Campaign.increment({ numConversions: 1 }, { where: { id: idCampaign }, transaction: t });
+      await Campaign.increment(
+        { numConversions: 1 },
+        { where: { id: idCampaign }, transaction: t }
+      );
     } catch (e) {
       throw new BadRequestError(e.message);
     }
