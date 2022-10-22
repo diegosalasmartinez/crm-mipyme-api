@@ -53,6 +53,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSONB,
         allowNull: false,
       },
+      htmlTemplate: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+      sent: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       startDate: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
