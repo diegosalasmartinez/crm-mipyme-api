@@ -248,7 +248,7 @@ class DealService {
     try {
       const step = await dealStepService.get(stepValue);
       await Deal.update({ idStep: step.id }, { where: { id: deal.id }, transaction: t });
-      if (stepValue === 'quotated') {
+      if (stepValue === 'quoted') {
         const quotationsId = deal.quotations
           .filter((quotation) => quotation.status.key === 'created')
           .map((quotation) => quotation.id);

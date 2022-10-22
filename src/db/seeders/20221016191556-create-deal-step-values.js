@@ -12,7 +12,7 @@ module.exports = {
       },
       {
         id: uuidv4(),
-        key: 'quotated',
+        key: 'quoted',
         name: 'Cotizado',
       },
       {
