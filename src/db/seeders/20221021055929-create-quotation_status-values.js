@@ -35,6 +35,11 @@ module.exports = {
         key: 'expired',
         name: 'Expirado',
       },
+      {
+        id: uuidv4(),
+        key: 'accepted',
+        name: 'Aceptado',
+      },
     ]);
   },
 
