@@ -10,6 +10,7 @@ const {
   Quotation,
   QuotationDetail,
   QuotationStatus,
+  sequelize,
 } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const DealOriginService = require('./DealOriginService');
@@ -18,6 +19,8 @@ const DealStepService = require('./DealStepService');
 const dealStepService = new DealStepService();
 const DealPriorityService = require('./DealPriorityService');
 const dealPriorityService = new DealPriorityService();
+const QuotationService = require('./QuotationService');
+const quotationService = new QuotationService();
 
 class DealService {
   async getDeals(idCompany) {
@@ -152,8 +155,8 @@ class DealService {
                 as: 'lead',
                 attributes: ['id', 'name', 'lastName'],
                 where: {
-                  id: leadsId
-                }
+                  id: leadsId,
+                },
               },
             ],
           },
@@ -236,6 +239,30 @@ class DealService {
         { transaction: t }
       );
     } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async updateStep(deal, stepValue) {
+    const t = await sequelize.transaction();
+    try {
+      const step = await dealStepService.get(stepValue);
+      await Deal.update({ idStep: step.id }, { where: { id: deal.id }, transaction: t });
+      if (stepValue === 'quotated') {
+        const quotationsId = deal.quotations
+          .filter((quotation) => quotation.status.key === 'created')
+          .map((quotation) => quotation.id);
+        await quotationService.sendQuotationsToNewStep(quotationsId, 'pending', t);
+      } else if (stepValue === 'won') {
+        const quotationsId = deal.quotations
+          .filter((quotation) => quotation.status.key === 'approved')
+          .map((quotation) => quotation.id);
+        await quotationService.sendQuotationsToNewStep(quotationsId, 'accepted', t);
+      }
+
+      t.commit();
+    } catch (e) {
+      t.rollback();
       throw new BadRequestError(e.message);
     }
   }
