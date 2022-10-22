@@ -24,12 +24,13 @@ const leadService = new LeadService();
 const DealService = require('./DealService');
 const dealService = new DealService();
 const QuotationService = require('./QuotationService');
+const { Op } = require('sequelize');
 const quotationService = new QuotationService();
 
 const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
 
 cron.schedule(
-  '0 0 * * *',
+  '1 18 * * *',
   async function () {
     const campaignService = new CampaignService();
     await campaignService.runCampaigns();
@@ -431,12 +432,32 @@ class CampaignService {
     try {
       const statusApproved = await campaignStatusService.get('approved');
       const statusRunning = await campaignStatusService.get('running');
+      const statusFinished = await campaignStatusService.get('finished');
 
       await Campaign.update(
+        { idStatus: statusFinished.id },
         {
-          idStatus: statusRunning.id,
-        },
-        { where: { idStatus: statusApproved.id } }
+          where: {
+            idStatus: statusRunning.id,
+            endDate: {
+              [Op.gt]: new Date(),
+            },
+            active: true,
+          },
+        }
+      );
+
+      await Campaign.update(
+        { idStatus: statusRunning.id },
+        {
+          where: {
+            idStatus: statusApproved.id,
+            startDate: {
+              [Op.lte]: new Date(),
+            },
+            active: true,
+          },
+        }
       );
     } catch (e) {
       throw new BadRequestError(e.message);
