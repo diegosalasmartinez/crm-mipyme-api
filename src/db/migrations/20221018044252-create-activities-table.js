@@ -28,6 +28,16 @@ module.exports = {
         onUpdate: 'CASCADE',
         allowNull: false,
       },
+      idStatus: {
+        type: Sequelize.UUID,
+        references: {
+          model: 'activity_status',
+          key: 'id',
+        },
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+        allowNull: false,
+      },
       name: {
         type: Sequelize.STRING,
         allowNull: false,
