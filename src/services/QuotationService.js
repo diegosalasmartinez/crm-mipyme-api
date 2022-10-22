@@ -1,6 +1,7 @@
 const {
   Quotation,
   QuotationDetail,
+  QuotationStatus,
   Deal,
   Contact,
   Lead,
@@ -13,38 +14,58 @@ const QuotationStatusService = require('./QuotationStatusService');
 const quotationStatusService = new QuotationStatusService();
 const QuotationDetailService = require('./QuotationDetailService');
 const quotationDetailService = new QuotationDetailService();
+const DealStepService = require('./DealStepService');
+const dealStepService = new DealStepService();
 
 class QuotationService {
-  // async getQuotations(idCompany, page = 0, rowsPerPage = 10) {
-  //   try {
-  //     const { rows: data = [], count } = await Quotation.findAndCountAll({
-  //       offset: page * rowsPerPage,
-  //       limit: rowsPerPage,
-  //       attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone', 'birthday', 'companyName', 'createdAt'],
-  //       required: true,
-  //       include: [
-  //         {
-  //           model: User,
-  //           as: 'creator',
-  //           where: { idCompany },
-  //           attributes: [],
-  //         },
-  //         {
-  //           model: ClassificationMarketing,
-  //           as: 'classificationMarketing',
-  //           attributes: ['key', 'name'],
-  //         },
-  //       ],
-  //       where: {
-  //         active: true,
-  //       },
-  //       order: [['createdAt', 'DESC']],
-  //     });
-  //     return { data, count };
-  //   } catch (e) {
-  //     throw new BadRequestError(e.message);
-  //   }
-  // }
+  async getQuotations(idCompany, status) {
+    try {
+      const { rows: data = [], count } = await Quotation.findAndCountAll({
+        required: true,
+        include: [
+          {
+            model: Deal,
+            as: 'deal',
+            include: [
+              {
+                model: Contact,
+                as: 'contact',
+                attributes: ['id'],
+                include: [
+                  { model: Lead, as: 'lead', attributes: ['id', 'name', 'lastName'] },
+                  {
+                    model: User,
+                    as: 'assigned',
+                    attributes: ['id', 'name', 'lastName'],
+                    where: { idCompany },
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: QuotationDetail,
+            as: 'detail',
+            include: [{ model: Product, as: 'product', attributes: ['id', 'code', 'name'] }],
+          },
+          {
+            model: QuotationStatus,
+            as: 'status',
+            where: {
+              key: status,
+            },
+          },
+        ],
+        where: {
+          active: true,
+        },
+        order: [['createdAt', 'DESC']],
+      });
+      return { data, count };
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
 
   // async getQuotationByIdSimple(id) {
   //   try {
@@ -83,6 +104,10 @@ class QuotationService {
             model: QuotationDetail,
             as: 'detail',
             include: [{ model: Product, as: 'product', attributes: ['id', 'code', 'name'] }],
+          },
+          {
+            model: QuotationStatus,
+            as: 'status',
           },
         ],
         where: {
@@ -145,6 +170,34 @@ class QuotationService {
       await t.commit();
     } catch (e) {
       await t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async sendQuotationsToNewStep(quotationsId, stepValue, t) {
+    try {
+      const status = await quotationStatusService.get(stepValue);
+      await Quotation.update(
+        { idStatus: status.id },
+        { where: { id: quotationsId }, transaction: t }
+      );
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async approveQuotation(quotation) {
+    const t = await sequelize.transaction();
+    try {
+      const quotationStatus = await quotationStatusService.get('approved');
+      await Quotation.update({ idStatus: quotationStatus.id }, { where: { id: quotation.id }, transaction: t });
+      const quotationStored = await Quotation.findByPk(quotation.id)
+      const deal = await quotationStored.getDeal()
+      const step = await dealStepService.get('negotiations');
+      await Deal.update({ idStep: step.id }, { where: { id: deal.id }, transaction: t });
+      t.commit();
+    } catch (e) {
+      t.rollback();
       throw new BadRequestError(e.message);
     }
   }
