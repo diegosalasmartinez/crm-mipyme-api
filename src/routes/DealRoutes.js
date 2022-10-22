@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   getDeals,
+  createDeal,
   getDealDetail,
   getDealBasicInfo,
   updateDealStep,
@@ -9,6 +10,7 @@ const {
 const router = express.Router();
 
 router.get('/', getDeals);
+router.post('/', createDeal);
 router.get('/:idDeal', getDealDetail);
 router.get('/:idDeal/basic', getDealBasicInfo);
 router.post('/update/step', updateDealStep);
