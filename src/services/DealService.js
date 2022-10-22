@@ -10,6 +10,7 @@ const {
   Quotation,
   QuotationDetail,
   QuotationStatus,
+  LostType,
   sequelize,
 } = require('../models/index');
 const { BadRequestError } = require('../errors');
@@ -21,6 +22,8 @@ const DealPriorityService = require('./DealPriorityService');
 const dealPriorityService = new DealPriorityService();
 const QuotationService = require('./QuotationService');
 const quotationService = new QuotationService();
+const LostTypeService = require('./LostTypeService');
+const lostTypeService = new LostTypeService();
 
 class DealService {
   async getDeals(idCompany) {
@@ -127,6 +130,10 @@ class DealService {
           {
             model: DealStep,
             as: 'step',
+          },
+          {
+            model: LostType,
+            as: 'lostType',
           },
         ],
         where: {
@@ -243,7 +250,7 @@ class DealService {
     }
   }
 
-  async updateStep(deal, stepValue) {
+  async updateStep(deal, stepValue, data) {
     const t = await sequelize.transaction();
     try {
       const step = await dealStepService.get(stepValue);
@@ -258,8 +265,14 @@ class DealService {
           .filter((quotation) => quotation.status.key === 'approved')
           .map((quotation) => quotation.id);
         await quotationService.sendQuotationsToNewStep(quotationsId, 'accepted', t);
+      } else if (stepValue === 'lost') {
+        const quotationsId = deal.quotations
+          .filter((quotation) => quotation.status.key === 'approved')
+          .map((quotation) => quotation.id);
+        await quotationService.sendQuotationsToNewStep(quotationsId, 'expired', t);
+        const lostType = await lostTypeService.get(data.reason);
+        await Deal.update({ idLostType: lostType.id }, { where: { id: deal.id }, transaction: t });
       }
-
       t.commit();
     } catch (e) {
       t.rollback();

@@ -32,8 +32,8 @@ const getDealBasicInfo = async (req, res) => {
 };
 
 const updateDealStep = async (req, res) => {
-  const { deal, step } = req.body;
-  await dealService.updateStep(deal, step);
+  const { deal, step, data } = req.body;
+  await dealService.updateStep(deal, step, data);
   res.status(StatusCodes.OK).json({ message: 'La oportunidad se ha actualizado' });
 };
 
