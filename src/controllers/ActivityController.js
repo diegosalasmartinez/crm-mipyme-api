@@ -2,12 +2,11 @@ const { StatusCodes } = require('http-status-codes');
 const ActivityService = require('../services/ActivityService');
 const activityService = new ActivityService();
 
-// const getActivities = async (req, res) => {
-//   const { id: idUser, idCompany } = req.user;
-//   // Cambiar a get all activities by user
-//   const data = await activityService.getActivities()
-//   res.status(StatusCodes.OK).json(data);
-// };
+const getActivities = async (req, res) => {
+  const { id: idUser, idCompany } = req.user;
+  const activities = await activityService.getActivities(idUser, idCompany);
+  res.status(StatusCodes.OK).json(activities);
+};
 
 const addActivity = async (req, res) => {
   const { idDeal, activity } = req.body;
@@ -18,5 +17,6 @@ const addActivity = async (req, res) => {
 };
 
 module.exports = {
+  getActivities,
   addActivity,
 };

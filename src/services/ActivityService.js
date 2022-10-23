@@ -1,4 +1,4 @@
-const { Activity, Deal, Status } = require('../models/index');
+const { Activity, ActivityStatus, Deal, User } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ActivityTypeService = require('./ActivityTypeService');
 const activityTypeService = new ActivityTypeService();
@@ -6,29 +6,34 @@ const ActivityStatusService = require('./ActivityStatusService');
 const activityStatusService = new ActivityStatusService();
 
 class ActivityService {
-  async getActivities(idDeal) {
+  async getActivities(idUser, idCompany) {
     try {
       const types = await activityTypeService.getAll();
       const data = [];
-      for (const step of types) {
+      for (const type of types) {
         const activities = await Activity.findAll({
           required: true,
           include: [
             {
-              model: Deal,
-              as: 'deal',
+              model: User,
+              as: 'creator',
               required: true,
               where: {
-                id: idDeal,
+                idCompany,
               },
             },
             {
-              model: Status,
+              model: Deal,
+              as: 'deal',
+              required: true,
+            },
+            {
+              model: ActivityStatus,
               as: 'status',
             },
           ],
           where: {
-            idStep: step.id,
+            idType: type.id,
             active: true,
           },
           order: [['createdAt', 'DESC']],
