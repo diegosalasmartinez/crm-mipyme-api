@@ -2,6 +2,10 @@ const { Ticket, TicketType, User, Contact, Lead } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const TicketTypeService = require('./TicketTypeService');
 const ticketTypeService = new TicketTypeService();
+const TicketPriorityService = require('./TicketPriorityService');
+const ticketPriorityService = new TicketPriorityService();
+const TicketStatusService = require('./TicketStatusService');
+const ticketStatusService = new TicketStatusService();
 
 class TicketService {
   async getTickets(idCompany) {
@@ -92,11 +96,16 @@ class TicketService {
   async addTicket(idUser, ticketDTO) {
     try {
       const type = await ticketTypeService.getDefault();
+      const priority = await ticketPriorityService.getDefault();
+      const status = await ticketStatusService.getDefault();
+
       const ticket = await Ticket.create({
         name: ticketDTO.name,
         description: ticketDTO.description,
         limitDate: ticketDTO.limitDate,
         idType: type.id,
+        idPriority: priority.id,
+        idStatus: status.id,
         createdBy: idUser,
         assignedTo: ticketDTO.assignedTo,
         idContact: ticketDTO.idContact,

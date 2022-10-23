@@ -3,8 +3,6 @@ const CampaignService = require('../services/CampaignService');
 const campaignService = new CampaignService();
 const ListService = require('../services/ListService');
 const listService = new ListService();
-const DealService = require('../services/DealService');
-const dealService = new DealService();
 
 const getCampaignsByCompany = async (req, res) => {
   const { status } = req.query;
@@ -59,10 +57,22 @@ const approveCampaign = async (req, res) => {
   });
 };
 
+const runCampaigns = async (req, res) => {
+  await campaignService.runCampaigns();
+  res.status(StatusCodes.OK).json({ message: `Done` });
+};
+
+const sendCampaigns = async (req, res) => {
+  await campaignService.sendCampaigns();
+  res.status(StatusCodes.OK).json({ message: `Done` });
+};
+
 module.exports = {
   getCampaignsByCompany,
   getCampaignById,
   addCampaign,
   updateCampaign,
   approveCampaign,
+  runCampaigns,
+  sendCampaigns 
 };
