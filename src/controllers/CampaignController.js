@@ -57,10 +57,22 @@ const approveCampaign = async (req, res) => {
   });
 };
 
+const runCampaigns = async (req, res) => {
+  await campaignService.runCampaigns();
+  res.status(StatusCodes.OK).json({ message: `Done` });
+};
+
+const sendCampaigns = async (req, res) => {
+  await campaignService.sendCampaigns();
+  res.status(StatusCodes.OK).json({ message: `Done` });
+};
+
 module.exports = {
   getCampaignsByCompany,
   getCampaignById,
   addCampaign,
   updateCampaign,
   approveCampaign,
+  runCampaigns,
+  sendCampaigns 
 };
