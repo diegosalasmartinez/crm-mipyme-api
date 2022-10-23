@@ -137,6 +137,10 @@ class DealService {
             as: 'step',
           },
           {
+            model: DealPriority,
+            as: 'priority',
+          },
+          {
             model: LostType,
             as: 'lostType',
           },
@@ -234,13 +238,16 @@ class DealService {
 
   async addDealThroughCampaign(idUser, idContact, dealDTO, idCampaign, t) {
     try {
-      const origin = await dealOriginService.get('campaign');
+      const origin = await dealOriginService.get(dealDTO.origin);
+      const priority = await dealPriorityService.get(dealDTO.priority);
       const step = await dealStepService.getDefault();
-      const priority = await dealPriorityService.getDefault();
 
       await Deal.create(
         {
-          ...dealDTO,
+          name: dealDTO.name,
+          expectedAmount: dealDTO.expectedAmount,
+          expectedCloseDate: dealDTO.expectedCloseDate,
+          description: dealDTO.description,
           idOrigin: origin.id,
           idStep: step.id,
           idPriority: priority.id,
