@@ -21,8 +21,15 @@ const addTicket = async (req, res) => {
   res.status(StatusCodes.OK).json(ticketCreated);
 };
 
+const updateTicketStatus = async (req, res) => {
+  const { ticket, status } = req.body;
+  await ticketService.updateStatus(ticket, status);
+  res.status(StatusCodes.OK).json({ message: 'La solicitud se ha actualizado' });
+};
+
 module.exports = {
   getTickets,
   getTicketDetail,
   addTicket,
+  updateTicketStatus,
 };
