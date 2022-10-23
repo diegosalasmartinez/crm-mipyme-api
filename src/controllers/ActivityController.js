@@ -9,8 +9,9 @@ const getActivities = async (req, res) => {
 };
 
 const addActivity = async (req, res) => {
+  const { id: idUser } = req.user;
   const { idDeal, activity } = req.body;
-  await activityService.addActivity(idDeal, activity);
+  await activityService.addActivity(idUser, idDeal, activity);
   res.status(StatusCodes.OK).json({
     message: `La actividad ${activity.name} ha sido registrada`,
   });

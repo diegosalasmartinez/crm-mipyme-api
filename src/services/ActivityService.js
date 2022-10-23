@@ -62,7 +62,7 @@ class ActivityService {
     }
   }
 
-  async addActivity(idDeal, activityDTO) {
+  async addActivity(idUser, idDeal, activityDTO) {
     try {
       const type = await activityTypeService.get(activityDTO.type);
       const status = await activityStatusService.getDefault();
@@ -71,6 +71,7 @@ class ActivityService {
         startDate: activityDTO.startDate,
         endDate: activityDTO.endDate,
         notes: activityDTO.notes,
+        createdBy: idUser,
         idType: type.id,
         idStatus: status.id,
         idDeal,

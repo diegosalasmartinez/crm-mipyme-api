@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.ActivityType, { foreignKey: 'idType', as: 'type' });
       this.belongsTo(models.ActivityStatus, { foreignKey: 'idStatus', as: 'status' });
       this.belongsTo(models.Deal, { foreignKey: 'idDeal', as: 'deal' });
+      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
     }
   }
   Activity.init(
