@@ -3,6 +3,9 @@ const {
   TicketType,
   TicketPriority,
   TicketStatus,
+  Activity,
+  ActivityStatus,
+  ActivityType,
   User,
   Contact,
   Lead,
@@ -99,16 +102,20 @@ class TicketService {
             model: TicketStatus,
             as: 'status',
           },
-          // {
-          //   model: Activity,
-          //   as: 'activities',
-          //   include: [
-          //     {
-          //       model: ActivityType,
-          //       as: 'type',
-          //     },
-          //   ],
-          // },
+          {
+            model: Activity,
+            as: 'activities',
+            include: [
+              {
+                model: ActivityType,
+                as: 'type',
+              },
+              {
+                model: ActivityStatus,
+                as: 'status',
+              },
+            ],
+          },
         ],
         where: {
           id,
