@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.User, { foreignKey: 'approvedBy', as: 'approver' });
       this.belongsTo(models.CampaignStatus, { foreignKey: 'idStatus', as: 'status' });
       this.hasMany(models.Discount, { foreignKey: 'idCampaign', as: 'discounts' });
+      this.hasMany(models.Deal, { foreignKey: 'idCampaign', as: 'deals' });
       this.belongsToMany(models.User, {
         foreignKey: 'idCampaign',
         as: 'assigned',

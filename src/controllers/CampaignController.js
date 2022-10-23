@@ -3,8 +3,6 @@ const CampaignService = require('../services/CampaignService');
 const campaignService = new CampaignService();
 const ListService = require('../services/ListService');
 const listService = new ListService();
-const DealService = require('../services/DealService');
-const dealService = new DealService();
 
 const getCampaignsByCompany = async (req, res) => {
   const { status } = req.query;

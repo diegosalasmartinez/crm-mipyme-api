@@ -21,8 +21,6 @@ const DiscountService = require('./DiscountService');
 const discountService = new DiscountService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
-const DealService = require('./DealService');
-const dealService = new DealService();
 const QuotationService = require('./QuotationService');
 const { Op } = require('sequelize');
 const quotationService = new QuotationService();
@@ -42,7 +40,7 @@ cron.schedule(
 );
 
 cron.schedule(
-  '27 17 * * *',
+  '8 18 * * *',
   async function () {
     const campaignService = new CampaignService();
     await campaignService.sendCampaigns();
@@ -283,9 +281,7 @@ class CampaignService {
 
   async getCampaignStats(campaign) {
     try {
-      const leads = await campaign.getLeads();
-      const leadsId = leads.map((lead) => lead.id);
-      const deals = await dealService.getDealsOfLeads(leadsId);
+      const deals = await campaign.getDeals();
       const dealsId = deals.map((deal) => deal.id);
       const sales = await quotationService.getSalesOfDeals(dealsId);
       return { numConversions: campaign.numConversions, numDeals: deals.length, sales };
