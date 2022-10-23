@@ -3,7 +3,7 @@ const TicketService = require('../services/TicketService');
 const ticketService = new TicketService();
 
 const getTickets = async (req, res) => {
-  const { id: idUser, idCompany } = req.user;
+  const { idCompany } = req.user;
   const data = await ticketService.getTickets(idCompany);
   res.status(StatusCodes.OK).json(data);
 };

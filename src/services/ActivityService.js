@@ -62,7 +62,7 @@ class ActivityService {
     }
   }
 
-  async addActivity(idUser, idDeal, activityDTO) {
+  async addActivity(idUser, idDeal, idTicket, activityDTO) {
     try {
       const type = await activityTypeService.get(activityDTO.type);
       const status = await activityStatusService.getDefault();
@@ -75,6 +75,7 @@ class ActivityService {
         idType: type.id,
         idStatus: status.id,
         idDeal,
+        idTicket,
       });
     } catch (e) {
       throw new BadRequestError(e.message);
