@@ -7,6 +7,7 @@ const {
   Lead,
   Activity,
   ActivityType,
+  ActivityStatus,
   Quotation,
   QuotationDetail,
   QuotationStatus,
@@ -109,6 +110,10 @@ class DealService {
               {
                 model: ActivityType,
                 as: 'type',
+              },
+              {
+                model: ActivityStatus,
+                as: 'status',
               },
             ],
           },

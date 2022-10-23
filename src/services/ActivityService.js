@@ -1,7 +1,9 @@
-const { Activity, Deal } = require('../models/index');
+const { Activity, Deal, Status } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ActivityTypeService = require('./ActivityTypeService');
 const activityTypeService = new ActivityTypeService();
+const ActivityStatusService = require('./ActivityStatusService');
+const activityStatusService = new ActivityStatusService();
 
 class ActivityService {
   async getActivities(idDeal) {
@@ -19,6 +21,10 @@ class ActivityService {
               where: {
                 id: idDeal,
               },
+            },
+            {
+              model: Status,
+              as: 'status',
             },
           ],
           where: {
@@ -54,12 +60,14 @@ class ActivityService {
   async addActivity(idDeal, activityDTO) {
     try {
       const type = await activityTypeService.get(activityDTO.type);
+      const status = await activityStatusService.getDefault();
       await Activity.create({
         name: activityDTO.name,
         startDate: activityDTO.startDate,
         endDate: activityDTO.endDate,
         notes: activityDTO.notes,
         idType: type.id,
+        idStatus: status.id,
         idDeal,
       });
     } catch (e) {
