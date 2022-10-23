@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.TicketType, { foreignKey: 'idType', as: 'type' });
       this.belongsTo(models.TicketPriority, { foreignKey: 'idPriority', as: 'priority' });
+      this.belongsTo(models.TicketStatus, { foreignKey: 'idStatus', as: 'status' });
       this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
       this.belongsTo(models.User, { foreignKey: 'assignedTo', as: 'assigned' });
       this.belongsTo(models.Contact, { foreignKey: 'idContact', as: 'contact' });

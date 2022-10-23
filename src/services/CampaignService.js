@@ -1,3 +1,4 @@
+var cron = require('node-cron');
 const {
   Campaign,
   CampaignStatus,
@@ -11,6 +12,8 @@ const {
   ClassificationMarketing,
   sequelize,
 } = require('../models/index');
+const { transporter } = require('../config/MailConfig');
+const { decode } = require('html-entities');
 const { BadRequestError } = require('../errors');
 const CampaignStatusService = require('./CampaignStatusService');
 const campaignStatusService = new CampaignStatusService();
@@ -18,12 +21,35 @@ const DiscountService = require('./DiscountService');
 const discountService = new DiscountService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
-const DealService = require('./DealService');
-const dealService = new DealService();
 const QuotationService = require('./QuotationService');
+const { Op } = require('sequelize');
 const quotationService = new QuotationService();
 
 const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
+
+cron.schedule(
+  '15 0 * * *',
+  async function () {
+    const campaignService = new CampaignService();
+    await campaignService.runCampaigns();
+  },
+  {
+    scheduled: true,
+    timezone: 'America/Lima',
+  }
+);
+
+cron.schedule(
+  '0 10 * * *',
+  async function () {
+    const campaignService = new CampaignService();
+    await campaignService.sendCampaigns();
+  },
+  {
+    scheduled: true,
+    timezone: 'America/Lima',
+  }
+);
 
 class CampaignService {
   async getCampaigns(idCompany, status) {
@@ -255,11 +281,9 @@ class CampaignService {
 
   async getCampaignStats(campaign) {
     try {
-      const leads = await campaign.getLeads()
-      const leadsId = leads.map((lead) => lead.id);
-      const deals = await dealService.getDealsOfLeads(leadsId);
-      const dealsId = deals.map(deal => deal.id)
-      const sales = await quotationService.getSalesOfDeals(dealsId)
+      const deals = await campaign.getDeals();
+      const dealsId = deals.map((deal) => deal.id);
+      const sales = await quotationService.getSalesOfDeals(dealsId);
       return { numConversions: campaign.numConversions, numDeals: deals.length, sales };
     } catch (e) {
       throw new BadRequestError(e.message);
@@ -280,6 +304,7 @@ class CampaignService {
         segments: campaignDTO.segments ?? [],
         step: campaignDTO.step ?? 0,
         html: campaignDTO.html ?? {},
+        htmlTemplate: campaignDTO.htmlTemplate ?? {},
         goal: campaignDTO.goal,
         budget: campaignDTO.budget,
         startDate: campaignDTO.startDate,
@@ -317,6 +342,7 @@ class CampaignService {
           segments: campaignDTO.segments ?? [],
           step: campaignDTO.step ?? 0,
           html: campaignDTO.html ?? {},
+          htmlTemplate: campaignDTO.htmlTemplate ?? {},
           goal: campaignDTO.goal,
           budget: campaignDTO.budget,
           startDate: campaignDTO.startDate,
@@ -392,6 +418,91 @@ class CampaignService {
       await Campaign.increment(
         { numConversions: 1 },
         { where: { id: idCampaign }, transaction: t }
+      );
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async runCampaigns() {
+    try {
+      const statusApproved = await campaignStatusService.get('approved');
+      const statusRunning = await campaignStatusService.get('running');
+      const statusFinished = await campaignStatusService.get('finished');
+
+      await Campaign.update(
+        { idStatus: statusFinished.id },
+        {
+          where: {
+            idStatus: statusRunning.id,
+            endDate: {
+              [Op.lt]: new Date(),
+            },
+            active: true,
+          },
+        }
+      );
+
+      await Campaign.update(
+        { idStatus: statusRunning.id },
+        {
+          where: {
+            idStatus: statusApproved.id,
+            startDate: {
+              [Op.lte]: new Date(),
+            },
+            active: true,
+          },
+        }
+      );
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async sendCampaigns() {
+    try {
+      const status = await campaignStatusService.get('running');
+      const campaigns = await Campaign.findAll({
+        attributes: ['id', 'name', 'html', 'htmlTemplate'],
+        include: [
+          {
+            model: Lead,
+            as: 'leads',
+            attributes: ['id', 'name', 'lastName', 'email'],
+          },
+        ],
+        where: {
+          idStatus: status.id,
+          sent: false,
+          active: true,
+        },
+      });
+
+      for (const campaign of campaigns) {
+        console.log(`Executing: ${campaign.name}`);
+        const htmlFormatted = decode(campaign.htmlTemplate);
+        console.log(htmlFormatted);
+
+        for (const lead of campaign.leads) {
+          console.log(`Sending to: ${lead.name} ${lead.lastName} - ${lead.email}`);
+
+          const info = await transporter.sendMail({
+            from: '"CRM MiPYME" <diesalasmart@gmail.com>',
+            to: lead.email,
+            subject: campaign.name,
+            html: htmlFormatted,
+          });
+          console.log(info);
+        }
+      }
+
+      const campaignsId = campaigns.map((campaign) => campaign.id);
+      await Campaign.update(
+        {
+          sent: true,
+        },
+        { where: { id: campaignsId } }
       );
     } catch (e) {
       throw new BadRequestError(e.message);

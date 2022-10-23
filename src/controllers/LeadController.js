@@ -15,6 +15,15 @@ const getLeadById = async (req, res) => {
   res.status(StatusCodes.OK).json(lead);
 };
 
+const addLeadBulk = async (req, res) => {
+  const { id } = req.user;
+  const leads = req.body;
+  for (const lead of leads) {
+    await leadService.addLead(id, lead);
+  }
+  res.status(StatusCodes.OK).json({ message: 'Done' });
+};
+
 const addLead = async (req, res) => {
   const { id } = req.user;
   const lead = req.body;
@@ -33,5 +42,6 @@ module.exports = {
   getLeads,
   getLeadById,
   addLead,
+  addLeadBulk,
   seed_addLeads,
 };

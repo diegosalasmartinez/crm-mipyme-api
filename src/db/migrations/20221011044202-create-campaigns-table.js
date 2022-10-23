@@ -80,6 +80,14 @@ module.exports = {
         type: Sequelize.JSONB,
         allowNull: false,
       },
+      htmlTemplate: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
+      sent: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       goal: Sequelize.STRING,
       budget: Sequelize.FLOAT,
       active: {
