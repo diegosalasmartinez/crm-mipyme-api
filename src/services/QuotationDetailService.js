@@ -15,8 +15,8 @@ class QuotationService {
             quantity: item.quantity,
             unitPrice: item.unitPrice,
             totalPrice: item.totalPrice,
-            discount: item.totalPrice,
-            finalPrice: item.totalPrice,
+            discount: item.discount,
+            finalPrice: item.finalPrice,
           },
           { transaction: t }
         );
@@ -29,7 +29,7 @@ class QuotationService {
   async updateQuotationDetail(idCompany, idQuotation, detail, t) {
     try {
       await QuotationDetail.destroy({ where: { idQuotation }, transaction: t });
-      await this.addQuotationDetail(idCompany, idQuotation, detail, t)
+      await this.addQuotationDetail(idCompany, idQuotation, detail, t);
     } catch (e) {
       throw new BadRequestError(e.message);
     }
