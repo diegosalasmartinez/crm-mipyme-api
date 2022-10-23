@@ -2,49 +2,59 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('listsxleads', {
+    return queryInterface.createTable('quotations', {
       id: {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
-        allowNull: false,
       },
-      idList: {
+      idDeal: {
         type: Sequelize.UUID,
         references: {
-          model: 'lists',
+          model: 'deals',
           key: 'id',
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
         allowNull: false,
       },
-      idLead: {
+      idStatus: {
         type: Sequelize.UUID,
         references: {
-          model: 'leads',
+          model: 'quotation_status',
           key: 'id',
         },
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
         allowNull: false,
       },
+      startDate: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      limitDate: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      notes: Sequelize.STRING,
       active: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true
+        defaultValue: true,
       },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.NOW,
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.NOW,
       },
     });
   },
   // eslint-disable-next-line no-unused-vars
   async down(queryInterface, Sequelize) {
-    return queryInterface.dropTable('listsxleads');
+    await queryInterface.dropTable('quotations');
   },
 };

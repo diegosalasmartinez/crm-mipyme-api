@@ -1,21 +1,31 @@
-const { Plan, Program, User } = require('../models/index');
+const { Plan, Program, Campaign, Company } = require('../models/index');
 const { BadRequestError } = require('../errors');
-
+const ProgramService = require('./ProgramService');
+const programService = new ProgramService();
 class PlanService {
   async getPlan(idCompany) {
     try {
       const plan = await Plan.findOne({
+        required: true,
         include: [
           {
-            model: User,
-            as: 'user',
-            where: { idCompany },
+            model: Company,
+            as: 'company',
             attributes: [],
+            where: { id: idCompany },
           },
           {
             model: Program,
-            as: 'programs'
-          }
+            as: 'programs',
+            attributes: ['id', 'name', 'createdAt'],
+            include: [
+              {
+                model: Campaign,
+                as: 'campaigns',
+                attributes: ['id', 'numConversions'],
+              },
+            ],
+          },
         ],
         where: {
           active: true,
@@ -27,11 +37,11 @@ class PlanService {
     }
   }
 
-  async addPlan(idUser, planDTO) {
+  async addPlan(idCompany, planDTO) {
     try {
       const plan = await Plan.create({
         ...planDTO,
-        createdBy: idUser,
+        idCompany,
       });
       return plan;
     } catch (e) {
@@ -39,13 +49,18 @@ class PlanService {
     }
   }
 
-  async addProgram(idPlan, programDTO) {
+  async getPlanStats(plan) {
     try {
-      const program = await Program.create({
-        ...programDTO,
-        idPlan
-      });
-      return program;
+      let numConversions = 0;
+      let numDeals = 0;
+      let sales = 0;
+      for (let program of plan.programs) {
+        const stats = await programService.getProgramStats(program);
+        numConversions += stats.numConversions;
+        numDeals += stats.numDeals;
+        sales += stats.sales;
+      }
+      return { numConversions, numDeals, sales };
     } catch (e) {
       throw new BadRequestError(e.message);
     }

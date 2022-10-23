@@ -4,15 +4,12 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class List extends Model {
     static associate(models) {
-      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'user' });
-      this.hasMany(
-        models.ListXLead,
-        { foreignKey: 'idList', as: 'leads' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
+      this.belongsToMany(models.Lead, {
+        foreignKey: 'idList',
+        as: 'leads',
+        through: 'listsxleads',
+      });
     }
   }
   List.init(

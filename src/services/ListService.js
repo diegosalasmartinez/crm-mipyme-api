@@ -1,22 +1,23 @@
 const { sequelize } = require('../models/index');
-const { List, Lead, User, ListXLead } = require('../models/index');
+const { List, Lead, User, ClassificationMarketing } = require('../models/index');
 const { BadRequestError } = require('../errors');
 
 class ListService {
-  async getLists(idCompany, page, rowsPerPage) {
+  async getLists(idCompany, page = 0, rowsPerPage = 10) {
     try {
-      const { rows: lists, count } = await List.findAndCountAll({
+      const { rows: data = [], count } = await List.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
+        required: true,
         include: [
           {
             model: User,
-            as: 'user',
+            as: 'creator',
             where: { idCompany },
             attributes: [],
           },
           {
-            model: ListXLead,
+            model: Lead,
             as: 'leads',
             attributes: ['id'],
           },
@@ -25,7 +26,20 @@ class ListService {
           active: true,
         },
       });
-      return { lists, count };
+      return { data, count };
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getListByIdSimple(id) {
+    try {
+      const list = await List.findOne({
+        where: {
+          id,
+        },
+      });
+      return list;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -36,21 +50,13 @@ class ListService {
       const list = await List.findOne({
         include: [
           {
-            model: ListXLead,
+            model: Lead,
             as: 'leads',
-            attributes: ['id'],
+            attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone'],
             include: [
               {
-                model: Lead,
-                as: 'lead',
-                attributes: [
-                  'id',
-                  'name',
-                  'lastName',
-                  'email',
-                  'birthday',
-                  'phone',
-                ],
+                model: ClassificationMarketing,
+                as: 'classificationMarketing',
               },
             ],
           },
@@ -78,20 +84,37 @@ class ListService {
     }
   }
 
-  async addLeadsToList(idList, leadsId) {
+  async addLeadsToList(idList, leadsId = []) {
     const t = await sequelize.transaction();
-
     try {
-      const leadsBulk = [];
-      for (let idLead of leadsId) {
-        const leadBulk = { idList, idLead };
-        leadsBulk.push(leadBulk);
+      const list = await List.findByPk(idList);
+      for (const idLead of leadsId) {
+        await list.addLead(idLead, { through: 'listsxleads' }, { transaction: t });
       }
-      await ListXLead.bulkCreate(leadsBulk, { transaction: t });
 
       await t.commit();
     } catch (e) {
       await t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getListsByArrayId(ids) {
+    try {
+      const lists = await List.findAll({
+        include: [
+          {
+            model: Lead,
+            as: 'leads',
+            attributes: ['id'],
+          },
+        ],
+        where: {
+          id: ids,
+        },
+      });
+      return lists;
+    } catch (e) {
       throw new BadRequestError(e.message);
     }
   }

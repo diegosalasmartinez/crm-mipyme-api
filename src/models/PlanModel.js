@@ -4,7 +4,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Plan extends Model {
     static associate(models) {
-      this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'user' });
+      this.belongsTo(models.Company, { foreignKey: 'idCompany', as: 'company' });
       this.hasMany(
         models.Program,
         { foreignKey: 'idPlan', as: 'programs' },
@@ -27,14 +27,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      objetive: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
-      },
-      budget: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
-      },
+      goal: DataTypes.STRING,
+      budget: DataTypes.FLOAT,
       description: DataTypes.STRING,
       active: {
         type: DataTypes.BOOLEAN,

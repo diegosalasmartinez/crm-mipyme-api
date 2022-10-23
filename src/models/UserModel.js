@@ -1,12 +1,12 @@
 'use strict';
 const { Model } = require('sequelize');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       this.belongsTo(models.Company, { foreignKey: 'idCompany' });
+      this.belongsToMany(models.Role, { foreignKey: 'idUser', as: 'roles', through: 'usersxroles' });
       this.hasMany(
         models.List,
         { foreignKey: 'createdBy' },
@@ -15,6 +15,27 @@ module.exports = (sequelize, DataTypes) => {
           onUpdate: 'CASCADE',
         }
       );
+      this.hasMany(
+        models.Campaign,
+        { foreignKey: 'createdBy' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
+      this.hasMany(
+        models.Contact,
+        { foreignKey: 'assignedTo' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
+      this.belongsToMany(models.Campaign, {
+        foreignKey: 'idUser',
+        as: 'campaigns',
+        through: 'usersxcampaigns',
+      });
     }
     async setPassword() {
       const salt = await bcrypt.genSalt(10);
@@ -22,15 +43,6 @@ module.exports = (sequelize, DataTypes) => {
     }
     async comparePassword(password) {
       return await bcrypt.compare(password, this.password);
-    }
-    async createJWT() {
-      return jwt.sign(
-        { userId: this.id, idCompany: this.idCompany },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: process.env.JWT_LIFETIME,
-        }
-      );
     }
     getFullName() {
       return `${this.name} ${this.lastName}`;

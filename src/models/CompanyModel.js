@@ -12,6 +12,22 @@ module.exports = (sequelize, DataTypes) => {
           onUpdate: 'CASCADE',
         }
       );
+      this.hasMany(
+        models.Plan,
+        { foreignKey: 'idCompany' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
+      this.hasMany(
+        models.Product,
+        { foreignKey: 'idCompany', as: 'products' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
     }
   }
   Company.init(
@@ -30,10 +46,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      address: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
+      address: DataTypes.STRING,
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

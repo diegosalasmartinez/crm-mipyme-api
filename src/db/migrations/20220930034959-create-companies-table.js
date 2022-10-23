@@ -8,7 +8,6 @@ module.exports = {
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
-        allowNull: false,
       },
       name: {
         type: Sequelize.STRING,
@@ -18,20 +17,20 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      address: {
-        type: Sequelize.STRING,
-      },
+      address: Sequelize.STRING,
       active: {
         type: Sequelize.BOOLEAN,
-        defaultValue: true
+        defaultValue: true,
       },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.NOW,
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.NOW,
       },
     });
   },

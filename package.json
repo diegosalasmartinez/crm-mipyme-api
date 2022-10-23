@@ -8,8 +8,10 @@
     "migration:run": "npx sequelize-cli db:migrate",
     "migration:rollback": "npx sequelize-cli db:migrate:undo",
     "migration:rollback:all": "npx sequelize-cli db:migrate:undo:all",
+    "seed:generate": "npx sequelize-cli seed:generate --name",
     "seed:run": "npx sequelize-cli db:seed:all",
-    "seed:rollback": "npx sequelize-cli db:seed:undo:all",
+    "seed:rollback": "npx sequelize-cli db:seed:undo",
+    "seed:rollback:all": "npx sequelize-cli db:seed:undo:all",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
     "start": "node index.js"
@@ -38,6 +40,7 @@
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.5.0",
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^8.5.0",
     "nodemon": "^2.0.16",
