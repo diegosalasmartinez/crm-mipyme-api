@@ -28,7 +28,7 @@ const quotationService = new QuotationService();
 const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
 
 cron.schedule(
-  '46 19 * * *',
+  '15 0 * * *',
   async function () {
     const campaignService = new CampaignService();
     await campaignService.runCampaigns();
@@ -500,7 +500,7 @@ class CampaignService {
       const campaignsId = campaigns.map((campaign) => campaign.id);
       await Campaign.update(
         {
-          sent: false,
+          sent: true,
         },
         { where: { id: campaignsId } }
       );
