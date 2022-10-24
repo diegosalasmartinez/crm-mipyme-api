@@ -104,12 +104,12 @@ class LeadService {
           if (s.detail && s.detail.length > 0) {
             criteria[Op.or] = {
               [Op.is]: null,
-              [Op.ne]: s.detail ?? '',
+              [Op.ne]: s.detail === null ? '' : s.detail,
             };
           } else {
             criteria[Op.or] = {
               [Op.not]: null,
-              [Op.ne]: s.detail ?? '',
+              [Op.ne]: s.detail === null ? '' : s.detail,
             };
           }
         } else {
