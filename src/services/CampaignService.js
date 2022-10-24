@@ -483,18 +483,16 @@ class CampaignService {
       for (const campaign of campaigns) {
         console.log(`Executing: ${campaign.name}`);
         const htmlFormatted = decode(campaign.htmlTemplate);
-        console.log(htmlFormatted);
 
         for (const lead of campaign.leads) {
           console.log(`Sending to: ${lead.name} ${lead.lastName} - ${lead.email}`);
 
-          const info = await transporter.sendMail({
+          await transporter.sendMail({
             from: '"CRM MiPYME" <diesalasmart@gmail.com>',
             to: lead.email,
             subject: campaign.name,
             html: htmlFormatted,
           });
-          console.log(info);
         }
       }
 

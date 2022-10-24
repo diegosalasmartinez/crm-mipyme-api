@@ -7,7 +7,6 @@ const CompanyService = require('./CompanyService');
 class AuthService {
   async login(email, password) {
     const userService = new UserService();
-    console.log(email, password)
     const user = await userService.getUserByEmail(email);
     if (!user) {
       throw new BadRequestError(`No existe el usuario con el correo ${email}`);
