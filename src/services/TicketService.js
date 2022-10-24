@@ -6,12 +6,17 @@ const {
   Activity,
   ActivityStatus,
   ActivityType,
+  Deal,
+  DealStep,
+  DealPriority,
   User,
   Contact,
   Lead,
   sequelize,
 } = require('../models/index');
 const { BadRequestError } = require('../errors');
+const DealService = require('./DealService');
+const dealService = new DealService();
 const TicketTypeService = require('./TicketTypeService');
 const ticketTypeService = new TicketTypeService();
 const TicketPriorityService = require('./TicketPriorityService');
@@ -103,6 +108,33 @@ class TicketService {
             as: 'status',
           },
           {
+            model: Deal,
+            as: 'deal',
+            include: [
+              {
+                model: Contact,
+                as: 'contact',
+                attributes: ['id'],
+                required: true,
+                include: [
+                  {
+                    model: Lead,
+                    as: 'lead',
+                    attributes: ['id', 'name', 'lastName'],
+                  },
+                ],
+              },
+              {
+                model: DealStep,
+                as: 'step',
+              },
+              {
+                model: DealPriority,
+                as: 'priority',
+              },
+            ],
+          },
+          {
             model: Activity,
             as: 'activities',
             include: [
@@ -130,24 +162,44 @@ class TicketService {
   }
 
   async addTicket(idUser, ticketDTO) {
+    const t = await sequelize.transaction();
+
     try {
       const type = await ticketTypeService.get(ticketDTO.type);
       const priority = await ticketPriorityService.get(ticketDTO.priority);
       const status = await ticketStatusService.getDefault();
 
-      const ticket = await Ticket.create({
-        name: ticketDTO.name,
-        description: ticketDTO.description,
-        limitDate: ticketDTO.limitDate,
-        idType: type.id,
-        idPriority: priority.id,
-        idStatus: status.id,
-        createdBy: idUser,
-        assignedTo: ticketDTO.assignedTo,
-        idContact: ticketDTO.idContact,
-      });
+      const ticket = await Ticket.create(
+        {
+          name: ticketDTO.name,
+          description: ticketDTO.description,
+          limitDate: ticketDTO.limitDate,
+          idType: type.id,
+          idPriority: priority.id,
+          idStatus: status.id,
+          createdBy: idUser,
+          assignedTo: ticketDTO.assignedTo,
+          idContact: ticketDTO.idContact,
+        },
+        { transaction: t }
+      );
+
+      if (ticketDTO.type === 'quotation') {
+        const deal = {
+          origin: 'ticket',
+          priority: ticketDTO.priority,
+          name: ticketDTO.name,
+          expectedCloseDate: ticketDTO.limitDate,
+          description: ticketDTO.description,
+        };
+        await dealService.addDealThroughTicket(idUser, ticketDTO.idContact, deal, ticket.id, t);
+      }
+
+      t.commit();
+
       return ticket;
     } catch (e) {
+      t.rollback();
       throw new BadRequestError(e.message);
     }
   }

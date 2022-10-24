@@ -262,6 +262,31 @@ class DealService {
     }
   }
 
+  async addDealThroughTicket(idUser, idContact, dealDTO, idTicket, t) {
+    try {
+      const origin = await dealOriginService.get(dealDTO.origin);
+      const priority = await dealPriorityService.get(dealDTO.priority);
+      const step = await dealStepService.getDefault();
+
+      await Deal.create(
+        {
+          name: dealDTO.name,
+          expectedCloseDate: dealDTO.expectedCloseDate,
+          description: dealDTO.description,
+          idOrigin: origin.id,
+          idStep: step.id,
+          idPriority: priority.id,
+          idContact,
+          idTicket,
+          createdBy: idUser,
+        },
+        { transaction: t }
+      );
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async updateStep(deal, stepValue, data) {
     const t = await sequelize.transaction();
     try {
