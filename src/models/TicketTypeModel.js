@@ -12,6 +12,14 @@ module.exports = (sequelize, DataTypes) => {
           onUpdate: 'CASCADE',
         }
       );
+      this.hasMany(
+        models.Article,
+        { foreignKey: 'idType', as: 'articles' },
+        {
+          onDelete: 'SET NULL',
+          onUpdate: 'CASCADE',
+        }
+      );
     }
   }
   TicketType.init(
