@@ -3,7 +3,7 @@ const TicketService = require('../services/TicketService');
 const ticketService = new TicketService();
 
 const getTickets = async (req, res) => {
-  const { id: idUser, idCompany } = req.user;
+  const { idCompany } = req.user;
   const data = await ticketService.getTickets(idCompany);
   res.status(StatusCodes.OK).json(data);
 };
@@ -21,8 +21,15 @@ const addTicket = async (req, res) => {
   res.status(StatusCodes.OK).json(ticketCreated);
 };
 
+const updateTicketStatus = async (req, res) => {
+  const { ticket, status } = req.body;
+  await ticketService.updateStatus(ticket, status);
+  res.status(StatusCodes.OK).json({ message: 'La solicitud se ha actualizado' });
+};
+
 module.exports = {
   getTickets,
   getTicketDetail,
   addTicket,
+  updateTicketStatus,
 };

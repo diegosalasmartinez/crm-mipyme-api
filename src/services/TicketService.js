@@ -1,4 +1,16 @@
-const { Ticket, TicketType, User, Contact, Lead } = require('../models/index');
+const {
+  Ticket,
+  TicketType,
+  TicketPriority,
+  TicketStatus,
+  Activity,
+  ActivityStatus,
+  ActivityType,
+  User,
+  Contact,
+  Lead,
+  sequelize,
+} = require('../models/index');
 const { BadRequestError } = require('../errors');
 const TicketTypeService = require('./TicketTypeService');
 const ticketTypeService = new TicketTypeService();
@@ -30,6 +42,18 @@ class TicketService {
                 as: 'lead',
               },
             ],
+          },
+          {
+            model: TicketType,
+            as: 'type',
+          },
+          {
+            model: TicketPriority,
+            as: 'priority',
+          },
+          {
+            model: TicketStatus,
+            as: 'status',
           },
         ],
         where: {
@@ -66,19 +90,31 @@ class TicketService {
               },
             ],
           },
-          // {
-          //   model: Activity,
-          //   as: 'activities',
-          //   include: [
-          //     {
-          //       model: ActivityType,
-          //       as: 'type',
-          //     },
-          //   ],
-          // },
           {
             model: TicketType,
             as: 'type',
+          },
+          {
+            model: TicketPriority,
+            as: 'priority',
+          },
+          {
+            model: TicketStatus,
+            as: 'status',
+          },
+          {
+            model: Activity,
+            as: 'activities',
+            include: [
+              {
+                model: ActivityType,
+                as: 'type',
+              },
+              {
+                model: ActivityStatus,
+                as: 'status',
+              },
+            ],
           },
         ],
         where: {
@@ -95,8 +131,8 @@ class TicketService {
 
   async addTicket(idUser, ticketDTO) {
     try {
-      const type = await ticketTypeService.getDefault();
-      const priority = await ticketPriorityService.getDefault();
+      const type = await ticketTypeService.get(ticketDTO.type);
+      const priority = await ticketPriorityService.get(ticketDTO.priority);
       const status = await ticketStatusService.getDefault();
 
       const ticket = await Ticket.create({
@@ -112,6 +148,18 @@ class TicketService {
       });
       return ticket;
     } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async updateStatus(ticket, statusValue) {
+    const t = await sequelize.transaction();
+    try {
+      const status = await ticketStatusService.get(statusValue);
+      await Ticket.update({ idStatus: status.id }, { where: { id: ticket.id }, transaction: t });
+      t.commit();
+    } catch (e) {
+      t.rollback();
       throw new BadRequestError(e.message);
     }
   }

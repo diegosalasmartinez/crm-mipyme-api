@@ -8,16 +8,32 @@ const getActivities = async (req, res) => {
   res.status(StatusCodes.OK).json(activities);
 };
 
+const getActivity = async (req, res) => {
+  const { idActivity } = req.params;
+  const activity = await activityService.getActivityById(idActivity);
+  res.status(StatusCodes.OK).json(activity);
+};
+
 const addActivity = async (req, res) => {
   const { id: idUser } = req.user;
-  const { idDeal, activity } = req.body;
-  await activityService.addActivity(idUser, idDeal, activity);
+  const { idDeal, idTicket, activity } = req.body;
+  await activityService.addActivity(idUser, idDeal, idTicket, activity);
   res.status(StatusCodes.OK).json({
     message: `La actividad ${activity.name} ha sido registrada`,
   });
 };
 
+const updateActivity = async (req, res) => {
+  const { idActivity, status } = req.body;
+  await activityService.updateActivity(idActivity, status);
+  res.status(StatusCodes.OK).json({
+    message: `La actividad ha sido actualizada`,
+  });
+};
+
 module.exports = {
   getActivities,
+  getActivity,
   addActivity,
+  updateActivity,
 };
