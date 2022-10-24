@@ -13,11 +13,11 @@ module.exports = {
       {
         id: uuidv4(),
         key: 'pending',
-        name: 'Retrasado',
+        name: 'En proceso',
       },
       {
         id: uuidv4(),
-        key: 'accepted',
+        key: 'closed',
         name: 'Finalizado',
       },
     ]);
