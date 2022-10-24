@@ -23,9 +23,9 @@ const getArticlesByType = async (req, res) => {
 };
 
 const addArticle = async (req, res) => {
-  const { id } = req.user;
+  const { id: idUser } = req.user;
   const article = req.body;
-  const articleCreated = await articleService.addArticle(id, article);
+  const articleCreated = await articleService.addArticle(idUser, article);
   res.status(StatusCodes.OK).json(articleCreated);
 };
 
