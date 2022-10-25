@@ -32,8 +32,9 @@ class ArticleService {
     }
   }
 
-  async getArticlesByType(idCompany, idType) {
+  async getArticlesByType(idCompany, typeValue) {
     try {
+      const type = await ticketTypeService.get(typeValue);
       const articles = await Article.findAll({
         include: [
           {
@@ -48,7 +49,7 @@ class ArticleService {
           },
         ],
         where: {
-          idType,
+          idType: type.id,
           active: true,
         },
         order: [['createdAt', 'DESC']],

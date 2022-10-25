@@ -17,16 +17,16 @@ const getArticleById = async (req, res) => {
 
 const getArticlesByType = async (req, res) => {
   const { idCompany } = req.user;
-  const { idType } = req.params;
-  const articles = await articleService.getArticleById(idCompany, idType);
+  const { type } = req.params;
+  const articles = await articleService.getArticlesByType(idCompany, type);
   res.status(StatusCodes.OK).json(articles);
 };
 
 const addArticle = async (req, res) => {
   const { id: idUser } = req.user;
   const article = req.body;
-  const articleCreated = await articleService.addArticle(idUser, article);
-  res.status(StatusCodes.OK).json(articleCreated);
+  await articleService.addArticle(idUser, article);
+  res.status(StatusCodes.OK).json({ message: `El artículo ${article.title} ha sido registrado` });
 };
 
 module.exports = {

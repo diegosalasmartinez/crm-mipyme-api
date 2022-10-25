@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get('/', getArticles);
 router.get('/:idArticle', getArticleById);
-router.get('/types/:idType', getArticlesByType);
+router.get('/types/:type', getArticlesByType);
 router.post('/', addArticle);
 
 module.exports = router;
