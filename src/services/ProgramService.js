@@ -80,7 +80,13 @@ class ProgramService {
           return num + stats.distribution[idx];
         });
       }
-      return { numConversions, numDeals, sales, distribution };
+      return {
+        numConversions,
+        numDeals,
+        sales,
+        numCampaigns: program.campaigns.length,
+        distribution,
+      };
     } catch (e) {
       throw new BadRequestError(e.message);
     }

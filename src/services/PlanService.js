@@ -12,7 +12,7 @@ const ProgramService = require('./ProgramService');
 const programService = new ProgramService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
-const { months } = require('../utils');
+const { generateChartLabels } = require('../utils');
 
 class PlanService {
   async getPlan(idCompany) {
@@ -80,17 +80,19 @@ class PlanService {
       let numDeals = 0;
       let sales = 0;
       let distribution = [0, 0, 0, 0];
+      let numCampaigns = 0;
 
       for (let program of plan.programs) {
         const stats = await programService.getProgramStats(program);
         numConversions += stats.numConversions;
         numDeals += stats.numDeals;
         sales += stats.sales;
+        numCampaigns += stats.numCampaigns;
         distribution = distribution.map(function (num, idx) {
           return num + stats.distribution[idx];
         });
       }
-      return { numConversions, numDeals, sales, distribution };
+      return { numConversions, numDeals, sales, numCampaigns, distribution };
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -99,19 +101,10 @@ class PlanService {
   async dashboard(idCompany) {
     try {
       const company = await this.getPlan(idCompany);
-      const statsCampaigns = await this.getPlanStats(company);
+      const { numCampaigns, numDeals, sales, distribution } = await this.getPlanStats(company);
 
       // Lead generation
-      var chartLabels = {};
-      var d = new Date();
-      d.setDate(1);
-      for (var m_month = 0; m_month < 9; m_month++) {
-        chartLabels[moment(d).format('YYYY-MM')] = {
-          value: 0,
-          name: months[d.getMonth()],
-        };
-        d.setMonth(d.getMonth() - 1);
-      }
+      const chartLabels = generateChartLabels();
       const { data: leads } = await leadService.getLeads(idCompany);
       leads.forEach((lead) => {
         const k = moment(lead.createdAt).format('YYYY-MM').slice(0, 7);
@@ -128,7 +121,13 @@ class PlanService {
         .reverse();
       const leadGeneration = { data, label };
 
-      return { ...statsCampaigns, leadGeneration };
+      const opportunities = {
+        numCampaigns,
+        numDeals,
+        sales,
+      };
+
+      return { opportunities, distribution, leadGeneration };
     } catch (e) {
       throw new BadRequestError(e.message);
     }
