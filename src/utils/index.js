@@ -1,4 +1,4 @@
-export const roles = {
+const roles = {
   ADMIN: 'admin',
   ADMIN_MARKETING: 'marketing_admin',
   MARKETING: 'marketing',
@@ -8,6 +8,14 @@ export const roles = {
   SERVICES: 'services',
 };
 
-export const hasRole = (userRoles, roles) => {
+const hasRole = (userRoles, roles) => {
   return userRoles.filter((r) => roles.includes(r.key)).length > 0;
+};
+
+const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+module.exports = {
+  roles,
+  hasRole,
+  months,
 };
