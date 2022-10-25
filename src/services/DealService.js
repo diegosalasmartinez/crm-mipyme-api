@@ -1,3 +1,4 @@
+const moment = require('moment');
 const {
   Deal,
   DealStep,
@@ -25,6 +26,9 @@ const QuotationService = require('./QuotationService');
 const quotationService = new QuotationService();
 const LostTypeService = require('./LostTypeService');
 const lostTypeService = new LostTypeService();
+const ActivityStatusService = require('./ActivityStatusService');
+const activityStatusService = new ActivityStatusService();
+const { generateChartLabels } = require('../utils');
 
 class DealService {
   async getDeals(idCompany) {
@@ -71,6 +75,62 @@ class DealService {
         data.push(deals);
       }
       return data;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getDealsSimple(idCompany) {
+    try {
+      const deals = await Deal.findAll({
+        include: [
+          {
+            model: Contact,
+            as: 'contact',
+            attributes: ['id'],
+            required: true,
+            include: [
+              {
+                model: User,
+                as: 'assigned',
+                attributes: ['id', 'name', 'lastName'],
+                required: true,
+                where: {
+                  idCompany,
+                },
+              },
+            ],
+          },
+          {
+            model: Activity,
+            as: 'activities',
+            include: [
+              {
+                model: ActivityStatus,
+                as: 'status',
+              },
+            ],
+          },
+          {
+            model: LostType,
+            as: 'lostType',
+          },
+          {
+            model: Quotation,
+            as: 'quotations',
+            include: [
+              {
+                model: QuotationDetail,
+                as: 'detail',
+              },
+            ],
+          },
+        ],
+        where: {
+          active: true,
+        },
+      });
+      return deals;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -313,6 +373,85 @@ class DealService {
       t.commit();
     } catch (e) {
       t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async dashboard(idCompany) {
+    try {
+      const deals = await this.getDealsSimple(idCompany);
+      // Sales stats
+      const numDeals = deals.length;
+      const winStep = await dealStepService.get('won');
+      const lostStep = await dealStepService.get('lost');
+      let wonQty = 0;
+      let wonAmount = 0;
+      let lostQty = 0;
+      let lostAmount = 0;
+      // Lead generation
+      const chartLabels = generateChartLabels();
+      // Activity stats
+      let numActivities = 0;
+      let avgTime = 0;
+      let onTime = 0;
+      let late = 0;
+      let closedStatus = await activityStatusService.get('closed');
+
+      deals.forEach((deal) => {
+        const k = moment(deal.createdAt).format('YYYY-MM').slice(0, 7);
+        // Group by created at
+        if (chartLabels[k]) {
+          chartLabels[k] = { value: chartLabels[k].value + 1, name: chartLabels[k].name };
+        }
+        // Group by win or lost
+        if (deal.idStep === winStep.id) {
+          wonQty++;
+          deal.quotations.forEach((quotation) => {
+            quotation.detail.forEach((item) => {
+              wonAmount += item.finalPrice;
+            });
+          });
+        } else if (deal.idStep === lostStep.id) {
+          lostQty++;
+          deal.quotations.forEach((quotation) => {
+            quotation.detail.forEach((item) => {
+              lostAmount += item.finalPrice;
+            });
+          });
+        }
+        // Group by activity
+        numActivities += deal.activities.length;
+        deal.activities.map((activity) => {
+          const startDate = moment(activity.startDate);
+          const endDate = moment(activity.endDate);
+          avgTime += moment.duration(endDate.diff(startDate)).asDays();
+          if (activity.idStatus === closedStatus.id) onTime++;
+        });
+      });
+      const data = Object.entries(chartLabels)
+        .map((entry) => entry[1].value)
+        .reverse();
+      const label = Object.entries(chartLabels)
+        .map((entry) => entry[1].name)
+        .reverse();
+      const dealGeneration = { data, label };
+
+      const sales = {
+        numDeals,
+        wonQty,
+        wonAmount,
+        lostQty,
+        lostAmount,
+      };
+
+      const activities = {
+        numActivities,
+        avgTime,
+        onTime,
+        late,
+      };
+      return { sales, dealGeneration, activities };
+    } catch (e) {
       throw new BadRequestError(e.message);
     }
   }

@@ -37,10 +37,17 @@ const updateDealStep = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: 'La oportunidad se ha actualizado' });
 };
 
+const dashboard = async (req, res) => {
+  const { idCompany } = req.user;
+  const stats = await dealService.dashboard(idCompany);
+  res.status(StatusCodes.OK).json(stats);
+};
+
 module.exports = {
   getDeals,
   createDeal,
   getDealDetail,
   getDealBasicInfo,
   updateDealStep,
+  dashboard
 };
