@@ -1,9 +1,11 @@
 const { Op } = require('sequelize');
 const { faker } = require('@faker-js/faker');
-const { Lead, User, List, ClassificationMarketing } = require('../models/index');
+const { Lead, User, List, ClassificationMarketing, Campaign, Program } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');
 const classificationService = new ClassificationMarketingService();
+const CampaignStatusService = require('./CampaignStatusService');
+const campaignStatusService = new CampaignStatusService();
 
 class LeadService {
   async getLeads(idCompany, page = 0, rowsPerPage = 10) {
@@ -11,7 +13,17 @@ class LeadService {
       const { rows: data = [], count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
-        attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone', 'birthday', 'companyName', 'createdAt'],
+        attributes: [
+          'id',
+          'name',
+          'lastName',
+          'email',
+          'birthday',
+          'phone',
+          'birthday',
+          'companyName',
+          'createdAt',
+        ],
         required: true,
         include: [
           {
@@ -53,12 +65,34 @@ class LeadService {
 
   async getLeadById(id) {
     try {
+      const status = await campaignStatusService.get('running');
       const lead = await Lead.findOne({
         include: [
           {
             model: List,
             as: 'lists',
             include: [{ model: Lead, as: 'leads', attributes: ['id'] }],
+          },
+          {
+            model: Campaign,
+            as: 'campaigns',
+            attributes: ['id', 'name', 'startDate', 'endDate'],
+            include: [
+              {
+                model: User,
+                as: 'creator',
+                attributes: ['id', 'name', 'lastName'],
+              },
+              {
+                model: Program,
+                as: 'program',
+                attributes: ['id', 'name'],
+              },
+            ],
+            where: {
+              idStatus: status.id,
+              active: true,
+            },
           },
           {
             model: ClassificationMarketing,
