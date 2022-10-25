@@ -12,7 +12,11 @@ const getLists = async (req, res) => {
 const getListDetail = async (req, res) => {
   const { idList } = req.params;
   const list = await listService.getListById(idList);
-  res.status(StatusCodes.OK).json(list);
+  let stats = null;
+  if (list) {
+    stats = await listService.getListStats(list);
+  }
+  res.status(StatusCodes.OK).json({ list, stats });
 };
 
 const addList = async (req, res) => {
