@@ -380,6 +380,7 @@ class DealService {
   async dashboard(idCompany) {
     try {
       const deals = await this.getDealsSimple(idCompany);
+
       // Sales stats
       const numDeals = deals.length;
       const winStep = await dealStepService.get('won');
@@ -388,14 +389,19 @@ class DealService {
       let wonAmount = 0;
       let lostQty = 0;
       let lostAmount = 0;
+
       // Lead generation
       const chartLabels = generateChartLabels();
+
       // Activity stats
       let numActivities = 0;
       let avgTime = 0;
       let onTime = 0;
       let late = 0;
       let closedStatus = await activityStatusService.get('closed');
+
+      // Rejection stats
+      const rejectionValues = {};
 
       deals.forEach((deal) => {
         const k = moment(deal.createdAt).format('YYYY-MM').slice(0, 7);
@@ -418,6 +424,12 @@ class DealService {
               lostAmount += item.finalPrice;
             });
           });
+
+          if (rejectionValues[deal.lostType.name]) {
+            rejectionValues[deal.lostType.name] = rejectionValues[deal.lostType.name] + 1;
+          } else {
+            rejectionValues[deal.lostType.name] = 1;
+          }
         }
         // Group by activity
         numActivities += deal.activities.length;
@@ -428,6 +440,7 @@ class DealService {
           if (activity.idStatus === closedStatus.id) onTime++;
         });
       });
+
       const data = Object.entries(chartLabels)
         .map((entry) => entry[1].value)
         .reverse();
@@ -435,6 +448,11 @@ class DealService {
         .map((entry) => entry[1].name)
         .reverse();
       const dealGeneration = { data, label };
+
+      const rejections = {
+        data: Object.entries(rejectionValues).map((entry) => entry[1]),
+        label: Object.entries(rejectionValues).map((entry) => entry[0]),
+      }
 
       const sales = {
         numDeals,
@@ -450,7 +468,7 @@ class DealService {
         onTime,
         late,
       };
-      return { sales, dealGeneration, activities };
+      return { sales, dealGeneration, activities, rejections };
     } catch (e) {
       throw new BadRequestError(e.message);
     }
