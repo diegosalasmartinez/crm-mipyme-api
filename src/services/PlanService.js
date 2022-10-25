@@ -1,3 +1,4 @@
+const moment = require('moment');
 const {
   Plan,
   Program,
@@ -9,6 +10,10 @@ const {
 const { BadRequestError } = require('../errors');
 const ProgramService = require('./ProgramService');
 const programService = new ProgramService();
+const LeadService = require('./LeadService');
+const leadService = new LeadService();
+const { months } = require('../utils');
+
 class PlanService {
   async getPlan(idCompany) {
     try {
@@ -86,6 +91,44 @@ class PlanService {
         });
       }
       return { numConversions, numDeals, sales, distribution };
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async dashboard(idCompany) {
+    try {
+      const company = await this.getPlan(idCompany);
+      const statsCampaigns = await this.getPlanStats(company);
+
+      // Lead generation
+      var chartLabels = {};
+      var d = new Date();
+      d.setDate(1);
+      for (var m_month = 0; m_month < 9; m_month++) {
+        chartLabels[moment(d).format('YYYY-MM')] = {
+          value: 0,
+          name: months[d.getMonth()],
+        };
+        d.setMonth(d.getMonth() - 1);
+      }
+      const { data: leads } = await leadService.getLeads(idCompany);
+      leads.forEach((lead) => {
+        const k = moment(lead.createdAt).format('YYYY-MM').slice(0, 7);
+        if (chartLabels[k]) {
+          chartLabels[k] = { value: chartLabels[k].value + 1, name: chartLabels[k].name };
+        }
+      });
+
+      const data = Object.entries(chartLabels)
+        .map((entry) => entry[1].value)
+        .reverse();
+      const label = Object.entries(chartLabels)
+        .map((entry) => entry[1].name)
+        .reverse();
+      const leadGeneration = { data, label };
+
+      return { ...statsCampaigns, leadGeneration };
     } catch (e) {
       throw new BadRequestError(e.message);
     }

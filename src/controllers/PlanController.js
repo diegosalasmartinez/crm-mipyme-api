@@ -19,7 +19,14 @@ const addPlan = async (req, res) => {
   res.status(StatusCodes.OK).json(planCreated);
 };
 
+const dashboard = async (req, res) => {
+  const { idCompany } = req.user;
+  const stats = await planService.dashboard(idCompany);
+  res.status(StatusCodes.OK).json(stats);
+}
+
 module.exports = {
   getPlan,
   addPlan,
+  dashboard
 };
