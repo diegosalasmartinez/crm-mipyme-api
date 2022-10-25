@@ -281,10 +281,27 @@ class CampaignService {
 
   async getCampaignStats(campaign) {
     try {
+      const distribution = {
+        started: 0,
+        ready_marketing: 0,
+        marketing_engaged: 0,
+        ready_sales: 0,
+      };
+      campaign.leads.forEach(function (lead) {
+        const classification = lead.classificationMarketing.key;
+        distribution[classification] = (distribution[classification] || 0) + 1;
+      });
+      const distributionArray = Object.keys(distribution).map((key) => distribution[key]);
+
       const deals = await campaign.getDeals();
       const dealsId = deals.map((deal) => deal.id);
       const sales = await quotationService.getSalesOfDeals(dealsId);
-      return { numConversions: campaign.numConversions, numDeals: deals.length, sales };
+      return {
+        distribution: distributionArray,
+        numConversions: campaign.numConversions,
+        numDeals: deals.length,
+        sales,
+      };
     } catch (e) {
       throw new BadRequestError(e.message);
     }

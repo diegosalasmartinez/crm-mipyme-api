@@ -1,4 +1,11 @@
-const { Plan, Program, Campaign, Company } = require('../models/index');
+const {
+  Plan,
+  Program,
+  Campaign,
+  Company,
+  Lead,
+  ClassificationMarketing,
+} = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ProgramService = require('./ProgramService');
 const programService = new ProgramService();
@@ -23,6 +30,19 @@ class PlanService {
                 model: Campaign,
                 as: 'campaigns',
                 attributes: ['id', 'numConversions'],
+                include: [
+                  {
+                    model: Lead,
+                    as: 'leads',
+                    attributes: ['id'],
+                    include: [
+                      {
+                        model: ClassificationMarketing,
+                        as: 'classificationMarketing',
+                      },
+                    ],
+                  },
+                ],
               },
             ],
           },
@@ -54,13 +74,18 @@ class PlanService {
       let numConversions = 0;
       let numDeals = 0;
       let sales = 0;
+      let distribution = [0, 0, 0, 0];
+
       for (let program of plan.programs) {
         const stats = await programService.getProgramStats(program);
         numConversions += stats.numConversions;
         numDeals += stats.numDeals;
         sales += stats.sales;
+        distribution = distribution.map(function (num, idx) {
+          return num + stats.distribution[idx];
+        });
       }
-      return { numConversions, numDeals, sales };
+      return { numConversions, numDeals, sales, distribution };
     } catch (e) {
       throw new BadRequestError(e.message);
     }

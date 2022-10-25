@@ -8,6 +8,7 @@ module.exports = {
     host: process.env.DEV_DB_HOST,
     port: parseInt(process.env.DEV_DB_HOST),
     dialect: process.env.DEV_DB_DIALECT,
+    logging: false,
     seederStorage: 'sequelize',
   },
   // "test": {
