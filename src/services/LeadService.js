@@ -1,6 +1,17 @@
 const { Op } = require('sequelize');
 const { faker } = require('@faker-js/faker');
-const { Lead, User, List, ClassificationMarketing, Campaign, Program } = require('../models/index');
+const {
+  Lead,
+  Contact,
+  User,
+  List,
+  ClassificationMarketing,
+  Campaign,
+  Program,
+  Deal,
+  Quotation,
+  QuotationStatus
+} = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');
 const classificationService = new ClassificationMarketingService();
@@ -93,6 +104,36 @@ class LeadService {
               idStatus: status.id,
               active: true,
             },
+          },
+          {
+            model: Contact,
+            as: 'contact',
+            attributes: ['id'],
+            include: [
+              {
+                model: Deal,
+                as: 'deals',
+                attributes: ['id'],
+                include: [
+                  {
+                    model: Quotation,
+                    as: 'quotations',
+                    attributes: ['id', 'startDate', 'limitDate'],
+                    include: [
+                      {
+                        model: Deal,
+                        as: 'deal',
+                        attributes: ['id', 'name'],
+                      },
+                      {
+                        model: QuotationStatus,
+                        as: 'status',
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
           {
             model: ClassificationMarketing,
