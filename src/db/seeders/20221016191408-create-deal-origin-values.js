@@ -15,6 +15,11 @@ module.exports = {
         key: 'campaign',
         name: 'Campaña de marketing',
       },
+      {
+        id: uuidv4(),
+        key: 'sales',
+        name: 'Captación de ventas',
+      },
     ]);
   },
 
