@@ -60,6 +60,44 @@ class LeadService {
     }
   }
 
+  async getAllLeads(idCompany) {
+    try {
+      const leads = await Lead.findAll({
+        attributes: [
+          'id',
+          'name',
+          'lastName',
+          'email',
+          'birthday',
+          'phone',
+          'birthday',
+          'companyName',
+          'createdAt',
+        ],
+        required: true,
+        include: [
+          {
+            model: User,
+            as: 'creator',
+            where: { idCompany },
+            attributes: [],
+          },
+          {
+            model: ClassificationMarketing,
+            as: 'classificationMarketing',
+            attributes: ['key', 'name'],
+          },
+        ],
+        where: {
+          active: true,
+        },
+      });
+      return leads;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async getLeadByIdSimple(id) {
     try {
       const lead = await Lead.findOne({
@@ -249,6 +287,7 @@ class LeadService {
           phone: faker.phone.number(),
           address: faker.address.secondaryAddress(),
           createdBy: idUser,
+          createdAt: faker.date.past(),
           idClassificationMarketing: classification.id,
         };
         leadsInfo.push(info);

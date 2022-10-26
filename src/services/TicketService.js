@@ -192,7 +192,7 @@ class TicketService {
           expectedCloseDate: ticketDTO.limitDate,
           description: ticketDTO.description,
         };
-        await dealService.addDealThroughTicket(idUser, ticketDTO.idContact, deal, ticket.id, t);
+        await dealService.addDeal(idUser, ticketDTO.idContact, deal, null, ticket.id, t);
       }
 
       t.commit();

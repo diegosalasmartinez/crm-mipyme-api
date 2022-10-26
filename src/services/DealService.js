@@ -282,21 +282,7 @@ class DealService {
     }
   }
 
-  async addDeal(idLead, dealDTO, t) {
-    try {
-      await Deal.create(
-        {
-          ...dealDTO,
-          idLead,
-        },
-        { transaction: t }
-      );
-    } catch (e) {
-      throw new BadRequestError(e.message);
-    }
-  }
-
-  async addDealThroughCampaign(idUser, idContact, dealDTO, idCampaign, t) {
+  async addDeal(idUser, idContact, dealDTO, idCampaign, idTicket, t) {
     try {
       const origin = await dealOriginService.get(dealDTO.origin);
       const priority = await dealPriorityService.get(dealDTO.priority);
@@ -312,32 +298,8 @@ class DealService {
           idStep: step.id,
           idPriority: priority.id,
           idContact,
-          idCampaign,
-          createdBy: idUser,
-        },
-        { transaction: t }
-      );
-    } catch (e) {
-      throw new BadRequestError(e.message);
-    }
-  }
-
-  async addDealThroughTicket(idUser, idContact, dealDTO, idTicket, t) {
-    try {
-      const origin = await dealOriginService.get(dealDTO.origin);
-      const priority = await dealPriorityService.get(dealDTO.priority);
-      const step = await dealStepService.getDefault();
-
-      await Deal.create(
-        {
-          name: dealDTO.name,
-          expectedCloseDate: dealDTO.expectedCloseDate,
-          description: dealDTO.description,
-          idOrigin: origin.id,
-          idStep: step.id,
-          idPriority: priority.id,
-          idContact,
           idTicket,
+          idCampaign,
           createdBy: idUser,
         },
         { transaction: t }

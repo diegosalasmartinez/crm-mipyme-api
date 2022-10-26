@@ -15,7 +15,7 @@ const createDeal = async (req, res) => {
   const { idCampaign, lead, deal } = req.body;
   const leadStored = await leadService.getLeadByIdSimple(lead.id);
   const contact = await leadStored.getContact();
-  await dealService.addDealThroughCampaign(idUser, contact.id, deal, idCampaign);
+  await dealService.addDeal(idUser, contact.id, deal, idCampaign, null);
   res.status(StatusCodes.OK).json({ message: `Oportunidad ${deal.name} registrada correctamente` });
 };
 
@@ -49,5 +49,5 @@ module.exports = {
   getDealDetail,
   getDealBasicInfo,
   updateDealStep,
-  dashboard
+  dashboard,
 };

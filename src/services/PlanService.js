@@ -105,7 +105,7 @@ class PlanService {
 
       // Lead generation
       const chartLabels = generateChartLabels();
-      const { data: leads } = await leadService.getLeads(idCompany);
+      const leads = await leadService.getAllLeads(idCompany);
       leads.forEach((lead) => {
         const k = moment(lead.createdAt).format('YYYY-MM').slice(0, 7);
         if (chartLabels[k]) {

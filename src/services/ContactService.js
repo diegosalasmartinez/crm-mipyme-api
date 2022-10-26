@@ -96,45 +96,26 @@ class ContactService {
     }
   }
 
-  async convertLead(contact, registerDeal, deal) {
+  async convertLead(idUser, idLead, assignedTo, idCampaign, registerDeal, deal) {
     const t = await sequelize.transaction();
     try {
-      await Contact.create({
-        idLead: contact.lead.id,
-        assignedTo: contact.assignedTo,
-      });
-      if (registerDeal) {
-        await dealService.addDeal(contact.lead.id, deal, t);
-      }
-      await leadService.convertLead(contact.lead.id, t);
-      await t.commit();
-    } catch (e) {
-      await t.rollback();
-      throw new BadRequestError(e.message);
-    }
-  }
-
-  async convertLeadThroughCampaign(idUser, idLead, assignedTo, idCampaign, registerDeal, deal) {
-    const t = await sequelize.transaction();
-    try {
-      let contact = await this.getContactByLead(idLead);
-      if (!contact) {
-        const classification = await classificationSalesService.getDefault();
-        contact = await Contact.create(
-          {
-            idLead,
-            assignedTo,
-            idClassificationSales: classification.id,
-          },
-          { transaction: t }
-        );
-      }
-
-      if (registerDeal) {
-        await dealService.addDealThroughCampaign(idUser, contact.id, deal, idCampaign, t);
-      }
+      const classification = await classificationSalesService.getDefault();
+      const contact = await Contact.create(
+        {
+          idLead,
+          assignedTo,
+          idClassificationSales: classification.id,
+        },
+        { transaction: t }
+      );
       await leadService.convertLead(idLead, t);
-      await campaignService.increaseConvertNumber(idCampaign, t);
+
+      if (registerDeal) {
+        await dealService.addDeal(idUser, contact.id, deal, idCampaign, null, t);
+      }
+      if (idCampaign) {
+        await campaignService.increaseConvertNumber(idCampaign, t);
+      }
       await t.commit();
     } catch (e) {
       await t.rollback();
