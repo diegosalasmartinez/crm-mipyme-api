@@ -497,13 +497,12 @@ class CampaignService {
         },
       });
 
+      const campaignsResult = [];
       for (const campaign of campaigns) {
-        console.log(`Executing: ${campaign.name}`);
+        campaignsResult.push(`Executing: ${campaign.name}`);
         const htmlFormatted = decode(campaign.htmlTemplate);
 
         for (const lead of campaign.leads) {
-          console.log(`Sending to: ${lead.name} ${lead.lastName} - ${lead.email}`);
-
           await transporter.sendMail({
             from: '"CRM MiPYME" <diesalasmart@gmail.com>',
             to: lead.email,
@@ -520,6 +519,7 @@ class CampaignService {
         },
         { where: { id: campaignsId } }
       );
+      return campaignsResult;
     } catch (e) {
       throw new BadRequestError(e.message);
     }

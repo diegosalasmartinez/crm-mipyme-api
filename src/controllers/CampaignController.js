@@ -63,8 +63,8 @@ const runCampaigns = async (req, res) => {
 };
 
 const sendCampaigns = async (req, res) => {
-  await campaignService.sendCampaigns();
-  res.status(StatusCodes.OK).json({ message: `Done` });
+  const result = await campaignService.sendCampaigns();
+  res.status(StatusCodes.OK).json(result);
 };
 
 module.exports = {
