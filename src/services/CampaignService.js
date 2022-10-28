@@ -254,6 +254,11 @@ class CampaignService {
             attributes: ['name', 'lastName'],
           },
           {
+            model: User,
+            as: 'approver',
+            attributes: ['name', 'lastName'],
+          },
+          {
             model: Lead,
             as: 'leads',
             attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone'],
@@ -421,6 +426,7 @@ class CampaignService {
           startDate: campaignDTO.startDate,
           endDate: campaignDTO.endDate,
           approvedBy: idUser,
+          approvedAt: new Date(),
           idStatus: status.id,
         },
         { where: { id: campaignDTO.id }, transaction: t }

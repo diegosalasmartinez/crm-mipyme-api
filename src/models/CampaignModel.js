@@ -73,6 +73,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       goal: DataTypes.STRING,
       budget: DataTypes.FLOAT,
+      approvedAt: DataTypes.DATE,
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
