@@ -124,10 +124,10 @@ class ListService {
   async getListStats(list) {
     try {
       // Lead generation
-      var chartLabels = {};
-      var d = new Date();
+      const chartLabels = {};
+      const d = new Date();
       d.setDate(1);
-      for (var m_month = 0; m_month < 9; m_month++) {
+      for (let m_month = 0; m_month < 9; m_month++) {
         chartLabels[moment(d).format('YYYY-MM')] = {
           value: 0,
           name: months[d.getMonth()],
