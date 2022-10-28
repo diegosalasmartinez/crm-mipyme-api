@@ -12,22 +12,8 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Ticket, { foreignKey: 'idTicket', as: 'ticket' });
       this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
       this.belongsTo(models.Contact, { foreignKey: 'idContact', as: 'contact' });
-      this.hasMany(
-        models.Activity,
-        { foreignKey: 'idDeal', as: 'activities' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
-      this.hasMany(
-        models.Quotation,
-        { foreignKey: 'idDeal', as: 'quotations' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.hasMany(models.Activity, { foreignKey: 'idDeal', as: 'activities' });
+      this.hasMany(models.Quotation, { foreignKey: 'idDeal', as: 'quotations' });
     }
   }
   Deal.init(

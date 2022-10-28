@@ -10,6 +10,7 @@ const {
   Company,
   User,
   ClassificationMarketing,
+  Rejection,
   sequelize,
 } = require('../models/index');
 const { transporter } = require('../config/MailConfig');
@@ -267,6 +268,17 @@ class CampaignService {
             model: CampaignStatus,
             as: 'status',
           },
+          {
+            model: Rejection,
+            as: 'rejections',
+            include: [
+              {
+                model: User,
+                as: 'creator',
+                attributes: ['id', 'name', 'lastName'],
+              },
+            ],
+          },
         ],
         where: {
           id,
@@ -370,6 +382,21 @@ class CampaignService {
       );
 
       await discountService.updateDiscounts(idCompany, campaignDTO, 'marketing');
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async rejectCampaign(idCampaign) {
+    try {
+      const status = await campaignStatusService.get('rejected');
+
+      await Campaign.update(
+        {
+          idStatus: status.id,
+        },
+        { where: { id: idCampaign } }
+      );
     } catch (e) {
       throw new BadRequestError(e.message);
     }

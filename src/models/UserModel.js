@@ -6,31 +6,15 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       this.belongsTo(models.Company, { foreignKey: 'idCompany' });
-      this.belongsToMany(models.Role, { foreignKey: 'idUser', as: 'roles', through: 'usersxroles' });
-      this.hasMany(
-        models.List,
-        { foreignKey: 'createdBy' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
-      this.hasMany(
-        models.Campaign,
-        { foreignKey: 'createdBy' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
-      this.hasMany(
-        models.Contact,
-        { foreignKey: 'assignedTo' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.hasMany(models.Rejection, { foreignKey: 'createdBy' });
+      this.hasMany(models.List, { foreignKey: 'createdBy' });
+      this.hasMany(models.Campaign, { foreignKey: 'createdBy' });
+      this.hasMany(models.Contact, { foreignKey: 'assignedTo' });
+      this.belongsToMany(models.Role, {
+        foreignKey: 'idUser',
+        as: 'roles',
+        through: 'usersxroles',
+      });
       this.belongsToMany(models.Campaign, {
         foreignKey: 'idUser',
         as: 'campaigns',

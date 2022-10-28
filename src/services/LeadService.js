@@ -10,7 +10,7 @@ const {
   Program,
   Deal,
   Quotation,
-  QuotationStatus
+  QuotationStatus,
 } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');

@@ -6,14 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.Deal, { foreignKey: 'idDeal', as: 'deal' });
       this.belongsTo(models.QuotationStatus, { foreignKey: 'idStatus', as: 'status' });
-      this.hasMany(
-        models.QuotationDetail,
-        { foreignKey: 'idQuotation', as: 'detail' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.hasMany(models.QuotationDetail, { foreignKey: 'idQuotation', as: 'detail' });
     }
   }
   Quotation.init(

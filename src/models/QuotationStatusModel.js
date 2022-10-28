@@ -4,14 +4,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class QuotationStatus extends Model {
     static associate(models) {
-      this.hasMany(
-        models.Quotation,
-        { foreignKey: 'idStatus', as: 'quotations' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.hasMany(models.Quotation, { foreignKey: 'idStatus', as: 'quotations' });
     }
   }
   QuotationStatus.init(

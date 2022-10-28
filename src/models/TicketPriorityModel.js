@@ -4,14 +4,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class TicketPriority extends Model {
     static associate(models) {
-      this.hasMany(
-        models.Ticket,
-        { foreignKey: 'idPriority', as: 'tickets' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.hasMany(models.Ticket, { foreignKey: 'idPriority', as: 'tickets' });
     }
   }
   TicketPriority.init(

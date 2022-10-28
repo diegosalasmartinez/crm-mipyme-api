@@ -4,14 +4,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class DiscountType extends Model {
     static associate(models) {
-      this.hasMany(
-        models.Discount,
-        { foreignKey: 'idType', as: 'discounts' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.hasMany(models.Discount, { foreignKey: 'idType', as: 'discounts' });
     }
   }
   DiscountType.init(

@@ -22,6 +22,7 @@ const quotationRoutes = require('./QuotationRoutes');
 const activityRoutes = require('./ActivityRoutes');
 const ticketRoutes = require('./TicketRoutes');
 const articleRoutes = require('./ArticleRoutes');
+const rejectionRoutes = require('./RejectionRoutes');
 authenticatedRoutes.use(baseUrl + 'account', accountRoutes);
 authenticatedRoutes.use(baseUrl + 'companies', companyRoutes);
 authenticatedRoutes.use(baseUrl + 'products', productRoutes);
@@ -37,6 +38,7 @@ authenticatedRoutes.use(baseUrl + 'quotations', quotationRoutes);
 authenticatedRoutes.use(baseUrl + 'activities', activityRoutes);
 authenticatedRoutes.use(baseUrl + 'tickets', ticketRoutes);
 authenticatedRoutes.use(baseUrl + 'articles', articleRoutes);
+authenticatedRoutes.use(baseUrl + 'rejections', rejectionRoutes);
 
 module.exports = {
   basicRoutes,

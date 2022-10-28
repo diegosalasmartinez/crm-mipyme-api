@@ -101,7 +101,7 @@ class PlanService {
   async dashboard(idCompany) {
     try {
       const company = await this.getPlan(idCompany);
-      const { numCampaigns, numDeals, sales, distribution } = await this.getPlanStats(company);
+      const { numCampaigns, numDeals, numConversions, sales, distribution } = await this.getPlanStats(company);
 
       // Lead generation
       const chartLabels = generateChartLabels();
@@ -124,6 +124,7 @@ class PlanService {
       const opportunities = {
         numCampaigns,
         numDeals,
+        numConversions,
         sales,
       };
 

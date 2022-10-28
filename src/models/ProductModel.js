@@ -5,14 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   class Product extends Model {
     static associate(models) {
       this.belongsTo(models.Company, { foreignKey: 'idCompany', as: 'company' });
-      this.hasMany(
-        models.Discount,
-        { foreignKey: 'idProduct', as: 'discounts' },
-        {
-          onDelete: 'SET NULL',
-          onUpdate: 'CASCADE',
-        }
-      );
+      this.hasMany(models.Discount, { foreignKey: 'idProduct', as: 'discounts' });
     }
   }
   Product.init(
