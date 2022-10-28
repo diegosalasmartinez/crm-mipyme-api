@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
+      status: {
+        type: DataTypes.ENUM('0', '1', '2'),
+        defaultValue: '0',
+      },
     },
     {
       sequelize,

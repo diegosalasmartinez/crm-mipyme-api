@@ -1,9 +1,27 @@
+const cron = require('node-cron');
+const { Op } = require('sequelize');
 const { Discount } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const DiscountTypeService = require('./DiscountTypeService');
 const discountTypeService = new DiscountTypeService();
 const ProductService = require('./ProductService');
 const productService = new ProductService();
+
+cron.schedule(
+  '53 9 * * *',
+  async function () {
+    try {
+      const discountService = new DiscountService();
+      await discountService.updateDiscountsStatus();
+    } catch (e) {
+      console.log(e.message);
+    }
+  },
+  {
+    scheduled: true,
+    timezone: 'America/Lima',
+  }
+);
 
 class DiscountService {
   async addDiscounts(idCampaign, idCompany, data, typeKey) {
@@ -38,6 +56,35 @@ class DiscountService {
 
       await Discount.destroy({ where: { idCampaign } });
       await this.addDiscounts(idCampaign, idCompany, discounts, typeKey);
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async updateDiscountsStatus() {
+    try {
+      await Discount.update(
+        { status: '2' },
+        {
+          where: {
+            status: '1',
+            endDate: {
+              [Op.lt]: new Date(),
+            },
+          },
+        }
+      );
+      await Discount.update(
+        { status: '1' },
+        {
+          where: {
+            status: '0',
+            startDate: {
+              [Op.lte]: new Date(),
+            },
+          },
+        }
+      );
     } catch (e) {
       throw new BadRequestError(e.message);
     }

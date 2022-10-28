@@ -1,4 +1,6 @@
-var cron = require('node-cron');
+const { decode } = require('html-entities');
+const { Op } = require('sequelize');
+const cron = require('node-cron');
 const {
   Campaign,
   CampaignStatus,
@@ -14,7 +16,6 @@ const {
   sequelize,
 } = require('../models/index');
 const { transporter } = require('../config/MailConfig');
-const { decode } = require('html-entities');
 const { BadRequestError } = require('../errors');
 const CampaignStatusService = require('./CampaignStatusService');
 const campaignStatusService = new CampaignStatusService();
@@ -23,7 +24,6 @@ const discountService = new DiscountService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
 const QuotationService = require('./QuotationService');
-const { Op } = require('sequelize');
 const quotationService = new QuotationService();
 
 const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
