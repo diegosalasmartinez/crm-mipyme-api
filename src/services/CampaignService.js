@@ -23,8 +23,6 @@ const DiscountService = require('./DiscountService');
 const discountService = new DiscountService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
-const QuotationService = require('./QuotationService');
-const quotationService = new QuotationService();
 
 const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
 
@@ -311,8 +309,12 @@ class CampaignService {
       const distributionArray = Object.keys(distribution).map((key) => distribution[key]);
 
       const deals = await campaign.getDeals();
-      const dealsId = deals.map((deal) => deal.id);
-      const sales = await quotationService.getSalesOfDeals(dealsId);
+      let sales = 0
+      deals.forEach(deal => {
+        if (deal.realAmount && deal.realAmount > 0) {
+          sales += deal.realAmount
+        }
+      })
       return {
         distribution: distributionArray,
         numConversions: campaign.numConversions,

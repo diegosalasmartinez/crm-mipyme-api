@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const { Op } = require('sequelize');
-const { Discount } = require('../models/index');
+const { Discount, Product } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const DiscountTypeService = require('./DiscountTypeService');
 const discountTypeService = new DiscountTypeService();
@@ -24,6 +24,29 @@ cron.schedule(
 );
 
 class DiscountService {
+  async getDiscounts(idCompany, page = 0, rowsPerPage = 10) {
+    try {
+      const { rows: data = [], count } = await Discount.findAndCountAll({
+        offset: page * rowsPerPage,
+        limit: rowsPerPage,
+        required: true,
+        include: [
+          {
+            model: Product,
+            as: 'product',
+          },
+        ],
+        where: {
+          status: '1',
+          '$product.idCompany$': idCompany,
+        },
+        order: [['createdAt', 'DESC']],
+      });
+      return { data, count };
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
   async addDiscounts(idCampaign, idCompany, data, typeKey) {
     try {
       const type = await discountTypeService.get(typeKey);

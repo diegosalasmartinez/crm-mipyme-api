@@ -309,6 +309,19 @@ class DealService {
     }
   }
 
+  async rejectQuotation(idQuotation) {
+    const t = await sequelize.transaction();
+    try {
+      const step = await dealStepService.get('rejected');
+      const deal = await quotationService.rejectQuotation(idQuotation, t);
+      await Deal.update({ idStep: step.id }, { where: { id: deal.id }, transaction: t });
+      t.commit();
+    } catch (e) {
+      t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async updateStep(deal, stepValue, data) {
     const t = await sequelize.transaction();
     try {
@@ -324,6 +337,7 @@ class DealService {
           .filter((quotation) => quotation.status.key === 'approved')
           .map((quotation) => quotation.id);
         await quotationService.sendQuotationsToNewStep(quotationsId, 'accepted', t);
+        await this.setTotalAmount(deal.id, t);
       } else if (stepValue === 'lost') {
         const quotationsId = deal.quotations
           .filter((quotation) => quotation.status.key === 'approved')
@@ -333,6 +347,19 @@ class DealService {
         await Deal.update({ idLostType: lostType.id }, { where: { id: deal.id }, transaction: t });
       }
       t.commit();
+    } catch (e) {
+      t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async setTotalAmount(idDeal, t) {
+    try {
+      const total = await quotationService.getTotalSalesAcceptedQuotation(idDeal);
+      await Deal.update(
+        { realAmount: total, realCloseDate: new Date() },
+        { where: { id: idDeal }, transaction: t }
+      );
     } catch (e) {
       t.rollback();
       throw new BadRequestError(e.message);
@@ -374,19 +401,10 @@ class DealService {
         // Group by win or lost
         if (deal.idStep === winStep.id) {
           wonQty++;
-          deal.quotations.forEach((quotation) => {
-            quotation.detail.forEach((item) => {
-              wonAmount += item.finalPrice;
-            });
-          });
+          wonAmount += deal.realAmount;
         } else if (deal.idStep === lostStep.id) {
           lostQty++;
-          deal.quotations.forEach((quotation) => {
-            quotation.detail.forEach((item) => {
-              lostAmount += item.finalPrice;
-            });
-          });
-
+          lostAmount += deal.expectedAmount ?? 0;
           if (rejectionValues[deal.lostType.name]) {
             rejectionValues[deal.lostType.name] = rejectionValues[deal.lostType.name] + 1;
           } else {
@@ -414,7 +432,7 @@ class DealService {
       const rejections = {
         data: Object.entries(rejectionValues).map((entry) => entry[1]),
         label: Object.entries(rejectionValues).map((entry) => entry[0]),
-      }
+      };
 
       const sales = {
         numDeals,
