@@ -2,6 +2,7 @@ const {
   Quotation,
   QuotationDetail,
   QuotationStatus,
+  Rejection,
   Deal,
   Contact,
   Lead,
@@ -67,20 +68,6 @@ class QuotationService {
     }
   }
 
-  // async getQuotationByIdSimple(id) {
-  //   try {
-  //     const lead = await Quotation.findOne({
-  //       where: {
-  //         id,
-  //         active: true,
-  //       },
-  //     });
-  //     return lead;
-  //   } catch (e) {
-  //     throw new BadRequestError(e.message);
-  //   }
-  // }
-
   async getQuotationById(id) {
     try {
       const quotation = await Quotation.findOne({
@@ -99,6 +86,11 @@ class QuotationService {
                 ],
               },
             ],
+          },
+          {
+            model: Rejection,
+            as: 'rejection',
+            include: [{ model: User, as: 'creator', attributes: ['id', 'name', 'lastName'] }],
           },
           {
             model: QuotationDetail,
@@ -205,9 +197,28 @@ class QuotationService {
     }
   }
 
-  async getSalesOfDeals(dealsId) {
+  async rejectQuotation(idQuotation, t) {
     try {
-      const quotations = await Quotation.findAll({
+      const status = await quotationStatusService.get('rejected_user');
+      await Quotation.update(
+        {
+          idStatus: status.id,
+        },
+        { where: { id: idQuotation }, transaction: t }
+      );
+      const quotation = await Quotation.findByPk(idQuotation);
+      const deal = await quotation.getDeal();
+      return deal;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getTotalSalesAcceptedQuotation(idDeal) {
+    try {
+      const status = await quotationStatusService.get('approved');
+      console.log(idDeal);
+      const quotation = await Quotation.findOne({
         required: true,
         include: [
           {
@@ -215,6 +226,28 @@ class QuotationService {
             as: 'detail',
             include: [{ model: Product, as: 'product', attributes: ['id', 'code', 'name'] }],
           },
+        ],
+        where: {
+          idDeal,
+          idStatus: status.id,
+          active: true,
+        },
+      });
+      let totalSales = 0;
+      for (let detail of quotation.detail) {
+        totalSales += detail.finalPrice;
+      }
+      return totalSales;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getSalesOfDeals(dealsId) {
+    try {
+      const quotations = await Quotation.findAll({
+        required: true,
+        include: [
           {
             model: QuotationStatus,
             as: 'status',
@@ -230,9 +263,7 @@ class QuotationService {
       });
       let totalSales = 0;
       for (let qt of quotations) {
-        for (let detail of qt.detail) {
-          totalSales += detail.finalPrice;
-        }
+        totalSales += qt.qu;
       }
       return totalSales;
     } catch (e) {
