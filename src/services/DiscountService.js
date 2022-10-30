@@ -10,7 +10,7 @@ const DealService = require('./DealService');
 const dealService = new DealService();
 
 cron.schedule(
-  '53 9 * * *',
+  '45 12 * * *',
   async function () {
     try {
       const discountService = new DiscountService();
@@ -122,6 +122,7 @@ class DiscountService {
         ],
 
         where: {
+          status: '1',
           '$campaign.creator.idCompany$': idCompany,
           '$campaign.leads.id$': deal.contact.lead.id,
         },
