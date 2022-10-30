@@ -1,11 +1,13 @@
 const cron = require('node-cron');
 const { Op } = require('sequelize');
-const { Discount, Product } = require('../models/index');
+const { Discount, Product, Campaign, User, Lead } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const DiscountTypeService = require('./DiscountTypeService');
 const discountTypeService = new DiscountTypeService();
 const ProductService = require('./ProductService');
 const productService = new ProductService();
+const DealService = require('./DealService');
+const dealService = new DealService();
 
 cron.schedule(
   '53 9 * * *',
@@ -35,6 +37,11 @@ class DiscountService {
             model: Product,
             as: 'product',
           },
+          {
+            model: Campaign,
+            as: 'campaign',
+            attributes: ['id', 'name'],
+          },
         ],
         where: {
           status: '1',
@@ -47,6 +54,7 @@ class DiscountService {
       throw new BadRequestError(e.message);
     }
   }
+
   async addDiscounts(idCampaign, idCompany, data, typeKey) {
     try {
       const type = await discountTypeService.get(typeKey);
@@ -79,6 +87,47 @@ class DiscountService {
 
       await Discount.destroy({ where: { idCampaign } });
       await this.addDiscounts(idCampaign, idCompany, discounts, typeKey);
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getAvailableDiscountsByDeal(idDeal, idCompany) {
+    try {
+      const deal = await dealService.getDealByIdSimple(idDeal);
+      const discounts = await Discount.findAll({
+        required: true,
+        include: [
+          {
+            model: Product,
+            as: 'product',
+          },
+          {
+            model: Campaign,
+            as: 'campaign',
+            attributes: ['id', 'name'],
+            include: [
+              {
+                model: User,
+                as: 'creator',
+                attributes: [],
+              },
+              {
+                model: Lead,
+                as: 'leads',
+                attributes: [],
+              },
+            ],
+          },
+        ],
+
+        where: {
+          '$campaign.creator.idCompany$': idCompany,
+          '$campaign.leads.id$': deal.contact.lead.id,
+        },
+        order: [['createdAt', 'DESC']],
+      });
+      return discounts;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
