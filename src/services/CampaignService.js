@@ -29,8 +29,12 @@ const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
 cron.schedule(
   '15 0 * * *',
   async function () {
-    const campaignService = new CampaignService();
-    await campaignService.runCampaigns();
+    try {
+      const campaignService = new CampaignService();
+      await campaignService.runCampaigns();
+    } catch (e) {
+      console.error(e)
+    }
   },
   {
     scheduled: true,
@@ -41,8 +45,12 @@ cron.schedule(
 cron.schedule(
   '0 10 * * *',
   async function () {
-    const campaignService = new CampaignService();
-    await campaignService.sendCampaigns();
+    try {
+      const campaignService = new CampaignService();
+      await campaignService.sendCampaigns();
+    } catch (e) {
+      console.error(e)
+    }
   },
   {
     scheduled: true,
