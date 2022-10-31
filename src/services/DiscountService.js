@@ -16,7 +16,7 @@ cron.schedule(
       const discountService = new DiscountService();
       await discountService.updateDiscountsStatus();
     } catch (e) {
-      console.log(e.message);
+      console.error(e.message);
     }
   },
   {

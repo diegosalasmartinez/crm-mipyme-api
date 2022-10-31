@@ -226,7 +226,7 @@ class LeadService {
             };
           }
         } else {
-          console.log(s.field, s.rule, s.detail);
+          console.error(s.field, s.rule, s.detail);
         }
         whereClausses[s.field] = criteria;
       }

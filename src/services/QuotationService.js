@@ -217,7 +217,6 @@ class QuotationService {
   async getTotalSalesAcceptedQuotation(idDeal) {
     try {
       const status = await quotationStatusService.get('approved');
-      console.log(idDeal);
       const quotation = await Quotation.findOne({
         required: true,
         include: [
