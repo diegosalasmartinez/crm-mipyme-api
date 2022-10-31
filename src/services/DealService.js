@@ -405,7 +405,7 @@ class DealService {
       const chartLabels = generateChartLabels();
 
       // Products
-      const products = {}
+      const topProducts = {};
 
       // Activity stats
       let numActivities = 0;
@@ -417,7 +417,7 @@ class DealService {
       // Rejection stats
       const rejectionValues = {};
 
-      deals.forEach((deal) => {
+      for (const deal of deals) {
         const k = moment(deal.createdAt).format('YYYY-MM').slice(0, 7);
         // Group by created at
         if (chartLabels[k]) {
@@ -445,6 +445,20 @@ class DealService {
               name: salesOriginMarketing[k].name,
             };
           }
+          const products = await quotationService.getProductsOfQuotationAccepted(deal.id);
+          products.forEach((product) => {
+            if (topProducts[product.code]) {
+              topProducts[product.code] = {
+                value: topProducts[product.code].value + 1,
+                name: topProducts[product.code].name,
+              };
+            } else {
+              topProducts[product.code] = {
+                value: 1,
+                name: product.name,
+              };
+            }
+          });
         } else if (deal.idStep === lostStep.id) {
           lostQty++;
           lostAmount += deal.expectedAmount ?? 0;
@@ -462,7 +476,7 @@ class DealService {
           avgTime += moment.duration(endDate.diff(startDate)).asDays();
           if (activity.idStatus === closedStatus.id) onTime++;
         });
-      });
+      }
 
       const data = Object.entries(chartLabels)
         .map((entry) => entry[1].value)
@@ -509,6 +523,11 @@ class DealService {
         ],
       };
 
+      const topProductsFiltered = Object.entries(topProducts)
+        .map((entry) => ({ code: entry[0], ...entry[1] }))
+        .sort((a, b) => (b.value > a.value ? 1 : a.value > b.value ? -1 : 0))
+        .slice(0, 10);
+
       const sales = {
         numDeals,
         wonQty,
@@ -523,7 +542,15 @@ class DealService {
         onTime,
         late,
       };
-      return { sales, dealGeneration, activities, rejections, origins };
+
+      return {
+        sales,
+        dealGeneration,
+        activities,
+        rejections,
+        origins,
+        topProducts: topProductsFiltered,
+      };
     } catch (e) {
       throw new BadRequestError(e.message);
     }

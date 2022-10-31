@@ -269,6 +269,33 @@ class QuotationService {
       throw new BadRequestError(e.message);
     }
   }
+
+  async getProductsOfQuotationAccepted(idDeal) {
+    try {
+      const status = await quotationStatusService.get('accepted');
+      const quotation = await Quotation.findOne({
+        required: true,
+        include: [
+          {
+            model: QuotationDetail,
+            as: 'detail',
+            include: [{ model: Product, as: 'product' }],
+          },
+        ],
+        where: {
+          idDeal: idDeal,
+          idStatus: status.id,
+          active: true,
+        },
+      });
+      if (quotation) {
+        return quotation.detail.map((d) => d.product);
+      }
+      return [];
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
 }
 
 module.exports = QuotationService;
