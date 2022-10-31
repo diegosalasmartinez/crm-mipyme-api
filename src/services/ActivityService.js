@@ -7,6 +7,7 @@ const {
   Contact,
   Lead,
   User,
+  Note,
 } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ActivityTypeService = require('./ActivityTypeService');
@@ -123,6 +124,17 @@ class ActivityService {
             ],
           },
           {
+            model: Note,
+            as: 'notes',
+            include: [
+              {
+                model: User,
+                as: 'creator',
+                attributes: ['id', 'name', 'lastName'],
+              },
+            ],
+          },
+          {
             model: ActivityStatus,
             as: 'status',
           },
@@ -151,7 +163,6 @@ class ActivityService {
         name: activityDTO.name,
         startDate: activityDTO.startDate,
         endDate: activityDTO.endDate,
-        notes: activityDTO.notes,
         createdBy: idUser,
         idType: type.id,
         idStatus: status.id,
@@ -165,10 +176,18 @@ class ActivityService {
 
   async updateActivity(idActivity, statusValue) {
     try {
+      const updateValues = {};
+      if (statusValue === 'pending') {
+        updateValues.realStartDate = new Date();
+      } else if (statusValue === 'closed') {
+        updateValues.realEndDate = new Date();
+      }
+
       const status = await activityStatusService.get(statusValue);
       await Activity.update(
         {
           idStatus: status.id,
+          ...updateValues,
         },
         { where: { id: idActivity } }
       );

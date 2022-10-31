@@ -13,6 +13,7 @@ const {
   QuotationDetail,
   QuotationStatus,
   LostType,
+  Note,
   sequelize,
 } = require('../models/index');
 const { BadRequestError } = require('../errors');
@@ -174,6 +175,17 @@ class DealService {
               {
                 model: ActivityStatus,
                 as: 'status',
+              },
+            ],
+          },
+          {
+            model: Note,
+            as: 'notes',
+            include: [
+              {
+                model: User,
+                as: 'creator',
+                attributes: ['id', 'name', 'lastName'],
               },
             ],
           },

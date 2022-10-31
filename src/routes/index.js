@@ -24,6 +24,7 @@ const ticketRoutes = require('./TicketRoutes');
 const articleRoutes = require('./ArticleRoutes');
 const rejectionRoutes = require('./RejectionRoutes');
 const discountRoutes = require('./DiscountRoutes');
+const noteRoutes = require('./NoteRoutes');
 authenticatedRoutes.use(baseUrl + 'account', accountRoutes);
 authenticatedRoutes.use(baseUrl + 'companies', companyRoutes);
 authenticatedRoutes.use(baseUrl + 'products', productRoutes);
@@ -41,6 +42,7 @@ authenticatedRoutes.use(baseUrl + 'tickets', ticketRoutes);
 authenticatedRoutes.use(baseUrl + 'articles', articleRoutes);
 authenticatedRoutes.use(baseUrl + 'rejections', rejectionRoutes);
 authenticatedRoutes.use(baseUrl + 'discounts', discountRoutes);
+authenticatedRoutes.use(baseUrl + 'notes', noteRoutes);
 
 module.exports = {
   basicRoutes,

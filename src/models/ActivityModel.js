@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.Deal, { foreignKey: 'idDeal', as: 'deal' });
       this.belongsTo(models.Ticket, { foreignKey: 'idTicket', as: 'ticket' });
       this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
+      this.hasMany(models.Note, { foreignKey: 'idActivity', as: 'notes' });
     }
   }
   Activity.init(
@@ -24,8 +25,9 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       startDate: DataTypes.DATE,
+      realStartDate: DataTypes.DATE,
       endDate: DataTypes.DATE,
-      notes: DataTypes.STRING,
+      realEndDate: DataTypes.DATE,
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
