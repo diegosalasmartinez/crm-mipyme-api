@@ -2,6 +2,7 @@ const moment = require('moment');
 const {
   Deal,
   DealStep,
+  DealOrigin,
   DealPriority,
   User,
   Contact,
@@ -115,6 +116,10 @@ class DealService {
           {
             model: LostType,
             as: 'lostType',
+          },
+          {
+            model: DealOrigin,
+            as: 'origin',
           },
           {
             model: Quotation,
@@ -390,9 +395,17 @@ class DealService {
       let wonAmount = 0;
       let lostQty = 0;
       let lostAmount = 0;
+      const originSales = await dealOriginService.get('sales');
+      const originTicket = await dealOriginService.get('ticket');
+      const salesOriginSales = generateChartLabels();
+      const salesOriginMarketing = generateChartLabels();
+      const salesOriginTicket = generateChartLabels();
 
       // Lead generation
       const chartLabels = generateChartLabels();
+
+      // Products
+      const products = {}
 
       // Activity stats
       let numActivities = 0;
@@ -414,6 +427,24 @@ class DealService {
         if (deal.idStep === winStep.id) {
           wonQty++;
           wonAmount += deal.realAmount;
+          if (deal.idOrigin === originSales.id) {
+            if (salesOriginSales[k]) {
+              salesOriginSales[k] = {
+                value: salesOriginSales[k].value + deal.realAmount,
+                name: salesOriginSales[k].name,
+              };
+            }
+          } else if (deal.idOrigin === originTicket.id) {
+            salesOriginTicket[k] = {
+              value: salesOriginTicket[k].value + deal.realAmount,
+              name: salesOriginTicket[k].name,
+            };
+          } else {
+            salesOriginMarketing[k] = {
+              value: salesOriginMarketing[k].value + deal.realAmount,
+              name: salesOriginMarketing[k].name,
+            };
+          }
         } else if (deal.idStep === lostStep.id) {
           lostQty++;
           lostAmount += deal.expectedAmount ?? 0;
@@ -446,6 +477,38 @@ class DealService {
         label: Object.entries(rejectionValues).map((entry) => entry[0]),
       };
 
+      const originLabels = Object.entries(chartLabels)
+        .map((entry) => entry[1].name)
+        .reverse();
+      const originSalesData = Object.entries(salesOriginSales)
+        .map((entry) => entry[1].value)
+        .reverse();
+
+      const originMarketingData = Object.entries(salesOriginMarketing)
+        .map((entry) => entry[1].value)
+        .reverse();
+      const originTicketsData = Object.entries(salesOriginTicket)
+        .map((entry) => entry[1].value)
+        .reverse();
+
+      const origins = {
+        label: originLabels,
+        series: [
+          {
+            name: 'Captación de ventas',
+            data: originSalesData,
+          },
+          {
+            name: 'Campañas de marketing',
+            data: originMarketingData,
+          },
+          {
+            name: 'Solicitudes de servicio',
+            data: originTicketsData,
+          },
+        ],
+      };
+
       const sales = {
         numDeals,
         wonQty,
@@ -460,7 +523,7 @@ class DealService {
         onTime,
         late,
       };
-      return { sales, dealGeneration, activities, rejections };
+      return { sales, dealGeneration, activities, rejections, origins };
     } catch (e) {
       throw new BadRequestError(e.message);
     }
