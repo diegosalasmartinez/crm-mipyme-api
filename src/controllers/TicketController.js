@@ -4,8 +4,8 @@ const ticketService = new TicketService();
 
 const getTickets = async (req, res) => {
   const { idCompany } = req.user;
-  const data = await ticketService.getTickets(idCompany);
-  res.status(StatusCodes.OK).json(data);
+  const { data, count } = await ticketService.getTickets(idCompany);
+  res.status(StatusCodes.OK).json({ data, count });
 };
 
 const getTicketDetail = async (req, res) => {

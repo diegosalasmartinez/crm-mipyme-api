@@ -28,7 +28,7 @@ const ticketStatusService = new TicketStatusService();
 class TicketService {
   async getTickets(idCompany) {
     try {
-      const data = await Ticket.findAll({
+      const { rows: data = [], count } = await Ticket.findAndCountAll({
         required: true,
         include: [
           {
@@ -67,7 +67,7 @@ class TicketService {
         },
         order: [['createdAt', 'DESC']],
       });
-      return data;
+      return { data, count };
     } catch (e) {
       throw new BadRequestError(e.message);
     }
