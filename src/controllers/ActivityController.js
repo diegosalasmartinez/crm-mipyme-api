@@ -4,7 +4,8 @@ const activityService = new ActivityService();
 
 const getActivities = async (req, res) => {
   const { id: idUser, idCompany } = req.user;
-  const activities = await activityService.getActivities(idUser, idCompany);
+  const { completed } = req.query;
+  const activities = await activityService.getActivities(idUser, idCompany, completed);
   res.status(StatusCodes.OK).json(activities);
 };
 

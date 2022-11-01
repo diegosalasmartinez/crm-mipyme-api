@@ -13,12 +13,22 @@ const { BadRequestError } = require('../errors');
 const ActivityTypeService = require('./ActivityTypeService');
 const activityTypeService = new ActivityTypeService();
 const ActivityStatusService = require('./ActivityStatusService');
+const { Op } = require('sequelize');
 const activityStatusService = new ActivityStatusService();
 
 class ActivityService {
-  async getActivities(idUser, idCompany) {
+  async getActivities(idUser, idCompany, completed = 'false') {
     try {
+      console.log(completed)
       const types = await activityTypeService.getAll();
+      const statusClosed = await activityStatusService.get('closed');
+      const whereClause = {};
+      if (completed === 'true') {
+        whereClause[Op.eq] = statusClosed.id;
+      } else {
+        whereClause[Op.ne] = statusClosed.id;
+      }
+
       const data = [];
       for (const type of types) {
         const activities = await Activity.findAll({
@@ -70,9 +80,13 @@ class ActivityService {
           ],
           where: {
             idType: type.id,
+            idStatus: whereClause,
             active: true,
           },
-          order: [['createdAt', 'DESC']],
+          order: [
+            ['endDate', 'ASC'],
+            ['updatedAt', 'DESC'],
+          ],
         });
         data.push(activities);
       }
