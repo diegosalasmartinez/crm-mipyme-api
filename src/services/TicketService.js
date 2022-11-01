@@ -216,14 +216,32 @@ class TicketService {
     }
   }
 
-  async updateStatus(ticket, statusValue) {
-    const t = await sequelize.transaction();
+  async updateStatus(idTicket, statusValue) {
     try {
       const status = await ticketStatusService.get(statusValue);
-      await Ticket.update({ idStatus: status.id }, { where: { id: ticket.id }, transaction: t });
-      t.commit();
+      const updateValues = {};
+      if (statusValue === 'pending') {
+        updateValues.startDate = new Date();
+      } else if (statusValue === 'closed') {
+        updateValues.endDate = new Date();
+      }
+      await Ticket.update({ idStatus: status.id, ...updateValues }, { where: { id: idTicket } });
     } catch (e) {
-      t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async updateStatusInBaseOfDeal(idDeal, stepValue) {
+    try {
+      const deal = await dealService.getDealByIdSimple(idDeal);
+      if (deal.idTicket) {
+        if (stepValue === 'quoted') {
+          await this.updateStatus(deal.idTicket, 'pending');
+        } else if (stepValue === 'won' || stepValue === 'lost') {
+          await this.updateStatus(deal.idTicket, 'closed');
+        }
+      }
+    } catch (e) {
       throw new BadRequestError(e.message);
     }
   }

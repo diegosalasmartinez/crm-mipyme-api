@@ -3,6 +3,8 @@ const DealService = require('../services/DealService');
 const dealService = new DealService();
 const LeadService = require('../services/LeadService');
 const leadService = new LeadService();
+const TicketService = require('../services/TicketService');
+const ticketService = new TicketService();
 
 const getDeals = async (req, res) => {
   const { idCompany } = req.user;
@@ -34,6 +36,7 @@ const getDealBasicInfo = async (req, res) => {
 const updateDealStep = async (req, res) => {
   const { deal, step, data } = req.body;
   await dealService.updateStep(deal, step, data);
+  await ticketService.updateStatusInBaseOfDeal(deal.id, step);
   res.status(StatusCodes.OK).json({ message: 'La oportunidad se ha actualizado' });
 };
 

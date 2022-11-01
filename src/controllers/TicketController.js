@@ -23,7 +23,7 @@ const addTicket = async (req, res) => {
 
 const updateTicketStatus = async (req, res) => {
   const { ticket, status } = req.body;
-  await ticketService.updateStatus(ticket, status);
+  await ticketService.updateStatus(ticket.id, status);
   res.status(StatusCodes.OK).json({ message: 'La solicitud se ha actualizado' });
 };
 
