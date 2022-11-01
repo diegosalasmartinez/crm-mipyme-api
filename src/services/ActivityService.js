@@ -19,7 +19,6 @@ const activityStatusService = new ActivityStatusService();
 class ActivityService {
   async getActivities(idUser, idCompany, completed = 'false') {
     try {
-      console.log(completed)
       const types = await activityTypeService.getAll();
       const statusClosed = await activityStatusService.get('closed');
       const whereClause = {};

@@ -42,6 +42,9 @@ class ProgramService {
             ],
           },
         ],
+        order: [
+          [{ model: Campaign, as: 'campaigns' }, 'startDate', 'ASC'],
+        ],
         where: {
           id,
         },

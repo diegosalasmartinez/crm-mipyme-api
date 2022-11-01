@@ -69,7 +69,7 @@ class TicketService {
         where: {
           active: true,
         },
-        order: [['createdAt', 'DESC']],
+        order: [['limitDate', 'ASC']],
       });
       return { data, count };
     } catch (e) {
@@ -119,7 +119,6 @@ class TicketService {
         where: {
           active: true,
         },
-        order: [['createdAt', 'DESC']],
       });
       return tickets;
     } catch (e) {

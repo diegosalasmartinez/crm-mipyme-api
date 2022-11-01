@@ -72,7 +72,7 @@ class DealService {
             idStep: step.id,
             active: true,
           },
-          order: [['createdAt', 'DESC']],
+          order: [['expectedCloseDate', 'ASC']],
         });
         data.push(deals);
       }

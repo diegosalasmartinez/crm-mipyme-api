@@ -50,6 +50,9 @@ class PlanService {
                 ],
               },
             ],
+            order: [
+              ['updatedAt', 'DESC']
+            ]
           },
         ],
         where: {
