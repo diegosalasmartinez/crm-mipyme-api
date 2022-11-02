@@ -22,8 +22,8 @@ const getListDetail = async (req, res) => {
 const addList = async (req, res) => {
   const { id: idUser } = req.user;
   const list = req.body;
-  const listCreated = await listService.addList(idUser, list);
-  res.status(StatusCodes.OK).json(listCreated);
+  await listService.addList(idUser, list);
+  res.status(StatusCodes.OK).json({ message: `La lista ${list.name} ha sido registrada` });
 };
 
 const addLeadsToList = async (req, res) => {

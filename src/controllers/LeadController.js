@@ -27,8 +27,8 @@ const addLeadBulk = async (req, res) => {
 const addLead = async (req, res) => {
   const { id } = req.user;
   const lead = req.body;
-  const leadCreated = await leadService.addLead(id, lead);
-  res.status(StatusCodes.OK).json(leadCreated);
+  await leadService.addLead(id, lead);
+  res.status(StatusCodes.OK).json({ message: `El cliente ${lead.name} ha sido registrado` });
 };
 
 const seed_addLeads = async (req, res) => {

@@ -34,9 +34,10 @@ const getCampaignById = async (req, res) => {
 const addCampaign = async (req, res) => {
   const { id: idUser, idCompany } = req.user;
   const { idProgram, campaign } = req.body;
-
-  const campaignCreated = await campaignService.addCampaign(idUser, idCompany, idProgram, campaign);
-  res.status(StatusCodes.OK).json(campaignCreated);
+  await campaignService.addCampaign(idUser, idCompany, idProgram, campaign);
+  res
+    .status(StatusCodes.OK)
+    .json({ message: `El borrador de la campaña ${campaign.name} ha sido registrado` });
 };
 
 const updateCampaign = async (req, res) => {
@@ -74,5 +75,5 @@ module.exports = {
   updateCampaign,
   approveCampaign,
   runCampaigns,
-  sendCampaigns 
+  sendCampaigns,
 };

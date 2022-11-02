@@ -11,8 +11,8 @@ const getProgram = async (req, res) => {
 
 const addProgram = async (req, res) => {
   const { idPlan, program } = req.body;
-  const programCreated = await programService.addProgram(idPlan, program);
-  res.status(StatusCodes.OK).json(programCreated);
+  await programService.addProgram(idPlan, program);
+  res.status(StatusCodes.OK).json({ message: `El programa ${program.name} ha sido registrado` });
 };
 
 module.exports = {

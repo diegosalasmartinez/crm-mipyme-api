@@ -5,7 +5,7 @@ const planService = new PlanService();
 const getPlan = async (req, res) => {
   const { idCompany } = req.user;
   const plan = await planService.getPlan(idCompany);
-  let stats = {} 
+  let stats = {};
   if (plan) {
     stats = await planService.getPlanStats(plan);
   }
@@ -15,18 +15,18 @@ const getPlan = async (req, res) => {
 const addPlan = async (req, res) => {
   const { idCompany } = req.user;
   const plan = req.body;
-  const planCreated = await planService.addPlan(idCompany, plan);
-  res.status(StatusCodes.OK).json(planCreated);
+  await planService.addPlan(idCompany, plan);
+  res.status(StatusCodes.OK).json({ message: `El plan ${plan.name} ha sido registrado` });
 };
 
 const dashboard = async (req, res) => {
   const { idCompany } = req.user;
   const stats = await planService.dashboard(idCompany);
   res.status(StatusCodes.OK).json(stats);
-}
+};
 
 module.exports = {
   getPlan,
   addPlan,
-  dashboard
+  dashboard,
 };

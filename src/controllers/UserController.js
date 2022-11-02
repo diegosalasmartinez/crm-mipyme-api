@@ -18,8 +18,8 @@ const getUserById = async (req, res) => {
 const addUser = async (req, res) => {
   const { idCompany } = req.user;
   const user = req.body;
-  const userCreated = await userService.addUser(idCompany, user);
-  res.status(StatusCodes.OK).json(userCreated);
+  await userService.addUser(idCompany, user);
+  res.status(StatusCodes.OK).json({ message: `El usuario ${user.name} ha sido registrado` });
 };
 
 module.exports = {

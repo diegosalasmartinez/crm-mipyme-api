@@ -17,14 +17,14 @@ const getTicketDetail = async (req, res) => {
 const addTicket = async (req, res) => {
   const { id: idUser } = req.user;
   const ticket = req.body;
-  const ticketCreated = await ticketService.addTicket(idUser, ticket);
-  res.status(StatusCodes.OK).json(ticketCreated);
+  await ticketService.addTicket(idUser, ticket);
+  res.status(StatusCodes.OK).json({ message: `La solicitud ${ticket.name} ha sido registrada` });
 };
 
 const updateTicketStatus = async (req, res) => {
   const { ticket, status } = req.body;
   await ticketService.updateStatus(ticket.id, status);
-  res.status(StatusCodes.OK).json({ message: 'La solicitud se ha actualizado' });
+  res.status(StatusCodes.OK).json({ message: 'La solicitud se ha actualizada' });
 };
 
 const dashboard = async (req, res) => {

@@ -18,8 +18,8 @@ const getQuotationById = async (req, res) => {
 const addQuotation = async (req, res) => {
   const { idCompany } = req.user;
   const quotation = req.body;
-  const quotationCreated = await quotationService.addQuotation(idCompany, quotation);
-  res.status(StatusCodes.OK).json(quotationCreated);
+  await quotationService.addQuotation(idCompany, quotation);
+  res.status(StatusCodes.OK).json({ message: 'La cotizacion ha sido registrada' });
 };
 
 const updateQuotation = async (req, res) => {
@@ -40,5 +40,5 @@ module.exports = {
   getQuotationById,
   addQuotation,
   updateQuotation,
-  approveQuotation
+  approveQuotation,
 };
