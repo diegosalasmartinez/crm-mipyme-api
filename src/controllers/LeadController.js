@@ -21,7 +21,7 @@ const getLeadById = async (req, res) => {
   const campaigns = await campaignService.getCampaignsByLead(leadStored.id);
   const quotations = await quotationService.getQuotationsByLead(leadStored.id);
   const quotationsAccepted = await quotationService.getQuotationsAcceptedByLead(leadStored.id);
-  const products = await productService.getProductsByLead(quotationsAccepted);
+  const products = await productService.getProductsByQuotations(quotationsAccepted);
   const lead = leadStored.toJSON();
   lead.campaigns = campaigns;
   lead.quotations = quotations;

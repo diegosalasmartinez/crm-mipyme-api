@@ -1,6 +1,10 @@
 const { StatusCodes } = require('http-status-codes');
 const ProductService = require('../services/ProductService');
 const productService = new ProductService();
+const QuotationService = require('../services/QuotationService');
+const quotationService = new QuotationService();
+const DealService = require('../services/DealService');
+const dealService = new DealService();
 
 const getProducts = async (req, res) => {
   const { page, rowsPerPage } = req.query;
@@ -23,6 +27,14 @@ const addProduct = async (req, res) => {
   res.status(StatusCodes.OK).json(productCreated);
 };
 
+const getBestProductsByDeal = async (req, res) => {
+  const { idDeal } = req.params;
+  const deal = await dealService.getDealByIdSimple(idDeal);
+  const quotations = await quotationService.getQuotationsAcceptedByLead(deal.contact.lead.id);
+  const products = await productService.getProductsByQuotations(quotations);
+  res.status(StatusCodes.OK).json(products);
+};
+
 const seed_addProducts = async (req, res) => {
   const { idCompany } = req.user;
   const { number } = req.query;
@@ -34,5 +46,6 @@ module.exports = {
   getProducts,
   getProductBySku,
   addProduct,
+  getBestProductsByDeal,
   seed_addProducts,
 };

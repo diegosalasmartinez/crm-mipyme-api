@@ -35,7 +35,7 @@ class ProductService {
     }
   }
 
-  async getProductsByLead(quotations) {
+  async getProductsByQuotations(quotations) {
     try {
       const topProductsMap = {};
       for (const quotation of quotations) {
