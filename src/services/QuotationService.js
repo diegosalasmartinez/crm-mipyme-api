@@ -1,3 +1,4 @@
+const cron = require('node-cron');
 const {
   Quotation,
   QuotationDetail,
@@ -17,6 +18,23 @@ const QuotationDetailService = require('./QuotationDetailService');
 const quotationDetailService = new QuotationDetailService();
 const DealStepService = require('./DealStepService');
 const dealStepService = new DealStepService();
+const { Op } = require('sequelize');
+
+cron.schedule(
+  '20 0 * * *',
+  async function () {
+    try {
+      const quotationService = new QuotationService();
+      await quotationService.expireQuotations();
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  {
+    scheduled: true,
+    timezone: 'America/Lima',
+  }
+);
 
 class QuotationService {
   async getQuotations(idCompany, status) {
@@ -362,6 +380,37 @@ class QuotationService {
       return [];
     } catch (e) {
       throw new BadRequestError(e.message);
+    }
+  }
+
+  async expireQuotations() {
+    try {
+      const approvedStatus = await quotationStatusService.get('approved');
+      const expiredStatus = await quotationStatusService.get('expired');
+      const quotations = await Quotation.findAll({
+        where: {
+          idStatus: approvedStatus.id,
+          limitDate: {
+            [Op.lt]: new Date(),
+          },
+        },
+      });
+      const dealStep = await dealStepService.get('negotiations');
+      for (const quotation of quotations) {
+        await Deal.update({ idStep: dealStep.id }, { where: { id: quotation.idDeal } });
+        await Quotation.update(
+          {
+            idStatus: expiredStatus.id,
+          },
+          {
+            where: {
+              id: quotation.id,
+            },
+          }
+        );
+      }
+    } catch (e) {
+      throw BadRequestError(e.message);
     }
   }
 }
