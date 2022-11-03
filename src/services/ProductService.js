@@ -35,6 +35,36 @@ class ProductService {
     }
   }
 
+  async getProductsByLead(quotations) {
+    try {
+      const topProductsMap = {};
+      for (const quotation of quotations) {
+        for (const item of quotation.detail) {
+          const product = item.product;
+          if (topProductsMap[product.code]) {
+            topProductsMap[product.code] = {
+              ...topProductsMap[product.code],
+              qty: topProductsMap[product.code].value + 1,
+            };
+          } else {
+            topProductsMap[product.code] = {
+              qty: 1,
+              value: product.toJSON(),
+            };
+          }
+        }
+      }
+      const topProducts = Object.entries(topProductsMap)
+        .map((entry) => ({ qty: entry[1].qty, ...entry[1].value }))
+        .sort((a, b) => (b.qty > a.qty ? 1 : a.qty > b.qty ? -1 : 0))
+        .slice(0, 10);
+
+      return topProducts;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async addProduct(idCompany, productDTO) {
     try {
       const product = await Product.create({

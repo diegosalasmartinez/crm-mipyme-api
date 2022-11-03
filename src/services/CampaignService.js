@@ -33,7 +33,7 @@ cron.schedule(
       const campaignService = new CampaignService();
       await campaignService.runCampaigns();
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   },
   {
@@ -49,7 +49,7 @@ cron.schedule(
       const campaignService = new CampaignService();
       await campaignService.sendCampaigns();
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   },
   {
@@ -302,6 +302,56 @@ class CampaignService {
     }
   }
 
+  async getCampaignsByLead(idLead) {
+    try {
+      const status = await campaignStatusService.get('running');
+      const campaigns = await Campaign.findAll({
+        attributes: {
+          exclude: ['html', 'segments', 'lists'],
+        },
+        include: [
+          { model: Lead, as: 'leads', attributes: ['id'] },
+          {
+            model: Program,
+            as: 'program',
+            attributes: ['id', 'name', 'idPlan'],
+            required: true,
+            include: [
+              {
+                model: Plan,
+                as: 'plan',
+                attributes: [],
+                include: [
+                  {
+                    model: Company,
+                    as: 'company',
+                    attributes: [],
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: User,
+            as: 'creator',
+            attributes: ['name', 'lastName'],
+          },
+          {
+            model: CampaignStatus,
+            as: 'status',
+          },
+        ],
+        where: {
+          '$leads.id$': idLead,
+          idStatus: status.id,
+        },
+      });
+      return campaigns;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async getCampaignStats(campaign) {
     try {
       const distribution = {
@@ -317,12 +367,12 @@ class CampaignService {
       const distributionArray = Object.keys(distribution).map((key) => distribution[key]);
 
       const deals = await campaign.getDeals();
-      let sales = 0
-      deals.forEach(deal => {
+      let sales = 0;
+      deals.forEach((deal) => {
         if (deal.realAmount && deal.realAmount > 0) {
-          sales += deal.realAmount
+          sales += deal.realAmount;
         }
-      })
+      });
       return {
         distribution: distributionArray,
         numConversions: campaign.numConversions,

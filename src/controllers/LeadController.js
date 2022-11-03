@@ -1,6 +1,12 @@
 const { StatusCodes } = require('http-status-codes');
 const LeadService = require('../services/LeadService');
 const leadService = new LeadService();
+const CampaignService = require('../services/CampaignService');
+const campaignService = new CampaignService();
+const QuotationService = require('../services/QuotationService');
+const quotationService = new QuotationService();
+const ProductService = require('../services/ProductService');
+const productService = new ProductService();
 
 const getLeads = async (req, res) => {
   const { page, rowsPerPage } = req.query;
@@ -11,7 +17,15 @@ const getLeads = async (req, res) => {
 
 const getLeadById = async (req, res) => {
   const { idLead } = req.params;
-  const lead = await leadService.getLeadById(idLead);
+  const leadStored = await leadService.getLeadById(idLead);
+  const campaigns = await campaignService.getCampaignsByLead(leadStored.id);
+  const quotations = await quotationService.getQuotationsByLead(leadStored.id);
+  const quotationsAccepted = await quotationService.getQuotationsAcceptedByLead(leadStored.id);
+  const products = await productService.getProductsByLead(quotationsAccepted);
+  const lead = leadStored.toJSON();
+  lead.campaigns = campaigns;
+  lead.quotations = quotations;
+  lead.products = products;
   res.status(StatusCodes.OK).json(lead);
 };
 

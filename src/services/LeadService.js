@@ -1,22 +1,9 @@
 const { Op } = require('sequelize');
 const { faker } = require('@faker-js/faker');
-const {
-  Lead,
-  Contact,
-  User,
-  List,
-  ClassificationMarketing,
-  Campaign,
-  Program,
-  Deal,
-  Quotation,
-  QuotationStatus,
-} = require('../models/index');
+const { Lead, User, List, ClassificationMarketing } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');
 const classificationService = new ClassificationMarketingService();
-const CampaignStatusService = require('./CampaignStatusService');
-const campaignStatusService = new CampaignStatusService();
 
 class LeadService {
   async getLeads(idCompany, page = 0, rowsPerPage = 10) {
@@ -114,64 +101,12 @@ class LeadService {
 
   async getLeadById(id) {
     try {
-      const status = await campaignStatusService.get('running');
       const lead = await Lead.findOne({
         include: [
           {
             model: List,
             as: 'lists',
             include: [{ model: Lead, as: 'leads', attributes: ['id'] }],
-          },
-          {
-            model: Campaign,
-            as: 'campaigns',
-            attributes: ['id', 'name', 'startDate', 'endDate'],
-            include: [
-              {
-                model: User,
-                as: 'creator',
-                attributes: ['id', 'name', 'lastName'],
-              },
-              {
-                model: Program,
-                as: 'program',
-                attributes: ['id', 'name'],
-              },
-            ],
-            where: {
-              idStatus: status.id,
-              active: true,
-            },
-          },
-          {
-            model: Contact,
-            as: 'contact',
-            attributes: ['id'],
-            include: [
-              {
-                model: Deal,
-                as: 'deals',
-                attributes: ['id'],
-                include: [
-                  {
-                    model: Quotation,
-                    as: 'quotations',
-                    attributes: ['id', 'startDate', 'limitDate'],
-                    include: [
-                      {
-                        model: Deal,
-                        as: 'deal',
-                        attributes: ['id', 'name'],
-                      },
-                      {
-                        model: QuotationStatus,
-                        as: 'status',
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
           },
           {
             model: ClassificationMarketing,

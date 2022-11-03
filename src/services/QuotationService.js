@@ -113,6 +113,74 @@ class QuotationService {
     }
   }
 
+  async getQuotationsByLead(idLead) {
+    try {
+      const quotations = await Quotation.findAll({
+        include: [
+          {
+            model: Deal,
+            as: 'deal',
+            attributes: ['id', 'name'],
+            include: [
+              {
+                model: Contact,
+                as: 'contact',
+                attributes: ['id'],
+                include: [{ model: Lead, as: 'lead', attributes: ['id', 'name', 'lastName'] }],
+              },
+            ],
+          },
+          {
+            model: QuotationStatus,
+            as: 'status',
+          },
+        ],
+        where: {
+          '$deal.contact.lead.id$': idLead,
+          active: true,
+        },
+        order: [['limitDate', 'DESC']],
+      });
+      return quotations;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getQuotationsAcceptedByLead(idLead) {
+    try {
+      const status = await quotationStatusService.get('accepted');
+      const quotations = await Quotation.findAll({
+        include: [
+          {
+            model: Deal,
+            as: 'deal',
+            attributes: ['id'],
+            include: [
+              {
+                model: Contact,
+                as: 'contact',
+                attributes: ['id'],
+              },
+            ],
+          },
+          {
+            model: QuotationDetail,
+            as: 'detail',
+            include: [{ model: Product, as: 'product' }],
+          },
+        ],
+        where: {
+          '$deal.contact.idLead$': idLead,
+          idStatus: status.id,
+        },
+      });
+      return quotations;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async addQuotation(idCompany, quotationDTO) {
     const t = await sequelize.transaction();
     try {
