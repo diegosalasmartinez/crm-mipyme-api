@@ -57,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       htmlTemplate: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       sent: {
         type: DataTypes.BOOLEAN,

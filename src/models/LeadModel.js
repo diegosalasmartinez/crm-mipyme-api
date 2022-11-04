@@ -42,6 +42,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      emailValidated: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      phoneValidated: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       email: DataTypes.STRING,
       phone: DataTypes.STRING,
       birthday: DataTypes.DATE,

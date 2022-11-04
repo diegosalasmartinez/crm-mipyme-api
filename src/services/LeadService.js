@@ -1,3 +1,4 @@
+const moment = require('moment');
 const { Op } = require('sequelize');
 const { faker } = require('@faker-js/faker');
 const { Lead, User, List, ClassificationMarketing } = require('../models/index');
@@ -139,6 +140,53 @@ class LeadService {
     }
   }
 
+  async updateLead(leadDTO) {
+    try {
+      const lead = await Lead.update(
+        {
+          name: leadDTO.name,
+          lastName: leadDTO.lastName,
+          email: leadDTO.email,
+          phone: leadDTO.phone,
+          sex: leadDTO.sex,
+          companyName: leadDTO.companyName,
+          address: leadDTO.address,
+          city: leadDTO.city,
+          maritalStatus: leadDTO.maritalStatus,
+          notes: leadDTO.notes,
+        },
+        { where: { id: leadDTO.id } }
+      );
+      return lead;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async validateLead(idLead, emailValidated) {
+    try {
+      const statusInitial = await classificationService.getDefault();
+      const statusReady = await classificationService.get('ready_marketing');
+      const lead = await Lead.findByPk(idLead);
+      console.log(lead.toJSON())
+
+      const updateValues = {};
+      if (emailValidated === 'true') {
+        updateValues.emailValidated = true;
+      } else {
+        updateValues.phoneValidated = true;
+      }
+      if (lead.idClassificationMarketing === statusInitial.id) {
+        updateValues.idClassificationMarketing = statusReady.id;
+      }
+
+      await Lead.update(updateValues, { where: { id: idLead } });
+      return lead;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async executeSegments(idCompany, segments, lists) {
     try {
       const whereClausses = {};
@@ -160,11 +208,20 @@ class LeadService {
               [Op.ne]: s.detail === null ? '' : s.detail,
             };
           }
+        } else if (s.rule === 'lte') {
+          criteria[Op.gte] = moment(new Date()).subtract(s.detail, 'years');
+        } else if (s.rule === 'gte') {
+          criteria[Op.lte] = moment(new Date()).subtract(s.detail, 'years');
         } else {
           console.error(s.field, s.rule, s.detail);
         }
-        whereClausses[s.field] = criteria;
+        if (s.field === 'age') {
+          whereClausses.birthday = criteria;
+        } else {
+          whereClausses[s.field] = criteria;
+        }
       }
+      console.log(whereClausses);
 
       const leads = await Lead.findAll({
         attributes: ['id'],

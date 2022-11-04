@@ -15,6 +15,12 @@ const getLeads = async (req, res) => {
   res.status(StatusCodes.OK).json({ data, count });
 };
 
+const getLeadSimple = async (req, res) => {
+  const { idLead } = req.params;
+  const lead = await leadService.getLeadByIdSimple(idLead);
+  res.status(StatusCodes.OK).json(lead);
+};
+
 const getLeadById = async (req, res) => {
   const { idLead } = req.params;
   const leadStored = await leadService.getLeadById(idLead);
@@ -45,6 +51,18 @@ const addLead = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: `El cliente ${lead.name} ha sido registrado` });
 };
 
+const updateLead = async (req, res) => {
+  const lead = req.body;
+  await leadService.updateLead(lead);
+  res.status(StatusCodes.OK).json({ message: `El cliente ${lead.name} ha sido actualizado` });
+};
+
+const validateLead = async (req, res) => {
+  const { idLead, emailValidated } = req.query;
+  await leadService.validateLead(idLead, emailValidated);
+  res.status(StatusCodes.OK).json({ message: `El cliente ha sido actualizado` });
+};
+
 const seed_addLeads = async (req, res) => {
   const { id } = req.user;
   const { number } = req.query;
@@ -55,7 +73,10 @@ const seed_addLeads = async (req, res) => {
 module.exports = {
   getLeads,
   getLeadById,
+  getLeadSimple,
   addLead,
+  validateLead,
+  updateLead,
   addLeadBulk,
   seed_addLeads,
 };
