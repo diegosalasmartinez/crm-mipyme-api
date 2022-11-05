@@ -4,8 +4,7 @@ const campaignService = new CampaignService();
 
 const verifyRead = async (req, res) => {
   const { idLead, idCampaign } = req.params;
-  console.log(`Lead id: ${idLead}`);
-  await campaignService.addScopeCampaign(idCampaign);
+  await campaignService.increaseScopeCampaign(idCampaign, idLead);
   res.status(StatusCodes.OK).sendBlankGif();
 };
 

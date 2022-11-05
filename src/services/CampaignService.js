@@ -1,4 +1,3 @@
-const { decode } = require('html-entities');
 const { Op } = require('sequelize');
 const cron = require('node-cron');
 const {
@@ -15,7 +14,6 @@ const {
   Rejection,
   sequelize,
 } = require('../models/index');
-const { transporter } = require('../config/MailConfig');
 const { BadRequestError } = require('../errors');
 const CampaignStatusService = require('./CampaignStatusService');
 const campaignStatusService = new CampaignStatusService();
@@ -23,6 +21,8 @@ const DiscountService = require('./DiscountService');
 const discountService = new DiscountService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
+const MailService = require('./MailService');
+const mailService = new MailService();
 require('dotenv').config();
 
 const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
@@ -606,17 +606,8 @@ class CampaignService {
         },
       });
 
-      const campaignsResult = [];
       for (const campaign of campaigns) {
-        campaignsResult.push(`Executing: ${campaign.name}`);
-        const htmlFormatted = decode(campaign.htmlTemplate);
-
-        await transporter.sendMail({
-          from: '"CRM MiPYME" <diesalasmart@gmail.com>',
-          to: campaign.leads.map((e) => e.email),
-          subject: campaign.name,
-          html: htmlFormatted,
-        });
+        await mailService.sendMail(campaign, {});
       }
 
       const campaignsId = campaigns.map((campaign) => campaign.id);
@@ -626,7 +617,6 @@ class CampaignService {
         },
         { where: { id: campaignsId } }
       );
-      return campaignsResult;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -642,6 +632,12 @@ class CampaignService {
             as: 'leads',
             attributes: ['id', 'name', 'lastName', 'email'],
           },
+          {
+            model: User,
+            as: 'creator',
+            attributes: ['id'],
+            include: [{ model: Company, as: 'company' }],
+          },
         ],
         where: {
           id: idCampaign,
@@ -649,26 +645,12 @@ class CampaignService {
         },
       });
 
-      const htmlDecoded = decode(campaign.htmlTemplate);
-      const pos = htmlDecoded.indexOf('</body');
-
-      for (const lead of campaign.leads) {
-        const imageTag = `<img src="${process.env.MAIL_HOST}/${campaign.id}/${lead.id}">`;
-        const htmlFormatted = [htmlDecoded.slice(0, pos), imageTag, htmlDecoded.slice(pos)].join(
-          ''
-        );
-
-        await transporter.sendMail({
-          from: '"CRM MiPYME" <diesalasmart@gmail.com>',
-          to: lead.email,
-          subject: campaign.name,
-          html: htmlFormatted,
-        });
-      }
+      await mailService.sendMail(campaign, {});
 
       await Campaign.update(
         {
-          scope: 0,
+          visitsQty: 0,
+          visitsLeads: [],
         },
         { where: { id: campaign.id } }
       );
@@ -677,9 +659,18 @@ class CampaignService {
     }
   }
 
-  async addScopeCampaign(idCampaign) {
+  async increaseScopeCampaign(idCampaign, idLead) {
     try {
-      await Campaign.increment({ scope: 1 }, { where: { id: idCampaign } });
+      const campaing = await Campaign.findByPk(idCampaign);
+      const visitsLeads = campaing.visitsLeads;
+      if (visitsLeads.indexOf(idLead) === -1) {
+        visitsLeads.push(idLead);
+      }
+
+      await Campaign.update(
+        { visitsQty: campaing.visitsQty, visitsLeads },
+        { where: { id: idCampaign } }
+      );
     } catch (e) {
       throw new BadRequestError(e.message);
     }

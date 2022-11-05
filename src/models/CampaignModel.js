@@ -71,6 +71,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
+      visitsQty: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      visitsLeads: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        defaultValue: [],
+      },
       goal: DataTypes.STRING,
       budget: DataTypes.FLOAT,
       approvedAt: DataTypes.DATE,
