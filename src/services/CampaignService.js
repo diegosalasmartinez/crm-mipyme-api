@@ -598,6 +598,12 @@ class CampaignService {
             as: 'leads',
             attributes: ['id', 'name', 'lastName', 'email'],
           },
+          {
+            model: User,
+            as: 'creator',
+            attributes: ['id'],
+            include: [{ model: Company, as: 'company' }],
+          },
         ],
         where: {
           idStatus: status.id,
@@ -607,7 +613,7 @@ class CampaignService {
       });
 
       for (const campaign of campaigns) {
-        await mailService.sendMail(campaign, {});
+        await mailService.sendMail(campaign, campaign.creator.company);
       }
 
       const campaignsId = campaigns.map((campaign) => campaign.id);
@@ -644,8 +650,7 @@ class CampaignService {
           active: true,
         },
       });
-      console.log(campaign.creator.company)
-      await mailService.sendMail(campaign, {});
+      await mailService.sendMail(campaign, campaign.creator.company);
 
       await Campaign.update(
         {
@@ -661,9 +666,9 @@ class CampaignService {
 
   async increaseScopeCampaign(idCampaign, idLead) {
     try {
+      console.log(idCampaign, idLead)
       const campaing = await Campaign.findByPk(idCampaign);
       const visitsLeads = campaing.visitsLeads;
-      console.log(idCampaign, idLead)
       if (visitsLeads.indexOf(idLead) === -1) {
         visitsLeads.push(idLead);
       }

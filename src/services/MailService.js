@@ -5,7 +5,6 @@ const { BadRequestError } = require('../errors');
 class MailService {
   async sendMail(campaign, company) {
     try {
-      console.log(company);
       const htmlDecoded = decode(campaign.htmlTemplate);
       const position = htmlDecoded.indexOf('</body');
 
@@ -16,9 +15,10 @@ class MailService {
           imageTag,
           htmlDecoded.slice(position),
         ].join('');
+        console.log(imageTag)
 
         await transporter.sendMail({
-          from: '"CRM MiPYME" <diesalasmart@gmail.com>',
+          from: `${company.name} <${company.email}>`,
           to: lead.email,
           subject: campaign.name,
           html: htmlFormatted,
