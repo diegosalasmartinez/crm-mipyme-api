@@ -644,7 +644,7 @@ class CampaignService {
           active: true,
         },
       });
-
+      console.log(campaign.creator.company)
       await mailService.sendMail(campaign, {});
 
       await Campaign.update(
