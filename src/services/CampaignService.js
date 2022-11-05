@@ -393,9 +393,9 @@ class CampaignService {
       }
       const status = await campaignStatusService.get(statusValue);
 
-      let htmlTemplate = campaignDTO.htmlTemplate === null ? '' : campaignDTO.htmlTemplate;
+      let htmlTemplate = campaignDTO?.htmlTemplate ? campaignDTO.htmlTemplate : '';
       if (htmlTemplate !== '') {
-        htmlTemplate.replace(/(\r\n|\n|\r)/gm, '')
+        htmlTemplate.replace(/(\r\n|\n|\r)/gm, '');
       }
 
       const campaign = await Campaign.create({
@@ -435,9 +435,9 @@ class CampaignService {
       }
       const status = await campaignStatusService.get(statusValue);
 
-      let htmlTemplate = campaignDTO.htmlTemplate === null ? '' : campaignDTO.htmlTemplate;
+      let htmlTemplate = campaignDTO?.htmlTemplate ? campaignDTO.htmlTemplate : '';
       if (htmlTemplate !== '') {
-        htmlTemplate.replace(/(\r\n|\n|\r)/gm, '')
+        htmlTemplate.replace(/(\r\n|\n|\r)/gm, '');
       }
 
       await Campaign.update(
