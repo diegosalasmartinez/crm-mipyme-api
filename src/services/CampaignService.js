@@ -663,12 +663,14 @@ class CampaignService {
     try {
       const campaing = await Campaign.findByPk(idCampaign);
       const visitsLeads = campaing.visitsLeads;
+      console.log(idCampaign, idLead)
       if (visitsLeads.indexOf(idLead) === -1) {
         visitsLeads.push(idLead);
       }
+      console.log(visitsLeads)
 
       await Campaign.update(
-        { visitsQty: campaing.visitsQty, visitsLeads },
+        { visitsQty: campaing.visitsQty + 1, visitsLeads },
         { where: { id: idCampaign } }
       );
     } catch (e) {
