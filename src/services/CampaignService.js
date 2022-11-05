@@ -28,7 +28,7 @@ require('dotenv').config();
 const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
 
 cron.schedule(
-  '10 20 * * *',
+  '15 0 * * *',
   async function () {
     try {
       const campaignService = new CampaignService();
@@ -44,7 +44,7 @@ cron.schedule(
 );
 
 cron.schedule(
-  '14 20 * * *',
+  '0 10 * * *',
   async function () {
     try {
       const campaignService = new CampaignService();
@@ -636,28 +636,19 @@ class CampaignService {
         },
       });
 
-      const htmlDecoded = decode(campaign.htmlTemplate.replace(/(\r\n|\n|\r)/gm, ''));
+      const htmlDecoded = decode(campaign.htmlTemplate);
       const pos = htmlDecoded.indexOf('</body');
 
-      let num = 0; 
       for (const lead of campaign.leads) {
         const imageTag = `<img src="${process.env.MAIL_HOST}/${campaign.id}/${lead.id}">`;
-        const htmlFormatted = [
-          htmlDecoded.slice(0, pos),
-          imageTag,
-          htmlDecoded.slice(pos),
-        ].join('');
-        // console.log(htmlFormatted)
+        const htmlFormatted = [htmlDecoded.slice(0, pos), imageTag, htmlDecoded.slice(pos)].join('');
 
-        if (num > 0) continue;
         await transporter.sendMail({
           from: '"CRM MiPYME" <diesalasmart@gmail.com>',
-          // to: campaign.leads.map((e) => e.email),
-          to: 'diesalasmart@gmail.com',
+          to: lead.email,
           subject: campaign.name,
           html: htmlFormatted,
         });
-        num++;
       }
     } catch (e) {
       throw new BadRequestError(e.message);
