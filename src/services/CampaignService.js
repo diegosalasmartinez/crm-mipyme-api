@@ -484,6 +484,11 @@ class CampaignService {
     try {
       const status = await campaignStatusService.get('approved');
 
+      let htmlTemplate = campaignDTO?.htmlTemplate ? campaignDTO.htmlTemplate : '';
+      if (htmlTemplate !== '') {
+        htmlTemplate.replace(/(\r\n|\n|\r)/gm, '');
+      }
+
       await Campaign.update(
         {
           name: campaignDTO.name,
@@ -491,7 +496,7 @@ class CampaignService {
           segments: campaignDTO.segments === null ? [] : campaignDTO.segments,
           step: campaignDTO.step === null ? 0 : campaignDTO.step,
           html: campaignDTO.html === null ? {} : campaignDTO.html,
-          htmlTemplate: campaignDTO.htmlTemplate === null ? {} : campaignDTO.htmlTemplate,
+          htmlTemplate,
           goal: campaignDTO.goal,
           budget: campaignDTO.budget,
           startDate: campaignDTO.startDate,
