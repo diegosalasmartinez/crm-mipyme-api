@@ -393,14 +393,18 @@ class CampaignService {
       }
       const status = await campaignStatusService.get(statusValue);
 
-      const htmlTemplate = campaignDTO.htmlTemplate === null ? '' : campaignDTO.htmlTemplate;
+      let htmlTemplate = campaignDTO.htmlTemplate === null ? '' : campaignDTO.htmlTemplate;
+      if (htmlTemplate !== '') {
+        htmlTemplate.replace(/(\r\n|\n|\r)/gm, '')
+      }
+
       const campaign = await Campaign.create({
         name: campaignDTO.name,
         lists: campaignDTO.lists === null ? [] : campaignDTO.lists,
         segments: campaignDTO.segments === null ? [] : campaignDTO.segments,
         step: campaignDTO.step === null ? 0 : campaignDTO.step,
         html: campaignDTO.html === null ? {} : campaignDTO.html,
-        htmlTemplate: htmlTemplate.replace(/(\r\n|\n|\r)/gm, ''),
+        htmlTemplate,
         goal: campaignDTO.goal,
         budget: campaignDTO.budget,
         startDate: campaignDTO.startDate,
@@ -431,7 +435,11 @@ class CampaignService {
       }
       const status = await campaignStatusService.get(statusValue);
 
-      const htmlTemplate = campaignDTO.htmlTemplate === null ? '' : campaignDTO.htmlTemplate;
+      let htmlTemplate = campaignDTO.htmlTemplate === null ? '' : campaignDTO.htmlTemplate;
+      if (htmlTemplate !== '') {
+        htmlTemplate.replace(/(\r\n|\n|\r)/gm, '')
+      }
+
       await Campaign.update(
         {
           name: campaignDTO.name,
@@ -439,7 +447,7 @@ class CampaignService {
           segments: campaignDTO.segments === null ? [] : campaignDTO.segments,
           step: campaignDTO.step === null ? 0 : campaignDTO.step,
           html: campaignDTO.html === null ? {} : campaignDTO.html,
-          htmlTemplate: htmlTemplate.replace(/(\r\n|\n|\r)/gm, ''),
+          htmlTemplate,
           goal: campaignDTO.goal,
           budget: campaignDTO.budget,
           startDate: campaignDTO.startDate,
