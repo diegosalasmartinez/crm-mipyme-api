@@ -15,14 +15,14 @@ class MailService {
           imageTag,
           htmlDecoded.slice(position),
         ].join('');
-        console.log(imageTag)
+        console.log(htmlFormatted)
 
-        await transporter.sendMail({
-          from: `${company.name} <${company.email}>`,
-          to: lead.email,
-          subject: campaign.name,
-          html: htmlFormatted,
-        });
+        // await transporter.sendMail({
+        //   from: `${company.name} <${company.email}>`,
+        //   to: lead.email,
+        //   subject: campaign.name,
+        //   html: htmlFormatted,
+        // });
       }
     } catch (e) {
       throw new BadRequestError(e.message);
