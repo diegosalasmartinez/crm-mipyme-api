@@ -225,7 +225,6 @@ class LeadService {
   async executeSegments(idCompany, segments, lists) {
     try {
       const whereClausses = this.generateWhereClausses(segments);
-      const status = await classificationService.get('marketing_engaged');
       const leads = await Lead.findAll({
         attributes: ['id'],
         required: true,
@@ -245,7 +244,7 @@ class LeadService {
         ],
         where: {
           ...whereClausses,
-          // idClassificationMarketing: status.id,
+          emailValidated: true,
           active: true,
         },
       });
