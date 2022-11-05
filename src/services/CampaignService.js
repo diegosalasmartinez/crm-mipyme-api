@@ -641,7 +641,9 @@ class CampaignService {
 
       for (const lead of campaign.leads) {
         const imageTag = `<img src="${process.env.MAIL_HOST}/${campaign.id}/${lead.id}">`;
-        const htmlFormatted = [htmlDecoded.slice(0, pos), imageTag, htmlDecoded.slice(pos)].join('');
+        const htmlFormatted = [htmlDecoded.slice(0, pos), imageTag, htmlDecoded.slice(pos)].join(
+          ''
+        );
 
         await transporter.sendMail({
           from: '"CRM MiPYME" <diesalasmart@gmail.com>',
@@ -650,6 +652,21 @@ class CampaignService {
           html: htmlFormatted,
         });
       }
+
+      await Campaign.update(
+        {
+          scope: 0,
+        },
+        { where: { id: campaign.id } }
+      );
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async addScopeCampaign(idCampaign) {
+    try {
+      await Campaign.increment({ scope: 1 }, { where: { id: idCampaign } });
     } catch (e) {
       throw new BadRequestError(e.message);
     }
