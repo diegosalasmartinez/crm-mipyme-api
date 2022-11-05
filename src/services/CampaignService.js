@@ -23,11 +23,12 @@ const DiscountService = require('./DiscountService');
 const discountService = new DiscountService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
+require('dotenv').config();
 
 const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
 
 cron.schedule(
-  '15 0 * * *',
+  '10 20 * * *',
   async function () {
     try {
       const campaignService = new CampaignService();
@@ -43,7 +44,7 @@ cron.schedule(
 );
 
 cron.schedule(
-  '0 10 * * *',
+  '14 20 * * *',
   async function () {
     try {
       const campaignService = new CampaignService();
@@ -392,13 +393,14 @@ class CampaignService {
       }
       const status = await campaignStatusService.get(statusValue);
 
+      const htmlTemplate = campaignDTO.htmlTemplate === null ? '' : campaignDTO.htmlTemplate;
       const campaign = await Campaign.create({
         name: campaignDTO.name,
         lists: campaignDTO.lists === null ? [] : campaignDTO.lists,
         segments: campaignDTO.segments === null ? [] : campaignDTO.segments,
         step: campaignDTO.step === null ? 0 : campaignDTO.step,
         html: campaignDTO.html === null ? {} : campaignDTO.html,
-        htmlTemplate: campaignDTO.htmlTemplate === null ? '' : campaignDTO.htmlTemplate,
+        htmlTemplate: htmlTemplate.replace(/(\r\n|\n|\r)/gm, ''),
         goal: campaignDTO.goal,
         budget: campaignDTO.budget,
         startDate: campaignDTO.startDate,
@@ -429,6 +431,7 @@ class CampaignService {
       }
       const status = await campaignStatusService.get(statusValue);
 
+      const htmlTemplate = campaignDTO.htmlTemplate === null ? '' : campaignDTO.htmlTemplate;
       await Campaign.update(
         {
           name: campaignDTO.name,
@@ -436,7 +439,7 @@ class CampaignService {
           segments: campaignDTO.segments === null ? [] : campaignDTO.segments,
           step: campaignDTO.step === null ? 0 : campaignDTO.step,
           html: campaignDTO.html === null ? {} : campaignDTO.html,
-          htmlTemplate: campaignDTO.htmlTemplate === null ? '' : campaignDTO.htmlTemplate,
+          htmlTemplate: htmlTemplate.replace(/(\r\n|\n|\r)/gm, ''),
           goal: campaignDTO.goal,
           budget: campaignDTO.budget,
           startDate: campaignDTO.startDate,
@@ -595,14 +598,12 @@ class CampaignService {
         campaignsResult.push(`Executing: ${campaign.name}`);
         const htmlFormatted = decode(campaign.htmlTemplate);
 
-        for (const lead of campaign.leads) {
-          await transporter.sendMail({
-            from: '"CRM MiPYME" <diesalasmart@gmail.com>',
-            to: lead.email,
-            subject: campaign.name,
-            html: htmlFormatted,
-          });
-        }
+        await transporter.sendMail({
+          from: '"CRM MiPYME" <diesalasmart@gmail.com>',
+          to: campaign.leads.map((e) => e.email),
+          subject: campaign.name,
+          html: htmlFormatted,
+        });
       }
 
       const campaignsId = campaigns.map((campaign) => campaign.id);
@@ -613,6 +614,51 @@ class CampaignService {
         { where: { id: campaignsId } }
       );
       return campaignsResult;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async sendCampaign(idCampaign) {
+    try {
+      const campaign = await Campaign.findOne({
+        attributes: ['id', 'name', 'html', 'htmlTemplate'],
+        include: [
+          {
+            model: Lead,
+            as: 'leads',
+            attributes: ['id', 'name', 'lastName', 'email'],
+          },
+        ],
+        where: {
+          id: idCampaign,
+          active: true,
+        },
+      });
+
+      const htmlDecoded = decode(campaign.htmlTemplate.replace(/(\r\n|\n|\r)/gm, ''));
+      const pos = htmlDecoded.indexOf('</body');
+
+      let num = 0; 
+      for (const lead of campaign.leads) {
+        const imageTag = `<img src="${process.env.MAIL_HOST}/${campaign.id}/${lead.id}">`;
+        const htmlFormatted = [
+          htmlDecoded.slice(0, pos),
+          imageTag,
+          htmlDecoded.slice(pos),
+        ].join('');
+        // console.log(htmlFormatted)
+
+        if (num > 0) continue;
+        await transporter.sendMail({
+          from: '"CRM MiPYME" <diesalasmart@gmail.com>',
+          // to: campaign.leads.map((e) => e.email),
+          to: 'diesalasmart@gmail.com',
+          subject: campaign.name,
+          html: htmlFormatted,
+        });
+        num++;
+      }
     } catch (e) {
       throw new BadRequestError(e.message);
     }

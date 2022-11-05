@@ -50,9 +50,7 @@ class PlanService {
                 ],
               },
             ],
-            order: [
-              ['updatedAt', 'DESC']
-            ]
+            order: [['updatedAt', 'DESC']],
           },
         ],
         where: {
@@ -104,17 +102,30 @@ class PlanService {
   async dashboard(idCompany) {
     try {
       const company = await this.getPlan(idCompany);
-      const { numCampaigns, numDeals, numConversions, sales, distribution } = await this.getPlanStats(company);
+      const { numCampaigns, numDeals, numConversions, sales } = await this.getPlanStats(company);
 
       // Lead generation
       const chartLabels = generateChartLabels();
       const leads = await leadService.getAllLeads(idCompany);
+
+      // Lead distribution
+      const distributionKeys = {
+        started: 0,
+        ready_marketing: 0,
+        marketing_engaged: 0,
+        ready_sales: 0,
+      };
+
       leads.forEach((lead) => {
         const k = moment(lead.createdAt).format('YYYY-MM').slice(0, 7);
+        const classification = lead.classificationMarketing.key;
+        distributionKeys[classification] = (distributionKeys[classification] || 0) + 1;
         if (chartLabels[k]) {
           chartLabels[k] = { value: chartLabels[k].value + 1, name: chartLabels[k].name };
         }
       });
+
+      const distribution = Object.keys(distributionKeys).map((key) => distributionKeys[key]);
 
       const data = Object.entries(chartLabels)
         .map((entry) => entry[1].value)

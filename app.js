@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 const rateLimit = require('express-rate-limit');
+const blankgif = require('blankgif');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -20,5 +21,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(cors());
 app.use(xss());
+app.use(blankgif.middleware());
 
 module.exports = app;

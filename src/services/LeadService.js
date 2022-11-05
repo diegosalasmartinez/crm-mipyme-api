@@ -168,7 +168,6 @@ class LeadService {
       const statusInitial = await classificationService.getDefault();
       const statusReady = await classificationService.get('ready_marketing');
       const lead = await Lead.findByPk(idLead);
-      console.log(lead.toJSON())
 
       const updateValues = {};
       if (emailValidated === 'true') {
@@ -187,42 +186,46 @@ class LeadService {
     }
   }
 
+  generateWhereClausses(segments) {
+    const whereClausses = {};
+    for (const s of segments) {
+      const criteria = {};
+      if (s.rule === 'exist') {
+        criteria[Op.not] = null;
+      } else if (s.rule === 'is') {
+        criteria[Op.eq] = s.detail;
+      } else if (s.rule === 'isnt') {
+        if (s.detail && s.detail.length > 0) {
+          criteria[Op.or] = {
+            [Op.is]: null,
+            [Op.ne]: s.detail === null ? '' : s.detail,
+          };
+        } else {
+          criteria[Op.or] = {
+            [Op.not]: null,
+            [Op.ne]: s.detail === null ? '' : s.detail,
+          };
+        }
+      } else if (s.rule === 'lte') {
+        criteria[Op.gte] = moment(new Date()).subtract(s.detail, 'years');
+      } else if (s.rule === 'gte') {
+        criteria[Op.lte] = moment(new Date()).subtract(s.detail, 'years');
+      } else {
+        console.error(s.field, s.rule, s.detail);
+      }
+      if (s.field === 'age') {
+        whereClausses.birthday = criteria;
+      } else {
+        whereClausses[s.field] = criteria;
+      }
+    }
+    return whereClausses;
+  }
+
   async executeSegments(idCompany, segments, lists) {
     try {
-      const whereClausses = {};
-      for (const s of segments) {
-        const criteria = {};
-        if (s.rule === 'exist') {
-          criteria[Op.not] = null;
-        } else if (s.rule === 'is') {
-          criteria[Op.eq] = s.detail;
-        } else if (s.rule === 'isnt') {
-          if (s.detail && s.detail.length > 0) {
-            criteria[Op.or] = {
-              [Op.is]: null,
-              [Op.ne]: s.detail === null ? '' : s.detail,
-            };
-          } else {
-            criteria[Op.or] = {
-              [Op.not]: null,
-              [Op.ne]: s.detail === null ? '' : s.detail,
-            };
-          }
-        } else if (s.rule === 'lte') {
-          criteria[Op.gte] = moment(new Date()).subtract(s.detail, 'years');
-        } else if (s.rule === 'gte') {
-          criteria[Op.lte] = moment(new Date()).subtract(s.detail, 'years');
-        } else {
-          console.error(s.field, s.rule, s.detail);
-        }
-        if (s.field === 'age') {
-          whereClausses.birthday = criteria;
-        } else {
-          whereClausses[s.field] = criteria;
-        }
-      }
-      console.log(whereClausses);
-
+      const whereClausses = this.generateWhereClausses(segments);
+      const status = await classificationService.get('marketing_engaged');
       const leads = await Lead.findAll({
         attributes: ['id'],
         required: true,
@@ -242,6 +245,7 @@ class LeadService {
         ],
         where: {
           ...whereClausses,
+          // idClassificationMarketing: status.id,
           active: true,
         },
       });

@@ -68,10 +68,17 @@ const sendCampaigns = async (req, res) => {
   res.status(StatusCodes.OK).json(result);
 };
 
+const sendCampaign = async (req, res) => {
+  const { idCampaign } = req.params;
+  await campaignService.sendCampaign(idCampaign);
+  res.status(StatusCodes.OK).json({ message: 'La campaña ha sido satisfactoriamente enviada.' });
+};
+
 module.exports = {
   getCampaignsByCompany,
   getCampaignById,
   addCampaign,
+  sendCampaign,
   updateCampaign,
   approveCampaign,
   runCampaigns,
