@@ -689,6 +689,25 @@ class CampaignService {
       throw new BadRequestError(e.message);
     }
   }
+
+  async getCampaignCPL(idCampaign) {
+    try {
+      const campaign = await Campaign.findByPk(idCampaign);
+      const leads = await campaign.getLeads();
+      const budget = campaign?.budget ?? 0;
+      const waste = campaign?.waste ?? 0;
+      const stats = {
+        budget,
+        waste,
+        usagePercentage: waste > 0 ? budget / waste : 0,
+        leadsQty: leads.length,
+        cpl: waste > 0 ? leads.length / waste : 0,
+      };
+      return stats;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
 }
 
 module.exports = CampaignService;

@@ -6,6 +6,7 @@ const {
   sendCampaign,
   updateCampaign,
   approveCampaign,
+  generateKPICampaign,
   runCampaigns,
   sendCampaigns,
 } = require('../controllers/CampaignController');
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.get('/', getCampaignsByCompany);
 router.get('/send/:idCampaign', sendCampaign);
+router.get('/kpi/:idCampaign', generateKPICampaign);
 router.get('/:idCampaign', getCampaignById);
 router.post('/', addCampaign);
 router.patch('/', updateCampaign);

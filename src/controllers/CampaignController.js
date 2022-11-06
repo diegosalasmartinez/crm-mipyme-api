@@ -74,6 +74,17 @@ const sendCampaign = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: 'La campaña ha sido satisfactoriamente enviada.' });
 };
 
+const generateKPICampaign = async (req, res) => {
+  const { kpi } = req.query;
+  const { idCampaign } = req.params;
+  let stats = {};
+  if (kpi === 'cpl') {
+    stats = await campaignService.getCampaignCPL(idCampaign);
+  }
+
+  res.status(StatusCodes.OK).json(stats);
+};
+
 module.exports = {
   getCampaignsByCompany,
   getCampaignById,
@@ -81,6 +92,7 @@ module.exports = {
   sendCampaign,
   updateCampaign,
   approveCampaign,
+  generateKPICampaign,
   runCampaigns,
   sendCampaigns,
 };
