@@ -64,7 +64,6 @@ class CampaignService {
   async getCampaigns(idCompany, status) {
     try {
       const { rows: data = [], count } = await Campaign.findAndCountAll({
-        required: true,
         attributes: {
           exclude: ['html', 'segments', 'lists'],
         },
@@ -73,18 +72,17 @@ class CampaignService {
             model: Program,
             as: 'program',
             attributes: ['id', 'name', 'idPlan'],
-            required: true,
             include: [
               {
                 model: Plan,
                 as: 'plan',
                 attributes: [],
-                required: true,
                 include: [
                   {
                     model: Company,
                     as: 'company',
                     attributes: [],
+                    required: false,
                     where: { id: idCompany },
                   },
                 ],
@@ -122,7 +120,6 @@ class CampaignService {
   async getCampaignsByUser(idUser, idCompany, status) {
     try {
       const { rows: data = [], count } = await Campaign.findAndCountAll({
-        required: true,
         attributes: {
           exclude: ['html', 'segments', 'lists'],
         },
@@ -131,18 +128,17 @@ class CampaignService {
             model: Program,
             as: 'program',
             attributes: ['id', 'name', 'idPlan'],
-            required: true,
             include: [
               {
                 model: Plan,
                 as: 'plan',
                 attributes: [],
-                required: true,
                 include: [
                   {
                     model: Company,
                     as: 'company',
                     attributes: [],
+                    required: false,
                     where: { id: idCompany },
                   },
                 ],
@@ -157,6 +153,7 @@ class CampaignService {
           {
             model: CampaignStatus,
             as: 'status',
+            required: false,
             where: {
               key: status,
             },
@@ -176,7 +173,6 @@ class CampaignService {
   async getAssignedCampaignsByUser(idUser, idCompany, status) {
     try {
       const { rows: data = [], count } = await Campaign.findAndCountAll({
-        required: true,
         attributes: {
           exclude: ['html', 'segments', 'lists'],
         },
@@ -185,18 +181,17 @@ class CampaignService {
             model: Program,
             as: 'program',
             attributes: ['id', 'name', 'idPlan'],
-            required: true,
             include: [
               {
                 model: Plan,
                 as: 'plan',
                 attributes: [],
-                required: true,
                 include: [
                   {
                     model: Company,
                     as: 'company',
                     attributes: [],
+                    required: false,
                     where: { id: idCompany },
                   },
                 ],
@@ -207,6 +202,7 @@ class CampaignService {
             model: User,
             as: 'assigned',
             attributes: ['name', 'lastName'],
+            required: false,
             where: {
               '$assigned.usersxcampaigns.idUser$': idUser,
             },
@@ -219,6 +215,7 @@ class CampaignService {
           {
             model: CampaignStatus,
             as: 'status',
+            required: false,
             where: {
               key: status,
             },
@@ -237,6 +234,7 @@ class CampaignService {
   async getCampaignById(id) {
     try {
       const campaign = await Campaign.findOne({
+        required: false,
         include: [
           {
             model: Discount,
@@ -269,13 +267,17 @@ class CampaignService {
           {
             model: Lead,
             as: 'leads',
-            attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone'],
+            required: false,
+            attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone', 'active'],
             include: [
               {
                 model: ClassificationMarketing,
                 as: 'classificationMarketing',
               },
             ],
+            where: {
+              active: true,
+            },
           },
           {
             model: MarketingKPI,
@@ -312,6 +314,7 @@ class CampaignService {
     try {
       const status = await campaignStatusService.get('running');
       const campaigns = await Campaign.findAll({
+        required: false,
         attributes: {
           exclude: ['html', 'segments', 'lists'],
         },
@@ -711,13 +714,37 @@ class CampaignService {
 
   async getCampaignROI(idCampaign) {
     try {
-
-      let amountWon = 0 
+      let amountWon = 0;
       const campaign = await Campaign.findByPk(idCampaign);
       const deals = await campaign.getDeals();
       for (const deal of deals) {
         if (deal.realCloseDate) {
-          amountWon += deal.realAmount
+          amountWon += deal.realAmount;
+        }
+      }
+
+      const waste = campaign?.waste ?? 0;
+
+      const stats = {
+        amountWon,
+        waste,
+        dealsQty: deals.length,
+        roi: waste > 0 ? (amountWon - waste) / waste : 0,
+      };
+      return stats;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getCampaignFidelization(idCampaign) {
+    try {
+      let amountWon = 0;
+      const campaign = await Campaign.findByPk(idCampaign);
+      const deals = await campaign.getDeals();
+      for (const deal of deals) {
+        if (deal.realCloseDate) {
+          amountWon += deal.realAmount;
         }
       }
 
