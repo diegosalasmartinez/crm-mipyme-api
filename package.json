@@ -40,7 +40,6 @@
     "pg-hstore": "^2.3.4",
     "pm2": "^5.2.2",
     "sequelize": "^6.19.0",
-    "uninstall": "0.0.0",
     "uuid": "^8.3.2",
     "xss-clean": "^0.1.1"
   },
