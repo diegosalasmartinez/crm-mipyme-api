@@ -1,6 +1,7 @@
 const { transporter } = require('../config/MailConfig');
 const { decode } = require('html-entities');
 const { BadRequestError } = require('../errors');
+require('dotenv').config();
 
 class MailService {
   async sendMail(campaign, company) {
