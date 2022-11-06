@@ -80,6 +80,8 @@ const generateKPICampaign = async (req, res) => {
   let stats = {};
   if (kpi === 'cpl') {
     stats = await campaignService.getCampaignCPL(idCampaign);
+  } else if (kpi === 'roi') {
+    stats = await campaignService.getCampaignROI(idCampaign);
   }
 
   res.status(StatusCodes.OK).json(stats);

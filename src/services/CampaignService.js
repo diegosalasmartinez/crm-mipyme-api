@@ -708,6 +708,32 @@ class CampaignService {
       throw new BadRequestError(e.message);
     }
   }
+
+  async getCampaignROI(idCampaign) {
+    try {
+
+      let amountWon = 0 
+      const campaign = await Campaign.findByPk(idCampaign);
+      const deals = await campaign.getDeals();
+      for (const deal of deals) {
+        if (deal.realCloseDate) {
+          amountWon += deal.realAmount
+        }
+      }
+
+      const waste = campaign?.waste ?? 0;
+
+      const stats = {
+        amountWon,
+        waste,
+        dealsQty: deals.length,
+        roi: waste > 0 ? (amountWon - waste) / waste : 0,
+      };
+      return stats;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
 }
 
 module.exports = CampaignService;
