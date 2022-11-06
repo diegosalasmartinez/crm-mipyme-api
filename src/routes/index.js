@@ -5,9 +5,7 @@ const authenticatedRoutes = express.Router();
 const baseUrl = '/api/v1/';
 
 const authRoutes = require('./AuthRoutes');
-const watchRoutes = require('./WatchRoutes');
 basicRoutes.use(baseUrl + 'auth', authRoutes);
-basicRoutes.use(baseUrl + 'watch', watchRoutes);
 
 const accountRoutes = require('./AccountRoutes');
 const companyRoutes = require('./CompanyRoutes');

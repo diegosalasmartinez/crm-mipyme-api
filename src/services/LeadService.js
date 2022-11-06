@@ -210,9 +210,8 @@ class LeadService {
         criteria[Op.gte] = moment(new Date()).subtract(s.detail, 'years');
       } else if (s.rule === 'gte') {
         criteria[Op.lte] = moment(new Date()).subtract(s.detail, 'years');
-      } else {
-        console.error(s.field, s.rule, s.detail);
       }
+      
       if (s.field === 'age') {
         whereClausses.birthday = criteria;
       } else {
