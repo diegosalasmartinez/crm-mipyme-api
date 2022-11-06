@@ -401,8 +401,9 @@ class DealService {
       const salesOriginMarketing = generateChartLabels();
       const salesOriginTicket = generateChartLabels();
 
-      // Lead generation
-      const chartLabels = generateChartLabels();
+      // Deal generation
+      const dealsChartLabels = generateChartLabels();
+      const salesChartLabels = generateChartLabels();
 
       // Products
       const topProducts = {};
@@ -420,9 +421,23 @@ class DealService {
       for (const deal of deals) {
         const k = moment(deal.createdAt).format('YYYY-MM').slice(0, 7);
         // Group by created at
-        if (chartLabels[k]) {
-          chartLabels[k] = { value: chartLabels[k].value + 1, name: chartLabels[k].name };
+        if (dealsChartLabels[k]) {
+          dealsChartLabels[k] = {
+            value: dealsChartLabels[k].value + 1,
+            name: dealsChartLabels[k].name,
+          };
         }
+
+        if (deal.realCloseDate) {
+          const kAux = moment(deal.realCloseDate).format('YYYY-MM').slice(0, 7);
+          if (salesChartLabels[kAux]) {
+            salesChartLabels[kAux] = {
+              value: salesChartLabels[kAux].value + 1,
+              name: salesChartLabels[kAux].name,
+            };
+          }
+        }
+
         // Group by win or lost
         if (deal.idStep === winStep.id) {
           wonQty++;
@@ -478,20 +493,23 @@ class DealService {
         });
       }
 
-      const data = Object.entries(chartLabels)
+      const data = Object.entries(dealsChartLabels)
         .map((entry) => entry[1].value)
         .reverse();
-      const label = Object.entries(chartLabels)
+      const data2 = Object.entries(salesChartLabels)
+        .map((entry) => entry[1].value)
+        .reverse();
+      const label = Object.entries(dealsChartLabels)
         .map((entry) => entry[1].name)
         .reverse();
-      const dealGeneration = { data, label };
+      const dealGeneration = { data, data2, label };
 
       const rejections = {
         data: Object.entries(rejectionValues).map((entry) => entry[1]),
         label: Object.entries(rejectionValues).map((entry) => entry[0]),
       };
 
-      const originLabels = Object.entries(chartLabels)
+      const originLabels = Object.entries(dealsChartLabels)
         .map((entry) => entry[1].name)
         .reverse();
       const originSalesData = Object.entries(salesOriginSales)
