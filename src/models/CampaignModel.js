@@ -47,6 +47,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      numRecessions: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       step: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
@@ -71,16 +75,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
-      visitsQty: {
-        type: DataTypes.INTEGER,
+      goal: DataTypes.STRING,
+      budget: {
+        type: DataTypes.FLOAT,
         defaultValue: 0,
       },
-      visitsLeads: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-        defaultValue: [],
-      },
-      goal: DataTypes.STRING,
-      budget: DataTypes.FLOAT,
       approvedAt: DataTypes.DATE,
       active: {
         type: DataTypes.BOOLEAN,

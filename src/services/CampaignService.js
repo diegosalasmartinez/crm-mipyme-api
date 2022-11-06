@@ -651,14 +651,6 @@ class CampaignService {
         },
       });
       await mailService.sendMail(campaign, campaign.creator.company);
-
-      await Campaign.update(
-        {
-          visitsQty: 0,
-          visitsLeads: [],
-        },
-        { where: { id: campaign.id } }
-      );
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -666,16 +658,7 @@ class CampaignService {
 
   async increaseScopeCampaign(idCampaign, idLead) {
     try {
-      const campaing = await Campaign.findByPk(idCampaign);
-      const visitsLeads = campaing.visitsLeads;
-      if (visitsLeads.indexOf(idLead) === -1) {
-        visitsLeads.push(idLead);
-      }
-
-      await Campaign.update(
-        { visitsQty: campaing.visitsQty + 1, visitsLeads },
-        { where: { id: idCampaign } }
-      );
+      console.log(idCampaign, idLead);
     } catch (e) {
       throw new BadRequestError(e.message);
     }
