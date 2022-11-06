@@ -1,8 +1,8 @@
 const express = require('express');
-const { getRoles } = require('../controllers/AccountController');
+const { getAccount } = require('../controllers/AccountController');
 
 const router = express.Router();
 
-router.get('/roles', getRoles);
+router.get('/', getAccount);
 
 module.exports = router;
