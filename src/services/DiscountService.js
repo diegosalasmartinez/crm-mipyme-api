@@ -55,7 +55,7 @@ class DiscountService {
     }
   }
 
-  async addDiscounts(idCampaign, idCompany, data, typeKey) {
+  async addDiscounts(idCampaign, idCompany, data, typeKey, t) {
     try {
       const type = await discountTypeService.get(typeKey);
 
@@ -65,14 +65,17 @@ class DiscountService {
 
         const product = await productService.getProductBySku(idCompany, row.code);
         if (product) {
-          await Discount.create({
-            idCampaign,
-            idProduct: product.id,
-            idType: type.id,
-            discount: row.discount,
-            startDate: startDate,
-            endDate: endDate,
-          });
+          await Discount.create(
+            {
+              idCampaign,
+              idProduct: product.id,
+              idType: type.id,
+              discount: row.discount,
+              startDate: startDate,
+              endDate: endDate,
+            },
+            { transaction: t }
+          );
         }
       }
     } catch (e) {
@@ -80,13 +83,13 @@ class DiscountService {
     }
   }
 
-  async updateDiscounts(idCompany, campaign, typeKey) {
+  async updateDiscounts(idCompany, campaign, typeKey, t) {
     try {
       const idCampaign = campaign.id;
       const discounts = campaign.discounts;
 
-      await Discount.destroy({ where: { idCampaign } });
-      await this.addDiscounts(idCampaign, idCompany, discounts, typeKey);
+      await Discount.destroy({ where: { idCampaign }, transaction: t });
+      await this.addDiscounts(idCampaign, idCompany, discounts, typeKey, t);
     } catch (e) {
       throw new BadRequestError(e.message);
     }

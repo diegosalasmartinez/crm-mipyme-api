@@ -10,6 +10,7 @@ const {
   Plan,
   Company,
   User,
+  MarketingKPI,
   ClassificationMarketing,
   Rejection,
   sequelize,
@@ -25,7 +26,7 @@ const MailService = require('./MailService');
 const mailService = new MailService();
 require('dotenv').config();
 
-const CAMPAIGN_STEP_SEND_TO_PENDING = 5;
+const CAMPAIGN_STEP_SEND_TO_PENDING = 6;
 
 cron.schedule(
   '15 0 * * *',
@@ -277,6 +278,10 @@ class CampaignService {
             ],
           },
           {
+            model: MarketingKPI,
+            as: 'kpis',
+          },
+          {
             model: CampaignStatus,
             as: 'status',
           },
@@ -386,6 +391,7 @@ class CampaignService {
   }
 
   async addCampaign(idUser, idCompany, idProgram, campaignDTO) {
+    const t = await sequelize.transaction();
     try {
       let statusValue = 'bulk';
       if (campaignDTO.step === CAMPAIGN_STEP_SEND_TO_PENDING) {
@@ -398,35 +404,38 @@ class CampaignService {
         htmlTemplate.replace(/(\r\n|\n|\r)/gm, '');
       }
 
-      const campaign = await Campaign.create({
-        name: campaignDTO.name,
-        lists: campaignDTO.lists === null ? [] : campaignDTO.lists,
-        segments: campaignDTO.segments === null ? [] : campaignDTO.segments,
-        step: campaignDTO.step === null ? 0 : campaignDTO.step,
-        html: campaignDTO.html === null ? {} : campaignDTO.html,
-        htmlTemplate,
-        goal: campaignDTO.goal,
-        budget: campaignDTO.budget,
-        startDate: campaignDTO.startDate,
-        endDate: campaignDTO.endDate,
-        createdBy: idUser,
-        idStatus: status.id,
-        idProgram,
-      });
-
-      await discountService.addDiscounts(
-        campaign.id,
-        idCompany,
-        campaignDTO.discounts,
-        'marketing'
+      const campaign = await Campaign.create(
+        {
+          name: campaignDTO.name,
+          lists: campaignDTO.lists === null ? [] : campaignDTO.lists,
+          segments: campaignDTO.segments === null ? [] : campaignDTO.segments,
+          step: campaignDTO.step === null ? 0 : campaignDTO.step,
+          html: campaignDTO.html === null ? {} : campaignDTO.html,
+          htmlTemplate,
+          goal: campaignDTO.goal,
+          budget: campaignDTO.budget,
+          startDate: campaignDTO.startDate,
+          endDate: campaignDTO.endDate,
+          createdBy: idUser,
+          idStatus: status.id,
+          idProgram,
+        },
+        { transaction: t }
       );
-      return campaign;
+
+      const discounts = campaignDTO.discounts;
+      await discountService.addDiscounts(campaign.id, idCompany, discounts, 'marketing', t);
+      await t.commit();
+
+      await this.registerKpisByCampaign(campaign, campaignDTO.kpis);
     } catch (e) {
+      await t.rollback();
       throw new BadRequestError(e.message);
     }
   }
 
   async updateCampaign(idCompany, campaignDTO) {
+    const t = await sequelize.transaction();
     try {
       const id = campaignDTO.id;
       let statusValue = 'bulk';
@@ -454,11 +463,14 @@ class CampaignService {
           endDate: campaignDTO.endDate,
           idStatus: status.id,
         },
-        { where: { id } }
+        { where: { id }, transaction: t }
       );
+      await discountService.updateDiscounts(idCompany, campaignDTO, 'marketing', t);
+      await t.commit();
 
-      await discountService.updateDiscounts(idCompany, campaignDTO, 'marketing');
+      await this.updateKpisByCampaign(id, campaignDTO.kpis);
     } catch (e) {
+      await t.rollback();
       throw new BadRequestError(e.message);
     }
   }
@@ -509,14 +521,28 @@ class CampaignService {
       );
 
       const campaign = await Campaign.findByPk(campaignDTO.id);
+      await discountService.updateDiscounts(idCompany, campaignDTO, 'marketing', t);
       await this.addUsersToCampaign(campaign, campaignDTO.assigned, t);
       await this.executeSegments(idCompany, campaign, t);
-
       await t.commit();
+
+      await this.updateKpisByCampaign(campaignDTO.id, campaignDTO.kpis);
     } catch (e) {
       await t.rollback();
       throw new BadRequestError(e.message);
     }
+  }
+
+  async registerKpisByCampaign(campaign, kpis) {
+    for (const idKPI of kpis) {
+      await campaign.addKpi(idKPI, { through: 'campaignsxkpi' });
+    }
+  }
+
+  async updateKpisByCampaign(idCampaign, kpis) {
+    const campaign = await Campaign.findByPk(idCampaign);
+    await campaign.setKpis([]);
+    await this.registerKpisByCampaign(campaign, kpis);
   }
 
   async addUsersToCampaign(campaign, assigned = [], t) {

@@ -21,6 +21,11 @@ module.exports = (sequelize, DataTypes) => {
         as: 'leads',
         through: 'leadsxcampaigns',
       });
+      this.belongsToMany(models.MarketingKPI, {
+        foreignKey: 'idCampaign',
+        as: 'kpis',
+        through: 'campaignsxkpi',
+      });
     }
   }
   Campaign.init(
