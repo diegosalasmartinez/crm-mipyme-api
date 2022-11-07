@@ -9,12 +9,13 @@ class ArticleService {
       const { rows: data = [], count } = await Article.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
+        required: false,
         include: [
           {
             model: User,
             as: 'creator',
-            where: { idCompany },
             attributes: ['id', 'name', 'lastName'],
+            where: { idCompany },
           },
           {
             model: TicketType,
@@ -36,6 +37,7 @@ class ArticleService {
     try {
       const type = await ticketTypeService.get(typeValue);
       const articles = await Article.findAll({
+        required: false,
         include: [
           {
             model: User,
