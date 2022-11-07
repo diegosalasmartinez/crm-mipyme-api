@@ -268,7 +268,7 @@ class DealService {
     try {
       const deal = await Deal.findOne({
         required: true,
-        attributes: ['id', 'name'],
+        attributes: ['id', 'name', 'idCampaign', 'idTicket'],
         include: [
           {
             model: Contact,

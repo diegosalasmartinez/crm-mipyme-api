@@ -58,6 +58,12 @@ const approveCampaign = async (req, res) => {
   });
 };
 
+const addSpending = async (req, res) => {
+  const { idCampaign, amount } = req.body;
+  await campaignService.increaseSpendings(idCampaign, amount);
+  res.status(StatusCodes.OK).json({ message: 'Se ha registrado el gasto' });
+};
+
 const runCampaigns = async (req, res) => {
   await campaignService.runCampaigns();
   res.status(StatusCodes.OK).json({ message: `Done` });
@@ -89,6 +95,12 @@ const generateKPICampaign = async (req, res) => {
   res.status(StatusCodes.OK).json(stats);
 };
 
+const excludeLeadOfCampaign = async (req, res) => {
+  const { idCampaign, idLead } = req.query;
+  await campaignService.excludeLeadOfCampaign(idCampaign, idLead);
+  res.status(StatusCodes.OK).json({ message: `El cliente ha sido excluido` });
+};
+
 module.exports = {
   getCampaignsByCompany,
   getCampaignById,
@@ -97,6 +109,8 @@ module.exports = {
   updateCampaign,
   approveCampaign,
   generateKPICampaign,
+  addSpending,
+  excludeLeadOfCampaign,
   runCampaigns,
   sendCampaigns,
 };

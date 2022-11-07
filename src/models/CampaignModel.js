@@ -56,6 +56,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      clientsGenerated: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       step: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
@@ -85,7 +89,12 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.FLOAT,
         defaultValue: 0,
       },
+      waste: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0,
+      },
       approvedAt: DataTypes.DATE,
+      sentAt: DataTypes.DATE,
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

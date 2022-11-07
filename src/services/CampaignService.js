@@ -20,6 +20,8 @@ const CampaignStatusService = require('./CampaignStatusService');
 const campaignStatusService = new CampaignStatusService();
 const DiscountService = require('./DiscountService');
 const discountService = new DiscountService();
+const DealService = require('./DealService');
+const dealService = new DealService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
 const MailService = require('./MailService');
@@ -649,6 +651,7 @@ class CampaignService {
       await Campaign.update(
         {
           sent: true,
+          sentAt: new Date(),
         },
         { where: { id: campaignsId } }
       );
@@ -680,6 +683,13 @@ class CampaignService {
         },
       });
       await mailService.sendMail(campaign, campaign.creator.company);
+      await Campaign.update(
+        {
+          sent: true,
+          sentAt: new Date(),
+        },
+        { id: campaign.id }
+      );
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -688,6 +698,40 @@ class CampaignService {
   async increaseScopeCampaign(idCampaign, idLead) {
     try {
       console.log(idCampaign, idLead);
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async increaseSpendings(idCampaign, amount) {
+    try {
+      await Campaign.increment({ waste: amount }, { where: { id: idCampaign } });
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async excludeLeadOfCampaign(idCampaign, idLead) {
+    try {
+      await Campaign.increment({ numRecessions: 1 }, { where: { id: idCampaign } });
+      await leadService.excludeLead(idLead);
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async updateFidelization(idDeal) {
+    try {
+      const deal = await dealService.getDealByIdSimple(idDeal);
+      if (deal.idCampaign) {
+        const leadPromoted = await leadService.convertClient(deal.contact.lead.id);
+        if (leadPromoted) {
+          await Campaign.increment(
+            { numConversions: 1, clientsGenerated: 1 },
+            { where: { id: deal.idCampaign } }
+          );
+        }
+      }
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -702,7 +746,7 @@ class CampaignService {
       const stats = {
         budget,
         waste,
-        usagePercentage: waste > 0 ? budget / waste : 0,
+        usagePercentage: budget > 0 ? (waste / budget) * 100 : 0,
         leadsQty: leads.length,
         cpl: waste > 0 ? leads.length / waste : 0,
       };
@@ -739,22 +783,19 @@ class CampaignService {
 
   async getCampaignFidelization(idCampaign) {
     try {
-      let amountWon = 0;
       const campaign = await Campaign.findByPk(idCampaign);
-      const deals = await campaign.getDeals();
-      for (const deal of deals) {
-        if (deal.realCloseDate) {
-          amountWon += deal.realAmount;
-        }
-      }
-
-      const waste = campaign?.waste ?? 0;
+      const leads = await campaign.getLeads();
+      const numLeads = leads.length;
+      const numConversions = campaign?.numConversions ?? 0;
+      const numRecessions = campaign?.numRecessions ?? 0;
 
       const stats = {
-        amountWon,
-        waste,
-        dealsQty: deals.length,
-        roi: waste > 0 ? (amountWon - waste) / waste : 0,
+        numLeads,
+        numConversions,
+        numRecessions,
+        clientsGenerated: campaign?.clientsGenerated ?? 0,
+        conversionsPercentage: numLeads > 0 ? (numConversions / numLeads) * 100 : 0,
+        recessionsPercentage: numLeads > 0 ? (numRecessions / numLeads) * 100 : 0,
       };
       return stats;
     } catch (e) {

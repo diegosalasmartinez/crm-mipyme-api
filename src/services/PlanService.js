@@ -34,18 +34,22 @@ class PlanService {
               {
                 model: Campaign,
                 as: 'campaigns',
-                attributes: ['id', 'numConversions'],
+                attributes: ['id', 'numConversions', 'waste'],
                 include: [
                   {
                     model: Lead,
                     as: 'leads',
                     attributes: ['id'],
+                    required: false,
                     include: [
                       {
                         model: ClassificationMarketing,
                         as: 'classificationMarketing',
                       },
                     ],
+                    where: {
+                      active: true,
+                    },
                   },
                 ],
               },
@@ -80,11 +84,13 @@ class PlanService {
       let numConversions = 0;
       let numDeals = 0;
       let sales = 0;
+      let waste = 0;
       let distribution = [0, 0, 0, 0];
       let numCampaigns = 0;
 
       for (let program of plan.programs) {
         const stats = await programService.getProgramStats(program);
+        waste += stats.waste;
         numConversions += stats.numConversions;
         numDeals += stats.numDeals;
         sales += stats.sales;
@@ -93,7 +99,7 @@ class PlanService {
           return num + stats.distribution[idx];
         });
       }
-      return { numConversions, numDeals, sales, numCampaigns, distribution };
+      return { numConversions, waste, numDeals, sales, numCampaigns, distribution };
     } catch (e) {
       throw new BadRequestError(e.message);
     }

@@ -17,7 +17,7 @@ class ProgramService {
           {
             model: Campaign,
             as: 'campaigns',
-            attributes: ['id', 'name', 'numConversions', 'startDate', 'endDate'],
+            attributes: ['id', 'name', 'numConversions', 'waste', 'startDate', 'endDate'],
             include: [
               {
                 model: User,
@@ -32,19 +32,21 @@ class ProgramService {
                 model: Lead,
                 as: 'leads',
                 attributes: ['id'],
+                required: false,
                 include: [
                   {
                     model: ClassificationMarketing,
                     as: 'classificationMarketing',
                   },
                 ],
+                where: {
+                  active: true,
+                },
               },
             ],
           },
         ],
-        order: [
-          [{ model: Campaign, as: 'campaigns' }, 'startDate', 'ASC'],
-        ],
+        order: [[{ model: Campaign, as: 'campaigns' }, 'startDate', 'ASC']],
         where: {
           id,
         },
@@ -72,10 +74,12 @@ class ProgramService {
       let numConversions = 0;
       let numDeals = 0;
       let sales = 0;
+      let waste = 0;
       let distribution = [0, 0, 0, 0];
 
       for (let campaign of program.campaigns) {
         const stats = await campaignService.getCampaignStats(campaign);
+        waste += campaign.waste;
         numConversions += stats.numConversions;
         numDeals += stats.numDeals;
         sales += stats.sales;
@@ -87,6 +91,7 @@ class ProgramService {
         numConversions,
         numDeals,
         sales,
+        waste,
         numCampaigns: program.campaigns.length,
         distribution,
       };

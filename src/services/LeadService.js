@@ -186,6 +186,14 @@ class LeadService {
     }
   }
 
+  async excludeLead(idLead) {
+    try {
+      await Lead.update({ active: false }, { where: { id: idLead } });
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   generateWhereClausses(segments) {
     const whereClausses = {};
     for (const s of segments) {
@@ -211,7 +219,7 @@ class LeadService {
       } else if (s.rule === 'gte') {
         criteria[Op.lte] = moment(new Date()).subtract(s.detail, 'years');
       }
-      
+
       if (s.field === 'age') {
         whereClausses.birthday = criteria;
       } else {
@@ -263,6 +271,31 @@ class LeadService {
         },
         { where: { id: idLead }, transaction: t }
       );
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async convertClient(idLead) {
+    try {
+      const classificationClient = await classificationService.get('ready_sales');
+      const classification = await classificationService.get('marketing_engaged');
+
+      const lead = await Lead.findOne({
+        id: idLead,
+        where: { idClassificationMarketing: classification.id },
+      });
+
+      if (lead) {
+        await Lead.update(
+          {
+            idClassificationMarketing: classificationClient.id,
+          },
+          { where: { id: idLead } }
+        );
+        return true;
+      }
+      return false;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
