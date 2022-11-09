@@ -50,24 +50,32 @@ class ListService {
   async getListById(id) {
     try {
       const list = await List.findOne({
-        include: [
-          {
-            model: Lead,
-            as: 'leads',
-            attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone'],
-            include: [
-              {
-                model: ClassificationMarketing,
-                as: 'classificationMarketing',
-              },
-            ],
-          },
-        ],
         where: {
           id,
         },
       });
       return list;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getLeadsByList(idList, page = 0, rowsPerPage = 10) {
+    try {
+      const list = await List.findByPk(idList);
+      const count = await list.countLeads();
+      const leads = await list.getLeads({
+        attributes: ['id', 'name', 'lastName', 'email', 'birthday', 'phone'],
+        include: [
+          {
+            model: ClassificationMarketing,
+            as: 'classificationMarketing',
+          },
+        ],
+        offset: page * rowsPerPage,
+        limit: rowsPerPage,
+      });
+      return { data: leads, count };
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -124,6 +132,15 @@ class ListService {
   async getListStats(list) {
     try {
       // Lead generation
+      const leads = await list.getLeads({
+        attributes: [],
+        include: [
+          {
+            model: ClassificationMarketing,
+            as: 'classificationMarketing',
+          },
+        ],
+      });
       const chartLabels = {};
       const d = new Date();
       d.setDate(1);
@@ -135,7 +152,7 @@ class ListService {
         d.setMonth(d.getMonth() - 1);
       }
 
-      list.leads.forEach((lead) => {
+      leads.forEach((lead) => {
         const k = moment(lead.listsxleads.createdAt).format('YYYY-MM').slice(0, 7);
         if (chartLabels[k]) {
           chartLabels[k] = { value: chartLabels[k].value + 1, name: chartLabels[k].name };
@@ -157,7 +174,7 @@ class ListService {
         marketing_engaged: 0,
         ready_sales: 0,
       };
-      list.leads.forEach(function (lead) {
+      leads.forEach(function (lead) {
         const classification = lead.classificationMarketing.key;
         distributionObj[classification] = (distributionObj[classification] || 0) + 1;
       });

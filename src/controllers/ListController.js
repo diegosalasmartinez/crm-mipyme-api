@@ -12,11 +12,15 @@ const getLists = async (req, res) => {
 const getListDetail = async (req, res) => {
   const { idList } = req.params;
   const list = await listService.getListById(idList);
-  let stats = null;
-  if (list) {
-    stats = await listService.getListStats(list);
-  }
+  let stats =  await listService.getListStats(list);
   res.status(StatusCodes.OK).json({ list, stats });
+};
+
+const getLeadsOfList = async (req, res) => {
+  const { idList } = req.params;
+  const { page, rowsPerPage } = req.query;
+  const leads = await listService.getLeadsByList(idList, page, rowsPerPage);
+  res.status(StatusCodes.OK).json(leads);
 };
 
 const addList = async (req, res) => {
@@ -37,6 +41,7 @@ const addLeadsToList = async (req, res) => {
 module.exports = {
   getLists,
   getListDetail,
+  getLeadsOfList,
   addList,
   addLeadsToList,
 };
