@@ -11,6 +11,7 @@ const {
   DealStep,
   DealPriority,
   User,
+  Company,
   Contact,
   Lead,
   Note,
@@ -27,6 +28,8 @@ const TicketPriorityService = require('./TicketPriorityService');
 const ticketPriorityService = new TicketPriorityService();
 const TicketStatusService = require('./TicketStatusService');
 const ticketStatusService = new TicketStatusService();
+const MailService = require('./MailService');
+const mailService = new MailService();
 const { generateChartLabels } = require('../utils');
 
 class TicketService {
@@ -80,12 +83,12 @@ class TicketService {
   async getTicketsSimple(idCompany) {
     try {
       const tickets = await Ticket.findAll({
-        required: true,
+        required: false,
         include: [
           {
             model: User,
             as: 'creator',
-            required: true,
+            required: false,
             attributes: ['id', 'name', 'lastName'],
             where: {
               idCompany,
@@ -269,13 +272,54 @@ class TicketService {
     }
   }
 
+  async getTicketInfoToEmail(idTicket) {
+    try {
+      const tickets = await Ticket.findOne({
+        required: false,
+        attributes: ['id', 'name'],
+        include: [
+          {
+            model: User,
+            as: 'creator',
+            required: false,
+            attributes: ['id', 'name', 'lastName'],
+            include: [{ model: Company, as: 'company', attributes: ['name', 'email'] }],
+          },
+          {
+            model: User,
+            as: 'assigned',
+            required: false,
+            attributes: ['id', 'name', 'lastName'],
+          },
+          {
+            model: Contact,
+            as: 'contact',
+            required: false,
+            include: [{ model: Lead, as: 'lead', attributes: ['name', 'email'] }],
+          },
+        ],
+        where: {
+          id: idTicket,
+          active: true,
+        },
+      });
+      return tickets;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async updateStatus(idTicket, statusValue) {
     try {
       const status = await ticketStatusService.get(statusValue);
       const updateValues = {};
       if (statusValue === 'pending') {
+        const ticket = await this.getTicketInfoToEmail(idTicket);
+        await mailService.sendInfoToUser(ticket, false);
         updateValues.startDate = new Date();
       } else if (statusValue === 'closed') {
+        const ticket = await this.getTicketInfoToEmail(idTicket);
+        await mailService.sendInfoToUser(ticket, true);
         updateValues.endDate = new Date();
       }
       await Ticket.update({ idStatus: status.id, ...updateValues }, { where: { id: idTicket } });

@@ -644,7 +644,7 @@ class CampaignService {
       });
 
       for (const campaign of campaigns) {
-        await mailService.sendMail(campaign, campaign.creator.company);
+        await mailService.sendCampaign(campaign, campaign.creator.company);
       }
 
       const campaignsId = campaigns.map((campaign) => campaign.id);
@@ -682,7 +682,7 @@ class CampaignService {
           active: true,
         },
       });
-      await mailService.sendMail(campaign, campaign.creator.company);
+      await mailService.sendCampaign(campaign, campaign.creator.company);
       await Campaign.update(
         {
           sent: true,
