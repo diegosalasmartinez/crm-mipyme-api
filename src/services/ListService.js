@@ -5,6 +5,7 @@ const { BadRequestError } = require('../errors');
 const { months } = require('../utils');
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
+
 class ListService {
   async getLists(idCompany, page = 0, rowsPerPage = 10) {
     try {
