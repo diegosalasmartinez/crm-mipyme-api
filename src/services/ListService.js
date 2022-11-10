@@ -3,7 +3,8 @@ const { sequelize } = require('../models/index');
 const { List, Lead, User, ClassificationMarketing } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const { months } = require('../utils');
-
+const LeadService = require('./LeadService');
+const leadService = new LeadService();
 class ListService {
   async getLists(idCompany, page = 0, rowsPerPage = 10) {
     try {
@@ -81,6 +82,23 @@ class ListService {
     }
   }
 
+  async getAvailableLeads(idCompany, idList, page, rowsPerPage) {
+    try {
+      const list = await this.getListById(idList);
+      const leads = await list.getLeads({
+        attributes: ['id'],
+        where: {
+          active: true,
+        },
+      });
+      const leadsId = leads.map((lead) => lead.id);
+
+      return leadService.getLeadsExcept(idCompany, leadsId, page, rowsPerPage);
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async addList(idUser, listDTO) {
     try {
       const list = await List.create({
@@ -101,6 +119,19 @@ class ListService {
       for (const idLead of leadsId) {
         await list.addLead(idLead, { through: 'listsxleads' }, { transaction: t });
       }
+
+      await t.commit();
+    } catch (e) {
+      await t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async removeLeadFromList(idList, idLead) {
+    const t = await sequelize.transaction();
+    try {
+      const list = await List.findByPk(idList);
+      await list.removeLead(idLead, { through: 'listsxleads' }, { transaction: t });
 
       await t.commit();
     } catch (e) {

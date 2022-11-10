@@ -12,8 +12,16 @@ const getLists = async (req, res) => {
 const getListDetail = async (req, res) => {
   const { idList } = req.params;
   const list = await listService.getListById(idList);
-  let stats =  await listService.getListStats(list);
+  const stats = await listService.getListStats(list);
   res.status(StatusCodes.OK).json({ list, stats });
+};
+
+const getAvailableLeads = async (req, res) => {
+  const { idList } = req.params;
+  const { page, rowsPerPage } = req.query;
+  const { idCompany } = req.user;
+  const { data, count } = await listService.getAvailableLeads(idCompany, idList, page, rowsPerPage);
+  res.status(StatusCodes.OK).json({ data, count });
 };
 
 const getLeadsOfList = async (req, res) => {
@@ -38,10 +46,20 @@ const addLeadsToList = async (req, res) => {
   });
 };
 
+const removeLeadFromList = async (req, res) => {
+  const { idList, idLead } = req.body;
+  await listService.removeLeadFromList(idList, idLead);
+  res.status(StatusCodes.OK).json({
+    message: 'El cliente se retiró de la lista',
+  });
+};
+
 module.exports = {
   getLists,
+  getAvailableLeads,
   getListDetail,
   getLeadsOfList,
   addList,
   addLeadsToList,
+  removeLeadFromList,
 };
