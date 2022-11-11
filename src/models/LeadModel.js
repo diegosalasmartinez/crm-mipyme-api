@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.hasOne(models.Contact, { foreignKey: 'idLead', as: 'contact' });
       this.belongsTo(models.User, { foreignKey: 'createdBy', as: 'creator' });
+      this.belongsTo(models.Form, { foreignKey: 'idForm', as: 'form' });
       this.belongsTo(models.ClassificationMarketing, {
         foreignKey: 'idClassificationMarketing',
         as: 'classificationMarketing',

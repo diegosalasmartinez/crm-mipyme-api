@@ -1,5 +1,7 @@
-const { Form } = require('../models/index');
+const { Form, sequelize } = require('../models/index');
 const { BadRequestError } = require('../errors');
+const LeadService = require('./LeadService');
+const leadService = new LeadService();
 
 class FormService {
   async getForms(idCompany, page = 0, rowsPerPage = 10) {
@@ -19,6 +21,19 @@ class FormService {
     }
   }
 
+  async getFormSimple(id) {
+    try {
+      const list = await Form.findOne({
+        where: {
+          id,
+        },
+      });
+      return list;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async getFormById(id) {
     try {
       const list = await Form.findOne({
@@ -33,12 +48,34 @@ class FormService {
   }
 
   async addForm(idCompany, formDTO) {
+    const t = await sequelize.transaction();
     try {
-      await Form.create({
-        name: formDTO.name,
-        title: formDTO.name,
-        idCompany,
-      });
+      const form = await Form.create(
+        {
+          name: formDTO.name,
+          title: formDTO.title,
+          subtitle: formDTO.subtitle,
+          textButton: formDTO.textButton,
+          idCompany,
+        },
+        { transaction: t }
+      );
+
+      for (const idList of formDTO.listsId) {
+        await form.addList(idList, { through: 'listsxforms' }, { transaction: t });
+      }
+
+      await t.commit();
+    } catch (e) {
+      await t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async addLead(idForm, leadDTO) {
+    try {
+      const lead = { ...leadDTO, idForm };
+      await leadService.addLead(null, lead, idForm);
     } catch (e) {
       throw new BadRequestError(e.message);
     }

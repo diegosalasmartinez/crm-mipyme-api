@@ -5,7 +5,9 @@ const authenticatedRoutes = express.Router();
 const baseUrl = '/api/v1/';
 
 const authRoutes = require('./AuthRoutes');
+const externalRoutes = require('./ExternalRoutes');
 basicRoutes.use(baseUrl + 'auth', authRoutes);
+basicRoutes.use(baseUrl + 'external', externalRoutes);
 
 const accountRoutes = require('./AccountRoutes');
 const companyRoutes = require('./CompanyRoutes');

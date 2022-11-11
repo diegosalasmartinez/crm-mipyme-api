@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   class Form extends Model {
     static associate(models) {
       this.belongsTo(models.Company, { foreignKey: 'idCompany', as: 'company' });
+      this.hasMany(models.Lead, { foreignKey: 'idForm', as: 'leads' });
       this.belongsToMany(models.List, {
         foreignKey: 'idForm',
         as: 'lists',
