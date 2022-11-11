@@ -1,10 +1,22 @@
 const moment = require('moment');
 const { Op } = require('sequelize');
 const { faker } = require('@faker-js/faker');
-const { Lead, User, List, ClassificationMarketing } = require('../models/index');
+const { Lead, User, List, Form, ClassificationMarketing } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');
 const classificationService = new ClassificationMarketingService();
+
+const attributes = [
+  'id',
+  'name',
+  'lastName',
+  'email',
+  'birthday',
+  'phone',
+  'birthday',
+  'companyName',
+  'createdAt',
+];
 
 class LeadService {
   async getLeads(idCompany, page = 0, rowsPerPage = 10) {
@@ -12,25 +24,11 @@ class LeadService {
       const { rows: data = [], count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
-        attributes: [
-          'id',
-          'name',
-          'lastName',
-          'email',
-          'birthday',
-          'phone',
-          'birthday',
-          'companyName',
-          'createdAt',
-        ],
-        required: true,
+        attributes,
+        required: false,
         include: [
-          {
-            model: User,
-            as: 'creator',
-            where: { idCompany },
-            attributes: [],
-          },
+          { model: User, as: 'creator', attributes: [] },
+          { model: Form, as: 'form', attributes: [] },
           {
             model: ClassificationMarketing,
             as: 'classificationMarketing',
@@ -39,6 +37,14 @@ class LeadService {
         ],
         where: {
           active: true,
+          [Op.or]: [
+            {
+              '$creator.idCompany$': idCompany,
+            },
+            {
+              '$form.idCompany$': idCompany,
+            },
+          ],
         },
         order: [['createdAt', 'DESC']],
       });
@@ -51,23 +57,12 @@ class LeadService {
   async getAllLeads(idCompany) {
     try {
       const leads = await Lead.findAll({
-        attributes: [
-          'id',
-          'name',
-          'lastName',
-          'email',
-          'birthday',
-          'phone',
-          'birthday',
-          'companyName',
-          'createdAt',
-        ],
+        attributes,
         required: true,
         include: [
           {
             model: User,
             as: 'creator',
-            where: { idCompany },
             attributes: [],
           },
           {
@@ -78,6 +73,14 @@ class LeadService {
         ],
         where: {
           active: true,
+          [Op.or]: [
+            {
+              '$creator.idCompany$': idCompany,
+            },
+            {
+              '$form.idCompany$': idCompany,
+            },
+          ],
         },
       });
       return leads;
@@ -91,23 +94,12 @@ class LeadService {
       const { rows: data = [], count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
-        attributes: [
-          'id',
-          'name',
-          'lastName',
-          'email',
-          'birthday',
-          'phone',
-          'birthday',
-          'companyName',
-          'createdAt',
-        ],
+        attributes,
         required: true,
         include: [
           {
             model: User,
             as: 'creator',
-            where: { idCompany },
             attributes: [],
           },
           {
@@ -117,10 +109,18 @@ class LeadService {
           },
         ],
         where: {
+          active: true,
           id: {
             [Op.notIn]: leadsId,
           },
-          active: true,
+          [Op.or]: [
+            {
+              '$creator.idCompany$': idCompany,
+            },
+            {
+              '$form.idCompany$': idCompany,
+            },
+          ],
         },
         order: [['createdAt', 'DESC']],
       });
@@ -170,12 +170,13 @@ class LeadService {
     }
   }
 
-  async addLead(idUser, leadDTO) {
+  async addLead(idUser = null, leadDTO, idForm = null) {
     try {
       const classification = await classificationService.getDefault();
       const lead = await Lead.create({
         ...leadDTO,
         createdBy: idUser,
+        idForm,
         idClassificationMarketing: classification.id,
       });
       return lead;
