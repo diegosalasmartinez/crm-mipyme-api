@@ -114,6 +114,12 @@ class PlanService {
       const chartLabels = generateChartLabels();
       const leads = await leadService.getAllLeads(idCompany);
 
+      // Lead origins
+      const leadsOriginData = {
+        MANUAL: 0,
+        FORM: 0,
+      };
+
       // Lead distribution
       const distributionKeys = {
         started: 0,
@@ -128,6 +134,11 @@ class PlanService {
         distributionKeys[classification] = (distributionKeys[classification] || 0) + 1;
         if (chartLabels[k]) {
           chartLabels[k] = { value: chartLabels[k].value + 1, name: chartLabels[k].name };
+        }
+        if (lead.createdBy) {
+          leadsOriginData.MANUAL = leadsOriginData.MANUAL + 1;
+        } else {
+          leadsOriginData.FORM = leadsOriginData.FORM + 1;
         }
       });
 
@@ -148,7 +159,12 @@ class PlanService {
         sales,
       };
 
-      return { opportunities, distribution, leadGeneration };
+      const leadsOrigin = {
+        label: ['Manual', 'Formularios'],
+        data: [leadsOriginData.MANUAL, leadsOriginData.FORM],
+      };
+
+      return { opportunities, distribution, leadGeneration, leadsOrigin };
     } catch (e) {
       throw new BadRequestError(e.message);
     }

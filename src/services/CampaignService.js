@@ -695,14 +695,6 @@ class CampaignService {
     }
   }
 
-  async increaseScopeCampaign(idCampaign, idLead) {
-    try {
-      console.log(idCampaign, idLead);
-    } catch (e) {
-      throw new BadRequestError(e.message);
-    }
-  }
-
   async increaseSpendings(idCampaign, amount) {
     try {
       await Campaign.increment({ waste: amount }, { where: { id: idCampaign } });

@@ -27,8 +27,16 @@ class LeadService {
         attributes,
         required: false,
         include: [
-          { model: User, as: 'creator', attributes: [] },
-          { model: Form, as: 'form', attributes: [] },
+          {
+            model: User,
+            as: 'creator',
+            attributes: [],
+          },
+          {
+            model: Form,
+            as: 'form',
+            attributes: [],
+          },
           {
             model: ClassificationMarketing,
             as: 'classificationMarketing',
@@ -58,11 +66,16 @@ class LeadService {
     try {
       const leads = await Lead.findAll({
         attributes,
-        required: true,
+        required: false,
         include: [
           {
             model: User,
             as: 'creator',
+            attributes: [],
+          },
+          {
+            model: Form,
+            as: 'form',
             attributes: [],
           },
           {
@@ -95,11 +108,16 @@ class LeadService {
         offset: page * rowsPerPage,
         limit: rowsPerPage,
         attributes,
-        required: true,
+        required: false,
         include: [
           {
             model: User,
             as: 'creator',
+            attributes: [],
+          },
+          {
+            model: Form,
+            as: 'form',
             attributes: [],
           },
           {
