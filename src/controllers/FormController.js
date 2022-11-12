@@ -15,6 +15,12 @@ const getFormDetail = async (req, res) => {
   res.status(StatusCodes.OK).json(form);
 };
 
+const getFormSimple = async (req, res) => {
+  const { idForm } = req.params;
+  const form = await formService.getFormSimple(idForm);
+  res.status(StatusCodes.OK).json(form);
+};
+
 const addForm = async (req, res) => {
   const { idCompany } = req.user;
   const form = req.body;
@@ -25,5 +31,6 @@ const addForm = async (req, res) => {
 module.exports = {
   getForms,
   getFormDetail,
+  getFormSimple,
   addForm,
 };
