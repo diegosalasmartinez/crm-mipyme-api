@@ -12,8 +12,13 @@ const getLists = async (req, res) => {
 const getListDetail = async (req, res) => {
   const { idList } = req.params;
   const list = await listService.getListById(idList);
-  const stats = await listService.getListStats(list);
-  res.status(StatusCodes.OK).json({ list, stats });
+  res.status(StatusCodes.OK).json(list);
+};
+
+const getListSimple = async (req, res) => {
+  const { idList } = req.params;
+  const list = await listService.getListByIdSimple(idList);
+  res.status(StatusCodes.OK).json(list);
 };
 
 const getAvailableLeads = async (req, res) => {
@@ -38,6 +43,12 @@ const addList = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: `La lista ${list.name} ha sido registrada` });
 };
 
+const updateList = async (req, res) => {
+  const list = req.body;
+  await listService.updateList(list);
+  res.status(StatusCodes.OK).json({ message: `La lista ${list.name} ha sido actualizada` });
+};
+
 const addLeadsToList = async (req, res) => {
   const { idList, leadsId } = req.body;
   await listService.addLeadsToList(idList, leadsId);
@@ -58,8 +69,10 @@ module.exports = {
   getLists,
   getAvailableLeads,
   getListDetail,
+  getListSimple,
   getLeadsOfList,
   addList,
+  updateList,
   addLeadsToList,
   removeLeadFromList,
 };

@@ -1,7 +1,7 @@
 const moment = require('moment');
 const { sequelize } = require('../models/index');
 const { List, Lead, User, ClassificationMarketing } = require('../models/index');
-const { BadRequestError } = require('../errors');
+const { BadRequestError, NotFoundError } = require('../errors');
 const { months } = require('../utils');
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
@@ -54,9 +54,17 @@ class ListService {
       const list = await List.findOne({
         where: {
           id,
+          active: true,
         },
       });
-      return list;
+      if (!list) {
+        throw new NotFoundError('No se encuentra la lista');
+      }
+
+      const leads = await list.getLeads();
+      const listJSON = list.toJSON();
+      const stats = await this.getListStats(list);
+      return { ...listJSON, numLeads: leads.length, stats };
     } catch (e) {
       throw new BadRequestError(e.message);
     }
@@ -104,9 +112,27 @@ class ListService {
     try {
       const list = await List.create({
         name: listDTO.name,
+        description: listDTO.description,
         createdBy: idUser,
       });
       await this.addLeadsToList(list.id, listDTO.leadsId);
+      return list;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async updateList(listDTO) {
+    try {
+      const list = await List.update(
+        {
+          name: listDTO.name,
+          description: listDTO.description,
+        },
+        {
+          where: { id: listDTO.id },
+        }
+      );
       return list;
     } catch (e) {
       throw new BadRequestError(e.message);
