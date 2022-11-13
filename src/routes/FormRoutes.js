@@ -3,6 +3,7 @@ const {
   getForms,
   getFormDetail,
   addForm,
+  updateForm,
   getFormSimple,
 } = require('../controllers/FormController');
 
@@ -12,5 +13,6 @@ router.get('/', getForms);
 router.get('/:idForm', getFormDetail);
 router.get('/simple/:idForm', getFormSimple);
 router.post('/', addForm);
+router.patch('/', updateForm);
 
 module.exports = router;

@@ -154,6 +154,14 @@ class ListService {
     }
   }
 
+  async addLeadToList(list, idLead) {
+    try {
+      await list.addLead(idLead, { through: 'listsxleads' });
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async removeLeadFromList(idList, idLead) {
     const t = await sequelize.transaction();
     try {

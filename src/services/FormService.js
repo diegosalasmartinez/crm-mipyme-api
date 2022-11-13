@@ -4,6 +4,8 @@ const { BadRequestError, NotFoundError } = require('../errors');
 const { generateChartLabels } = require('../utils');
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
+const ListService = require('./ListService');
+const listService = new ListService();
 
 class FormService {
   async getForms(idCompany, page = 0, rowsPerPage = 10) {
@@ -45,6 +47,12 @@ class FormService {
   async getFormById(id) {
     try {
       const form = await Form.findOne({
+        include: [
+          {
+            model: List,
+            as: 'lists',
+          },
+        ],
         where: {
           id,
         },
@@ -96,7 +104,7 @@ class FormService {
 
     return { distribution, leadGeneration };
   }
-  
+
   async addForm(idCompany, formDTO) {
     const t = await sequelize.transaction();
     try {
@@ -125,8 +133,40 @@ class FormService {
   async addLead(idForm, leadDTO) {
     try {
       const lead = { ...leadDTO, idForm };
-      await leadService.addLead(null, lead, idForm);
+      const leadJSON = await leadService.addLead(null, lead, idForm);
+      const form = await Form.findByPk(idForm);
+      const lists = await form.getLists();
+      for (const list of lists) {
+        await listService.addLeadToList(list, leadJSON.id);
+      }
     } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async updateForm(formDTO) {
+    const t = await sequelize.transaction();
+    try {
+      await Form.update(
+        {
+          name: formDTO.name,
+          title: formDTO.title,
+          subtitle: formDTO.subtitle,
+          textButton: formDTO.textButton,
+        },
+        { where: { id: formDTO.id }, transaction: t }
+      );
+
+      const form = await Form.findByPk(formDTO.id);
+      await form.setLists([]);
+
+      for (const idList of formDTO.listsId) {
+        await form.addList(idList, { through: 'listsxforms' }, { transaction: t });
+      }
+
+      await t.commit();
+    } catch (e) {
+      await t.rollback();
       throw new BadRequestError(e.message);
     }
   }

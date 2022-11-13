@@ -28,9 +28,16 @@ const addForm = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: `El formulario ${form.name} ha sido registrado` });
 };
 
+const updateForm = async (req, res) => {
+  const form = req.body;
+  await formService.updateForm(form);
+  res.status(StatusCodes.OK).json({ message: `El formulario ${form.name} ha sido actualizado` });
+};
+
 module.exports = {
   getForms,
   getFormDetail,
   getFormSimple,
   addForm,
+  updateForm,
 };
