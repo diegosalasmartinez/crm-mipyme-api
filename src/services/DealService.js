@@ -222,6 +222,7 @@ class DealService {
             as: 'lostType',
           },
         ],
+        order: [[{ model: Quotation, as: 'quotations' }, 'createdAt', 'DESC']],
         where: {
           id,
           active: true,
