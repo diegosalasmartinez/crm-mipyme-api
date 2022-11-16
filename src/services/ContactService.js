@@ -1,5 +1,6 @@
 const { Contact, Lead, User, sequelize } = require('../models/index');
 const { BadRequestError } = require('../errors');
+const { validateRoles } = require('../utils/permissions');
 const DealService = require('./DealService');
 const dealService = new DealService();
 const LeadService = require('./LeadService');
@@ -10,8 +11,13 @@ const CampaignService = require('./CampaignService');
 const campaignService = new CampaignService();
 
 class ContactService {
-  async getContacts(idCompany, page = 0, rowsPerPage = 10) {
+  async getContacts(idUser, idCompany, roles, page = 0, rowsPerPage = 10) {
     try {
+      const whereRules = {};
+      if (!validateRoles(roles, ['admin', 'admin_sales'])) {
+        whereRules['$assignedTo$'] = idUser;
+      }
+
       const { rows: data = [], count } = await Contact.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
@@ -49,49 +55,7 @@ class ContactService {
         ],
         where: {
           active: true,
-        },
-        order: [['createdAt', 'DESC']],
-      });
-      return { data, count };
-    } catch (e) {
-      throw new BadRequestError(e.message);
-    }
-  }
-
-  async getContactsByPortfolio(idUser, idCompany, page = 0, rowsPerPage = 10) {
-    try {
-      const { rows: data = [], count } = await Contact.findAndCountAll({
-        offset: page * rowsPerPage,
-        limit: rowsPerPage,
-        required: true,
-        include: [
-          {
-            model: Lead,
-            as: 'lead',
-            attributes: [
-              'id',
-              'name',
-              'lastName',
-              'email',
-              'birthday',
-              'phone',
-              'birthday',
-              'companyName',
-              'createdAt',
-            ],
-            required: true,
-            include: [
-              {
-                model: User,
-                as: 'creator',
-                where: { idCompany },
-                attributes: [],
-              },
-            ],
-          },
-        ],
-        where: {
-          active: true,
+          ...whereRules,
         },
         order: [['createdAt', 'DESC']],
       });

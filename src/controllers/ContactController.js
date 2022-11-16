@@ -5,19 +5,14 @@ const contactService = new ContactService();
 const getContacts = async (req, res) => {
   const { page, rowsPerPage } = req.query;
   const { id: idUser, idCompany, roles } = req.user;
-  const isAdmin = roles.filter((r) => r.key === 'admin' || r.key === 'admin_marketing').length > 0;
-
-  let obj = {
-    data: [],
-    count: 0,
-  };
-
-  if (isAdmin) {
-    obj = await contactService.getContacts(idCompany, page, rowsPerPage);
-  } else {
-    obj = await contactService.getContactsByPortfolio(idUser, idCompany, page, rowsPerPage);
-  }
-  res.status(StatusCodes.OK).json({ data: obj.data, count: obj.count });
+  const { data, count } = await contactService.getContacts(
+    idUser,
+    idCompany,
+    roles,
+    page,
+    rowsPerPage
+  );
+  res.status(StatusCodes.OK).json({ data, count });
 };
 
 const convertLead = async (req, res) => {
