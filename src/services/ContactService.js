@@ -41,6 +41,11 @@ class ContactService {
               },
             ],
           },
+          {
+            model: User,
+            as: 'assigned',
+            attributes: ['id', 'name', 'lastName'],
+          },
         ],
         where: {
           active: true,

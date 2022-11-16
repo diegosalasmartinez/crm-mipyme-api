@@ -1,7 +1,7 @@
 const moment = require('moment');
 const { Op } = require('sequelize');
 const { faker } = require('@faker-js/faker');
-const { Lead, User, List, Form, ClassificationMarketing } = require('../models/index');
+const { Lead, User, List, Contact, Form, ClassificationMarketing } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');
 const classificationService = new ClassificationMarketingService();
@@ -166,6 +166,18 @@ class LeadService {
     try {
       const lead = await Lead.findOne({
         include: [
+          {
+            model: Contact,
+            as: 'contact',
+            required: false,
+            include: [
+              {
+                model: User,
+                as: 'assigned',
+                attributes: ['id', 'name', 'lastName'],
+              },
+            ],
+          },
           {
             model: List,
             as: 'lists',
