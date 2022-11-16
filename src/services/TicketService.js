@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const moment = require('moment');
 const {
   Ticket,
@@ -33,10 +34,24 @@ const mailService = new MailService();
 const { generateChartLabels } = require('../utils');
 
 class TicketService {
-  async getTickets(idCompany) {
+  async getTickets(idCompany, page = 0, rowsPerPage = 10, finished = false) {
     try {
+      const status = await ticketStatusService.get('closed');
+      const whereRules = {};
+      if (finished === 'true') {
+        whereRules.idStatus = {
+          [Op.eq]: status.id
+        }
+      } else {
+        whereRules.idStatus = {
+          [Op.ne]: status.id
+        }
+      }
+
       const { rows: data = [], count } = await Ticket.findAndCountAll({
-        required: true,
+        offset: page * rowsPerPage,
+        limit: rowsPerPage,
+        required: false,
         include: [
           {
             model: User,
@@ -71,6 +86,7 @@ class TicketService {
         ],
         where: {
           active: true,
+          ...whereRules,
         },
         order: [['limitDate', 'ASC']],
       });
