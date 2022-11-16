@@ -140,6 +140,19 @@ class ContactService {
       throw new BadRequestError(e.message);
     }
   }
+
+  async reassignContact(idContact, idUser) {
+    try {
+      await Contact.update(
+        {
+          assignedTo: idUser,
+        },
+        { where: { id: idContact } }
+      );
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
 }
 
 module.exports = ContactService;

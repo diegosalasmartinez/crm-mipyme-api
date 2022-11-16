@@ -29,7 +29,16 @@ const convertLead = async (req, res) => {
   });
 };
 
+const reassignContact = async (req, res) => {
+  const { contact, idUser } = req.body;
+  await contactService.reassignContact(contact.id, idUser);
+  res.status(StatusCodes.OK).json({
+    message: `El cliente potencial ${contact.lead.name} ${contact.lead.lastName} ha sido reasignado`,
+  });
+};
+
 module.exports = {
   getContacts,
   convertLead,
+  reassignContact,
 };
