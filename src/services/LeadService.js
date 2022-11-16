@@ -24,7 +24,6 @@ class LeadService {
       const { rows: data = [], count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
-        attributes,
         required: false,
         include: [
           {
