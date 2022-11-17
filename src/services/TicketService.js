@@ -29,9 +29,12 @@ const TicketPriorityService = require('./TicketPriorityService');
 const ticketPriorityService = new TicketPriorityService();
 const TicketStatusService = require('./TicketStatusService');
 const ticketStatusService = new TicketStatusService();
+const UserService = require('./UserService');
+const userService = new UserService();
 const MailService = require('./MailService');
 const mailService = new MailService();
 const { generateChartLabels } = require('../utils');
+const { validateRoles } = require('../utils/permissions');
 
 class TicketService {
   async getTickets(idCompany, page = 0, rowsPerPage = 10, finished = false) {
@@ -40,12 +43,12 @@ class TicketService {
       const whereRules = {};
       if (finished === 'true') {
         whereRules.idStatus = {
-          [Op.eq]: status.id
-        }
+          [Op.eq]: status.id,
+        };
       } else {
         whereRules.idStatus = {
-          [Op.ne]: status.id
-        }
+          [Op.ne]: status.id,
+        };
       }
 
       const { rows: data = [], count } = await Ticket.findAndCountAll({
@@ -463,6 +466,95 @@ class TicketService {
         activities,
         origins,
       };
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async performanceUsers(idCompany) {
+    try {
+      const arrUsers = [];
+      const users = await userService.getAllUsers(idCompany);
+      for (const user of users) {
+        const tickets = await user.getTickets({
+          include: [
+            { model: TicketType, as: 'type' },
+            { model: Activity, as: 'activities' },
+            {
+              model: Deal,
+              as: 'deal',
+              include: [
+                {
+                  model: Activity,
+                  as: 'activities',
+                  attributes: ['startDate', 'realStartDate', 'endDate', 'realEndDate', 'createdAt'],
+                },
+              ],
+            },
+          ],
+        });
+
+        if (
+          tickets.length === 0 &&
+          !validateRoles(user.roles, ['admin', 'admin_services', 'services'])
+        ) {
+          continue;
+        }
+
+        let numTickets = tickets.length
+        let timeToStart = 0;
+        let timeToFinish = 0;
+        let numPending = 0;
+        let numStarted = 0;
+        let numFinished = 0;
+        let numLate = 0;
+        let numQuestions = 0;
+        let numQuotations = 0;
+        let numActivities = 0;
+
+        for (const ticket of tickets) {
+          const createdAt = moment(ticket.createdAt);
+          if (ticket.startDate) {
+            numStarted++;
+            const startDate = moment(ticket.startDate);
+            timeToStart += moment.duration(startDate.diff(createdAt)).asSeconds();
+          } else {
+            numPending++;
+          }
+          if (ticket.endDate) {
+            numFinished++;
+            const startDate = moment(ticket.startDate);
+            const endDate = moment(ticket.endDate);
+            timeToFinish += moment.duration(endDate.diff(startDate)).asSeconds();
+          }
+          if (ticket.startDate && !ticket.endDate) {
+            numLate += moment(ticket.limitDate).isBefore(ticket.endDate) ? 1 : 0;
+          }
+
+          if (ticket.type.key === 'question') {
+            numQuestions++;
+          } else {
+            numQuotations++;
+          }
+
+          let activities = ticket.deal ? ticket.deal.activities : ticket.activities;
+          numActivities = activities.length;
+        }
+
+        const userJSON = user.toJSON();
+        userJSON.numTickets = numTickets;
+        userJSON.numPending = numPending;
+        userJSON.numStarted = numStarted;
+        userJSON.numFinished = numFinished;
+        userJSON.numLate = numLate;
+        userJSON.numQuestions = numQuestions;
+        userJSON.numQuotations = numQuotations;
+        userJSON.timeToStart = numStarted > 0 ? timeToStart / numStarted : numStarted;
+        userJSON.timeToFinish = numFinished > 0 ? timeToFinish / numFinished : numFinished;
+        userJSON.numActivities = numActivities;
+        arrUsers.push(userJSON);
+      }
+      return arrUsers;
     } catch (e) {
       throw new BadRequestError(e.message);
     }

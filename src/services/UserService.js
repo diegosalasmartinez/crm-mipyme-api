@@ -29,6 +29,30 @@ class UserService {
     }
   }
 
+  async getAllUsers(idCompany) {
+    try {
+      const users = await User.findAll({
+        include: [
+          {
+            model: Role,
+            as: 'roles',
+          },
+        ],
+        where: {
+          idCompany,
+          active: true,
+        },
+        attributes: {
+          exclude: ['password'],
+        },
+      });
+
+      return users;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async getUserById(id) {
     try {
       const user = await User.findOne({

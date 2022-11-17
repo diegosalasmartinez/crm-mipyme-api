@@ -34,10 +34,17 @@ const dashboard = async (req, res) => {
   res.status(StatusCodes.OK).json(stats);
 };
 
+const performanceUsers = async (req, res) => {
+  const { idCompany } = req.user;
+  const users = await ticketService.performanceUsers(idCompany);
+  res.status(StatusCodes.OK).json(users);
+}
+
 module.exports = {
   getTickets,
   getTicketDetail,
   addTicket,
   updateTicketStatus,
   dashboard,
+  performanceUsers
 };

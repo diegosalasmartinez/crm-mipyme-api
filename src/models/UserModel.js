@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Campaign, { foreignKey: 'createdBy' });
       this.hasMany(models.Campaign, { foreignKey: 'approvedBy' });
       this.hasMany(models.Contact, { foreignKey: 'assignedTo' });
+      this.hasMany(models.Ticket, { foreignKey: 'assignedTo', as: 'tickets' });
       this.belongsToMany(models.Role, {
         foreignKey: 'idUser',
         as: 'roles',
