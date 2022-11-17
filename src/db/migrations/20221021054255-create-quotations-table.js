@@ -30,11 +30,11 @@ module.exports = {
       },
       startDate: {
         type: Sequelize.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       limitDate: {
         type: Sequelize.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       notes: Sequelize.STRING,
       active: {
