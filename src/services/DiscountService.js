@@ -5,7 +5,6 @@ const {
   Product,
   Campaign,
   ClassificationSales,
-  User,
   Lead,
   sequelize,
 } = require('../models/index');
@@ -20,9 +19,10 @@ const DealService = require('./DealService');
 const dealService = new DealService();
 
 cron.schedule(
-  '45 12 * * *',
+  '30 0 * * *',
   async function () {
     try {
+      console.log('Executing job => update discount status');
       const discountService = new DiscountService();
       await discountService.updateDiscountsStatus();
     } catch (e) {
@@ -157,23 +157,28 @@ class DiscountService {
             attributes: ['id', 'name'],
             include: [
               {
-                model: User,
-                as: 'creator',
-                attributes: [],
-              },
-              {
                 model: Lead,
                 as: 'leads',
                 attributes: [],
               },
             ],
           },
+          {
+            model: ClassificationSales,
+            as: 'classificationSales',
+          },
         ],
-
         where: {
           status: '1',
-          '$campaign.creator.idCompany$': idCompany,
-          '$campaign.leads.id$': deal.contact.lead.id,
+          '$product.idCompany$': idCompany,
+          [Op.or]: [
+            {
+              '$campaign.leads.id$': deal.contact.lead.id,
+            },
+            {
+              idClassificationSales: deal.contact.classificationSales.id,
+            },
+          ],
         },
         order: [['createdAt', 'DESC']],
       });

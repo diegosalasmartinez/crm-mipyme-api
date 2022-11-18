@@ -34,6 +34,7 @@ cron.schedule(
   '15 0 * * *',
   async function () {
     try {
+      console.log('Executing job => run campaigns');
       const campaignService = new CampaignService();
       await campaignService.runCampaigns();
     } catch (e) {
@@ -50,6 +51,7 @@ cron.schedule(
   '0 10 * * *',
   async function () {
     try {
+      console.log('Executing job => send campaigns');
       const campaignService = new CampaignService();
       await campaignService.sendCampaigns();
     } catch (e) {

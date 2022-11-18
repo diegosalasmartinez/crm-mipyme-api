@@ -24,6 +24,7 @@ cron.schedule(
   '20 0 * * *',
   async function () {
     try {
+      console.log('Executing job => expire quotations');
       const quotationService = new QuotationService();
       await quotationService.expireQuotations();
     } catch (e) {
