@@ -22,8 +22,15 @@ const addUser = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: `El usuario ${user.name} ha sido registrado` });
 };
 
+const getProfile = async (req, res) => {
+  const { id: idUser } = req.user;
+  const user = await userService.getUserProfile(idUser);
+  res.status(StatusCodes.OK).json(user);
+};
+
 module.exports = {
   getUsers,
   getUserById,
   addUser,
+  getProfile
 };

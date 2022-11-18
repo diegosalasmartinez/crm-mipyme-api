@@ -1,4 +1,4 @@
-const { User, Role, sequelize } = require('../models/index');
+const { User, Role, Company, sequelize } = require('../models/index');
 const RoleService = require('./RoleService');
 const { BadRequestError } = require('../errors');
 
@@ -63,6 +63,25 @@ class UserService {
             model: Role,
             as: 'roles',
           },
+        ],
+      });
+      return user;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async getUserProfile(id) {
+    try {
+      const user = await User.findOne({
+        where: { id, active: true },
+        attributes: ['id', 'name', 'lastName', 'email', 'idCompany', 'active', 'createdAt'],
+        include: [
+          {
+            model: Role,
+            as: 'roles',
+          },
+          { model: Company, as: 'company' },
         ],
       });
       return user;
