@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       address: DataTypes.STRING,
+      quotationRules: DataTypes.STRING,
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
