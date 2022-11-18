@@ -6,6 +6,7 @@ const {
   DealPriority,
   User,
   Contact,
+  ClassificationSales,
   Lead,
   Activity,
   ActivityType,
@@ -286,6 +287,10 @@ class DealService {
                 as: 'assigned',
                 attributes: ['id', 'name', 'lastName'],
               },
+              {
+                model: ClassificationSales,
+                as: 'classificationSales',
+              }
             ],
           },
         ],
