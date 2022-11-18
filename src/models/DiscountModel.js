@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.DiscountType, { foreignKey: 'idType', as: 'type' });
       this.belongsTo(models.Campaign, { foreignKey: 'idCampaign', as: 'campaign' });
       this.belongsTo(models.Product, { foreignKey: 'idProduct', as: 'product' });
+      this.belongsTo(models.ClassificationSales, {
+        foreignKey: 'idClassificationSales',
+        as: 'classificationSales',
+      });
     }
   }
   Discount.init(

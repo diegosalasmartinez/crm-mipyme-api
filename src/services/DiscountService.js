@@ -1,6 +1,14 @@
 const cron = require('node-cron');
 const { Op } = require('sequelize');
-const { Discount, Product, Campaign, User, Lead, sequelize } = require('../models/index');
+const {
+  Discount,
+  Product,
+  Campaign,
+  ClassificationSales,
+  User,
+  Lead,
+  sequelize,
+} = require('../models/index');
 const { BadRequestError } = require('../errors');
 const DiscountTypeService = require('./DiscountTypeService');
 const discountTypeService = new DiscountTypeService();
@@ -28,7 +36,7 @@ cron.schedule(
 );
 
 class DiscountService {
-  async getDiscounts(idCompany, page = 0, rowsPerPage = 10) {
+  async getDiscounts(idCompany, step, page = 0, rowsPerPage = 10) {
     try {
       const { rows: data = [], count } = await Discount.findAndCountAll({
         offset: page * rowsPerPage,
@@ -44,9 +52,13 @@ class DiscountService {
             as: 'campaign',
             attributes: ['id', 'name'],
           },
+          {
+            model: ClassificationSales,
+            as: 'classificationSales',
+          },
         ],
         where: {
-          status: '1',
+          status: step,
           '$product.idCompany$': idCompany,
         },
         order: [['createdAt', 'DESC']],
@@ -101,7 +113,6 @@ class DiscountService {
     const t = await sequelize.transaction();
     try {
       const type = await discountTypeService.get(typeKey);
-      console.log(type)
 
       for (const row of data) {
         const startDate = row.startDate;
