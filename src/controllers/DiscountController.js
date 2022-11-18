@@ -16,7 +16,15 @@ const getAvailableDiscountsByDeal = async (req, res) => {
   res.status(StatusCodes.OK).json(discounts);
 };
 
+const createDiscounts = async (req, res) => {
+  const { idCompany } = req.user;
+  const { discounts } = req.body;
+  await discountService.addBulkDiscounts(idCompany, discounts, 'sales');
+  res.status(StatusCodes.OK).json({ message: 'Los descuentos se crearon correctamente' });
+};
+
 module.exports = {
   getDiscounts,
   getAvailableDiscountsByDeal,
+  createDiscounts,
 };

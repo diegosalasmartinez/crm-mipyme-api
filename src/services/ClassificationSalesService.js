@@ -21,6 +21,17 @@ class ClassificationSalesService {
       throw new BadRequestError(e.message);
     }
   }
+
+  async getByName(name) {
+    try {
+      const classification = await ClassificationSales.findOne({
+        where: { name },
+      });
+      return classification;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
 }
 
 module.exports = ClassificationSalesService;

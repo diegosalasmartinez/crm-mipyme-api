@@ -1,9 +1,11 @@
 const cron = require('node-cron');
 const { Op } = require('sequelize');
-const { Discount, Product, Campaign, User, Lead } = require('../models/index');
+const { Discount, Product, Campaign, User, Lead, sequelize } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const DiscountTypeService = require('./DiscountTypeService');
 const discountTypeService = new DiscountTypeService();
+const ClassificationSalesService = require('./ClassificationSalesService');
+const classificationSalesService = new ClassificationSalesService();
 const ProductService = require('./ProductService');
 const productService = new ProductService();
 const DealService = require('./DealService');
@@ -62,8 +64,8 @@ class DiscountService {
       for (const row of data) {
         const startDate = row.startDate;
         const endDate = row.endDate;
-
         const product = await productService.getProductBySku(idCompany, row.code);
+
         if (product) {
           await Discount.create(
             {
@@ -91,6 +93,39 @@ class DiscountService {
       await Discount.destroy({ where: { idCampaign }, transaction: t });
       await this.addDiscounts(idCampaign, idCompany, discounts, typeKey, t);
     } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async addBulkDiscounts(idCompany, data, typeKey) {
+    const t = await sequelize.transaction();
+    try {
+      const type = await discountTypeService.get(typeKey);
+      console.log(type)
+
+      for (const row of data) {
+        const startDate = row.startDate;
+        const endDate = row.endDate;
+        const classification = await classificationSalesService.getByName(row.classification);
+        const product = await productService.getProductBySku(idCompany, row.code);
+
+        if (classification && product) {
+          await Discount.create(
+            {
+              idProduct: product.id,
+              idType: type.id,
+              idClassificationSales: classification.id,
+              discount: row.discount,
+              startDate: startDate,
+              endDate: endDate,
+            },
+            { transaction: t }
+          );
+        }
+      }
+      t.commit();
+    } catch (e) {
+      t.rollback();
       throw new BadRequestError(e.message);
     }
   }
