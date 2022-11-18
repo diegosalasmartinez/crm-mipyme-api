@@ -1,4 +1,4 @@
-const { Contact, Lead, User, sequelize } = require('../models/index');
+const { Contact, Lead, ClassificationSales, User, sequelize } = require('../models/index');
 const { BadRequestError } = require('../errors');
 const { validateRoles } = require('../utils/permissions');
 const DealService = require('./DealService');
@@ -52,6 +52,10 @@ class ContactService {
             as: 'assigned',
             attributes: ['id', 'name', 'lastName'],
           },
+          {
+            model: ClassificationSales,
+            as: 'classificationSales',
+          },
         ],
         where: {
           active: true,
@@ -65,10 +69,10 @@ class ContactService {
     }
   }
 
-  async convertLead(idUser, idLead, assignedTo, idCampaign, registerDeal, deal) {
+  async convertLead(idUser, idLead, assignedTo, classificationKey, idCampaign, registerDeal, deal) {
     const t = await sequelize.transaction();
     try {
-      const classification = await classificationSalesService.getDefault();
+      const classification = await classificationSalesService.get(classificationKey);
       const contact = await Contact.create(
         {
           idLead,

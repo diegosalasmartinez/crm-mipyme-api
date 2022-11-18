@@ -1,7 +1,15 @@
 const moment = require('moment');
 const { Op } = require('sequelize');
 const { faker } = require('@faker-js/faker');
-const { Lead, User, List, Contact, Form, ClassificationMarketing } = require('../models/index');
+const {
+  Lead,
+  User,
+  List,
+  Contact,
+  Form,
+  ClassificationMarketing,
+  ClassificationSales,
+} = require('../models/index');
 const { BadRequestError } = require('../errors');
 const ClassificationMarketingService = require('./ClassificationMarketingService');
 const classificationService = new ClassificationMarketingService();
@@ -174,6 +182,10 @@ class LeadService {
                 model: User,
                 as: 'assigned',
                 attributes: ['id', 'name', 'lastName'],
+              },
+              {
+                model: ClassificationSales,
+                as: 'classificationSales',
               },
             ],
           },

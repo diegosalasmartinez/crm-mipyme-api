@@ -17,8 +17,16 @@ const getContacts = async (req, res) => {
 
 const convertLead = async (req, res) => {
   const { id: idUser } = req.user;
-  const { idCampaign, lead, assignedTo, registerDeal, deal } = req.body;
-  await contactService.convertLead(idUser, lead.id, assignedTo, idCampaign, registerDeal, deal);
+  const { idCampaign, lead, assignedTo, classification, registerDeal, deal } = req.body;
+  await contactService.convertLead(
+    idUser,
+    lead.id,
+    assignedTo,
+    classification,
+    idCampaign,
+    registerDeal,
+    deal
+  );
   res.status(StatusCodes.OK).json({
     message: `El cliente potencial ${lead.name} ${lead.lastName} ha sido convertido a contacto`,
   });
