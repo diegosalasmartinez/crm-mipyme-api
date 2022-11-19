@@ -270,7 +270,11 @@ class QuotationService {
     try {
       const quotationStatus = await quotationStatusService.get('approved');
       await Quotation.update(
-        { idStatus: quotationStatus.id },
+        {
+          idStatus: quotationStatus.id,
+          startDate: quotation.startDate,
+          limitDate: quotation.limitDate,
+        },
         { where: { id: quotation.id }, transaction: t }
       );
       const quotationStored = await Quotation.findByPk(quotation.id);
