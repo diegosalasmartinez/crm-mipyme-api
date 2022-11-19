@@ -41,7 +41,9 @@ const approveQuotation = async (req, res) => {
 
 const generatePDF = async (req, res) => {
   const { idQuotation } = req.params;
+  const { idCompany } = req.user;
   const quotation = await quotationService.getQuotationById(idQuotation);
+  const company = await companyService.getCompanyById(idCompany);
   const stream = res.writeHead(200, {
     'Content-Type': 'application/pdf',
     'Content-Disposition': 'attachment; filename=quotation.pdf',
@@ -49,6 +51,8 @@ const generatePDF = async (req, res) => {
 
   pdfService.generateQuotationPDF(
     quotation,
+    quotation.deal.contact,
+    company,
     (chunk) => stream.write(chunk),
     () => stream.end()
   );
@@ -56,7 +60,7 @@ const generatePDF = async (req, res) => {
 
 const sendPDF = async (req, res) => {
   const { idQuotation } = req.params;
-  const { idCompany} = req.user;
+  const { idCompany } = req.user;
   const quotation = await quotationService.getQuotationById(idQuotation);
   const company = await companyService.getCompanyById(idCompany);
   pdfService.sendQuotationPDF(quotation, quotation.deal.contact, company);
