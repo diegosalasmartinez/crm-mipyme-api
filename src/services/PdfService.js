@@ -1,19 +1,21 @@
 const PDFDocument = require('pdfkit');
 const MailService = require('./MailService');
 const mailService = new MailService();
+const QuotationPdfReport = require('../reports/QuotationPdfReport');
 
 class PdfService {
-  async generateQuotationPDF(quotation, dataCallback, endCallback) {
-    const doc = new PDFDocument();
+  async generateQuotationPDF(quotation, contact, company, dataCallback, endCallback) {
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
     doc.on('data', dataCallback);
     doc.on('end', endCallback);
 
-    doc.fontSize(25).text(`Cotizacion ${quotation.id}`, 100, 100);
+    const quotationReport = new QuotationPdfReport(doc, quotation, contact, company);
+    quotationReport.generate();
     doc.end();
   }
 
   async sendQuotationPDF(quotation, contact, company) {
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({ size: 'A4', margin: 50 });
     const buffers = [];
     doc.on('data', buffers.push.bind(buffers));
     doc.on('end', async () => {
@@ -21,7 +23,8 @@ class PdfService {
       await mailService.sendPDFToContact(pdfData, contact, company);
     });
 
-    doc.fontSize(25).text(`Cotizacion ${quotation.id}`, 100, 100);
+    const quotationReport = new QuotationPdfReport(doc, quotation, contact, company);
+    quotationReport.generate();
     doc.end();
   }
 }
