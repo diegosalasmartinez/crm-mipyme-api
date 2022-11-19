@@ -33,7 +33,21 @@ class MailService {
         from: `${company.name} <${company.email}>`,
         to: lead.email,
         subject: `Actualización de la solicitud ${ticket.name}`,
-        text
+        text,
+      });
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async sendPDFToContact(pdf, contact, company) {
+    try {
+      await transporter.sendMail({
+        from: `${company.name} <${company.email}>`,
+        to: contact.lead.email,
+        subject: `Envío de cotización`,
+        text: 'Se adjunta la cotización solicitada.',
+        attachments: [{ filename: 'cotizacion.pdf', content: pdf }],
       });
     } catch (e) {
       throw new BadRequestError(e.message);
