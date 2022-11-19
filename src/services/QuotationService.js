@@ -100,7 +100,7 @@ class QuotationService {
                 as: 'contact',
                 attributes: ['id'],
                 include: [
-                  { model: Lead, as: 'lead', attributes: ['id', 'name', 'lastName'] },
+                  { model: Lead, as: 'lead', attributes: ['id', 'name', 'lastName', 'email'] },
                   { model: User, as: 'assigned', attributes: ['id', 'name', 'lastName'] },
                 ],
               },

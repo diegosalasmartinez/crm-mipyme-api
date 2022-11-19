@@ -1,6 +1,10 @@
 const { StatusCodes } = require('http-status-codes');
+const CompanyService = require('../services/CompanyService');
+const companyService = new CompanyService();
 const QuotationService = require('../services/QuotationService');
 const quotationService = new QuotationService();
+const PdfService = require('../services/PdfService');
+const pdfService = new PdfService();
 
 const getQuotations = async (req, res) => {
   const { status } = req.query;
@@ -35,10 +39,36 @@ const approveQuotation = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: 'La cotizacion ha sido aprobada' });
 };
 
+const generatePDF = async (req, res) => {
+  const { idQuotation } = req.params;
+  const quotation = await quotationService.getQuotationById(idQuotation);
+  const stream = res.writeHead(200, {
+    'Content-Type': 'application/pdf',
+    'Content-Disposition': 'attachment; filename=quotation.pdf',
+  });
+
+  pdfService.generateQuotationPDF(
+    quotation,
+    (chunk) => stream.write(chunk),
+    () => stream.end()
+  );
+};
+
+const sendPDF = async (req, res) => {
+  const { idQuotation } = req.params;
+  const { idCompany} = req.user;
+  const quotation = await quotationService.getQuotationById(idQuotation);
+  const company = await companyService.getCompanyById(idCompany);
+  pdfService.sendQuotationPDF(quotation, quotation.deal.contact, company);
+  res.status(StatusCodes.OK).json({ message: 'El PDF de la cotización ha sido enviado.' });
+};
+
 module.exports = {
   getQuotations,
   getQuotationById,
   addQuotation,
   updateQuotation,
   approveQuotation,
+  generatePDF,
+  sendPDF,
 };
