@@ -60,7 +60,6 @@ class ListService {
       if (!list) {
         throw new NotFoundError('No se encuentra la lista');
       }
-
       const leads = await list.getLeads();
       const listJSON = list.toJSON();
       const stats = await this.getListStats(list);
@@ -93,7 +92,7 @@ class ListService {
 
   async getAvailableLeads(idCompany, idList, page, rowsPerPage) {
     try {
-      const list = await this.getListById(idList);
+      const list = await this.getListByIdSimple(idList);
       const leads = await list.getLeads({
         attributes: ['id'],
         where: {
