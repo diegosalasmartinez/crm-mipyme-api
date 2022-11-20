@@ -208,8 +208,6 @@ class QuotationService {
         {
           idDeal: quotationDTO.idDeal,
           idStatus: status.id,
-          startDate: quotationDTO.startDate,
-          limitDate: quotationDTO.limitDate,
           notes: quotationDTO.notes,
         },
         { transaction: t }
@@ -233,8 +231,6 @@ class QuotationService {
     try {
       await Quotation.update(
         {
-          startDate: quotation.startDate,
-          limitDate: quotation.limitDate,
           notes: quotation.notes,
         },
         { where: { id: quotation.id }, transaction: t }
