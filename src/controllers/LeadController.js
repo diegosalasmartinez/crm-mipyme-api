@@ -9,9 +9,16 @@ const ProductService = require('../services/ProductService');
 const productService = new ProductService();
 
 const getLeads = async (req, res) => {
-  const { page, rowsPerPage } = req.query;
+  const { page, rowsPerPage, name, email, classification: classificationKey } = req.query;
   const { idCompany } = req.user;
-  const { data, count } = await leadService.getLeads(idCompany, page, rowsPerPage);
+  const { data, count } = await leadService.getLeads(
+    idCompany,
+    page,
+    rowsPerPage,
+    name,
+    email,
+    classificationKey
+  );
   res.status(StatusCodes.OK).json({ data, count });
 };
 

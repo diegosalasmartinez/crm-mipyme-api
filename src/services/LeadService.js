@@ -1,5 +1,5 @@
 const moment = require('moment');
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const { faker } = require('@faker-js/faker');
 const {
   Lead,
@@ -27,8 +27,16 @@ const attributes = [
 ];
 
 class LeadService {
-  async getLeads(idCompany, page = 0, rowsPerPage = 10) {
+  async getLeads(
+    idCompany,
+    page = 0,
+    rowsPerPage = 10,
+    name = '',
+    email = '',
+    classificationKey = ''
+  ) {
     try {
+      const classification = await classificationService.get(classificationKey);
       const { rows: data = [], count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
@@ -60,6 +68,17 @@ class LeadService {
               '$form.idCompany$': idCompany,
             },
           ],
+          name: {
+            [Op.iLike]: `%${name}%`,
+          },
+          email: {
+            [Op.iLike]: `%${email}%`,
+          },
+          idClassificationMarketing: classification
+            ? classification.id
+            : {
+                [Op.ne]: null,
+              },
         },
         order: [['createdAt', 'DESC']],
       });
