@@ -1,5 +1,5 @@
 const moment = require('moment');
-const { Op, Sequelize } = require('sequelize');
+const { Op } = require('sequelize');
 const { faker } = require('@faker-js/faker');
 const {
   Lead,
