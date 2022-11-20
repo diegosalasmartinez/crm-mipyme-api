@@ -121,6 +121,21 @@ class ContactService {
       throw new BadRequestError(e.message);
     }
   }
+
+  async updateClassification(idContact, classificationKey) {
+    try {
+      const classification = await classificationSalesService.get(classificationKey);
+
+      await Contact.update(
+        {
+          idClassificationSales: classification.id,
+        },
+        { where: { id: idContact } }
+      );
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
 }
 
 module.exports = ContactService;

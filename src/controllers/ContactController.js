@@ -40,8 +40,17 @@ const reassignContact = async (req, res) => {
   });
 };
 
+const updateClassification = async (req, res) => {
+  const { contact, classificationKey } = req.body;
+  await contactService.updateClassification(contact.id, classificationKey);
+  res.status(StatusCodes.OK).json({
+    message: `El cliente potencial ${contact.lead.name} ${contact.lead.lastName} ha sido actualizado`,
+  });
+};
+
 module.exports = {
   getContacts,
   convertLead,
   reassignContact,
+  updateClassification,
 };
