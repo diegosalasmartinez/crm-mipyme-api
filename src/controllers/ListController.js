@@ -23,9 +23,17 @@ const getListSimple = async (req, res) => {
 
 const getAvailableLeads = async (req, res) => {
   const { idList } = req.params;
-  const { page, rowsPerPage } = req.query;
+  const { page, rowsPerPage, name, email, classification: classificationKey } = req.query;
   const { idCompany } = req.user;
-  const { data, count } = await listService.getAvailableLeads(idCompany, idList, page, rowsPerPage);
+  const { data, count } = await listService.getAvailableLeads(
+    idCompany,
+    idList,
+    page,
+    rowsPerPage,
+    name,
+    email,
+    classificationKey
+  );
   res.status(StatusCodes.OK).json({ data, count });
 };
 

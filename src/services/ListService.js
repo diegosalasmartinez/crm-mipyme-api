@@ -1,10 +1,13 @@
 const moment = require('moment');
+const { Op } = require('sequelize');
 const { sequelize } = require('../models/index');
 const { List, Lead, User, ClassificationMarketing } = require('../models/index');
 const { BadRequestError, NotFoundError } = require('../errors');
 const { months } = require('../utils');
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
+const ClassificationMarketingService = require('./ClassificationMarketingService');
+const classificationService = new ClassificationMarketingService();
 
 class ListService {
   async getLists(idCompany, page = 0, rowsPerPage = 10) {
@@ -90,9 +93,24 @@ class ListService {
     }
   }
 
-  async getAvailableLeads(idCompany, idList, page, rowsPerPage) {
+  async getAvailableLeads(idCompany, idList, page, rowsPerPage, name, email, classificationKey) {
     try {
       const list = await this.getListByIdSimple(idList);
+      const classification = await classificationService.get(classificationKey);
+      const whereRules = {
+        name: {
+          [Op.iLike]: `%${name}%`,
+        },
+        email: {
+          [Op.iLike]: `%${email}%`,
+        },
+        idClassificationMarketing: classification
+          ? classification.id
+          : {
+              [Op.ne]: null,
+            },
+      };
+
       const leads = await list.getLeads({
         attributes: ['id'],
         where: {
@@ -101,7 +119,7 @@ class ListService {
       });
       const leadsId = leads.map((lead) => lead.id);
 
-      return leadService.getLeadsExcept(idCompany, leadsId, page, rowsPerPage);
+      return leadService.getLeadsExcept(idCompany, leadsId, page, rowsPerPage, whereRules);
     } catch (e) {
       throw new BadRequestError(e.message);
     }

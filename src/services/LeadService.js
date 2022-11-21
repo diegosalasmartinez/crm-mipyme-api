@@ -128,7 +128,7 @@ class LeadService {
     }
   }
 
-  async getLeadsExcept(idCompany, leadsId, page = 0, rowsPerPage = 10) {
+  async getLeadsExcept(idCompany, leadsId, page = 0, rowsPerPage = 10, whereRules) {
     try {
       const { rows: data = [], count } = await Lead.findAndCountAll({
         offset: page * rowsPerPage,
@@ -165,6 +165,7 @@ class LeadService {
               '$form.idCompany$': idCompany,
             },
           ],
+          ...whereRules
         },
         order: [['createdAt', 'DESC']],
       });
