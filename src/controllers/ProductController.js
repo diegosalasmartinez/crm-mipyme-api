@@ -20,11 +20,11 @@ const getProductBySku = async (req, res) => {
   res.status(StatusCodes.OK).json(product);
 };
 
-const addProduct = async (req, res) => {
+const addProducts = async (req, res) => {
   const { idCompany } = req.user;
-  const product = req.body;
-  const productCreated = await productService.addProduct(idCompany, product);
-  res.status(StatusCodes.OK).json(productCreated);
+  const { products } = req.body;
+  await productService.addProducts(idCompany, products);
+  res.status(StatusCodes.OK).json({ message: 'Se importaron los productos correctamente.' });
 };
 
 const getBestProductsByDeal = async (req, res) => {
@@ -38,14 +38,14 @@ const getBestProductsByDeal = async (req, res) => {
 const seed_addProducts = async (req, res) => {
   const { idCompany } = req.user;
   const { number } = req.query;
-  await productService.seed_addLeads(idCompany, number);
+  await productService.seed_addProducts(idCompany, number);
   res.status(StatusCodes.OK).json({ message: 'Done' });
 };
 
 module.exports = {
   getProducts,
   getProductBySku,
-  addProduct,
+  addProducts,
   getBestProductsByDeal,
   seed_addProducts,
 };

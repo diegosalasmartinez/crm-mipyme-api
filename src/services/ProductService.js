@@ -77,7 +77,17 @@ class ProductService {
     }
   }
 
-  async seed_addLeads(idCompany, number) {
+  async addProducts(idCompany, products) {
+    try {
+      for (const product of products) {
+        await this.addProduct(idCompany, product);
+      }
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async seed_addProducts(idCompany, number) {
     try {
       const productsInfo = [];
       for (let i = 0; i < number; i++) {
