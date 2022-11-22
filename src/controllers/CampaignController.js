@@ -7,20 +7,8 @@ const listService = new ListService();
 const getCampaignsByCompany = async (req, res) => {
   const { status } = req.query;
   const { id: idUser, idCompany, roles } = req.user;
-  const isAdmin = roles.filter((r) => r.key === 'admin' || r.key === 'admin_marketing').length > 0;
-
-  let obj = {
-    data: [],
-    count: 0,
-  };
-  if (isAdmin) {
-    obj = await campaignService.getCampaigns(idCompany, status);
-  } else if (status === 'bulk') {
-    obj = await campaignService.getCampaignsByUser(idUser, idCompany, status);
-  } else if (status === 'approved') {
-    obj = await campaignService.getAssignedCampaignsByUser(idUser, idCompany, status);
-  }
-  res.status(StatusCodes.OK).json({ data: obj.data, count: obj.count });
+  const { data, count } = await campaignService.getCampaigns(idUser, roles, idCompany, status);
+  res.status(StatusCodes.OK).json({ data, count });
 };
 
 const getCampaignById = async (req, res) => {

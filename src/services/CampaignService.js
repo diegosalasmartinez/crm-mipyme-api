@@ -25,6 +25,7 @@ const dealService = new DealService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
 const MailService = require('./MailService');
+const { validateRoles } = require('../utils/permissions');
 const mailService = new MailService();
 require('dotenv').config();
 
@@ -65,12 +66,25 @@ cron.schedule(
 );
 
 class CampaignService {
-  async getCampaigns(idCompany, status) {
+  async getCampaigns(idUser, roles, idCompany, status) {
     try {
+      const assignedRules = {};
+      const whereRules = {};
+      const isAdmin = validateRoles(roles, ['admin', 'admin_marketing']);
+
+      if (!isAdmin) {
+        if (status === 'running') {
+          assignedRules['$assigned.id$'] = idUser;
+        } else if (status !== 'finished') {
+          whereRules['createdBy'] = idUser;
+        }
+      }
+
       const { rows: data = [], count } = await Campaign.findAndCountAll({
         attributes: {
           exclude: ['html', 'segments', 'lists'],
         },
+        required: false,
         include: [
           {
             model: Program,
@@ -96,7 +110,11 @@ class CampaignService {
           {
             model: User,
             as: 'assigned',
-            attributes: ['name', 'lastName'],
+            attributes: ['id', 'name', 'lastName'],
+            required: Object.keys(assignedRules).length !== 0,
+            where: {
+              ...assignedRules,
+            },
           },
           {
             model: User,
@@ -113,120 +131,7 @@ class CampaignService {
         ],
         where: {
           active: true,
-        },
-      });
-      return { data, count };
-    } catch (e) {
-      throw new BadRequestError(e.message);
-    }
-  }
-
-  async getCampaignsByUser(idUser, idCompany, status) {
-    try {
-      const { rows: data = [], count } = await Campaign.findAndCountAll({
-        attributes: {
-          exclude: ['html', 'segments', 'lists'],
-        },
-        include: [
-          {
-            model: Program,
-            as: 'program',
-            attributes: ['id', 'name', 'idPlan'],
-            include: [
-              {
-                model: Plan,
-                as: 'plan',
-                attributes: [],
-                include: [
-                  {
-                    model: Company,
-                    as: 'company',
-                    attributes: [],
-                    required: false,
-                    where: { id: idCompany },
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            model: User,
-            as: 'creator',
-            attributes: ['name', 'lastName'],
-          },
-          {
-            model: CampaignStatus,
-            as: 'status',
-            required: false,
-            where: {
-              key: status,
-            },
-          },
-        ],
-        where: {
-          createdBy: idUser,
-          active: true,
-        },
-      });
-      return { data, count };
-    } catch (e) {
-      throw new BadRequestError(e.message);
-    }
-  }
-
-  async getAssignedCampaignsByUser(idUser, idCompany, status) {
-    try {
-      const { rows: data = [], count } = await Campaign.findAndCountAll({
-        attributes: {
-          exclude: ['html', 'segments', 'lists'],
-        },
-        include: [
-          {
-            model: Program,
-            as: 'program',
-            attributes: ['id', 'name', 'idPlan'],
-            include: [
-              {
-                model: Plan,
-                as: 'plan',
-                attributes: [],
-                include: [
-                  {
-                    model: Company,
-                    as: 'company',
-                    attributes: [],
-                    required: false,
-                    where: { id: idCompany },
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            model: User,
-            as: 'assigned',
-            attributes: ['name', 'lastName'],
-            required: false,
-            where: {
-              '$assigned.usersxcampaigns.idUser$': idUser,
-            },
-          },
-          {
-            model: User,
-            as: 'creator',
-            attributes: ['name', 'lastName'],
-          },
-          {
-            model: CampaignStatus,
-            as: 'status',
-            required: false,
-            where: {
-              key: status,
-            },
-          },
-        ],
-        where: {
-          active: true,
+          ...whereRules,
         },
       });
       return { data, count };
