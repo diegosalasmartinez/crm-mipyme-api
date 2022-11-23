@@ -9,8 +9,8 @@ const CampaignService = require('../services/CampaignService');
 const campaignService = new CampaignService();
 
 const getDeals = async (req, res) => {
-  const { idCompany } = req.user;
-  const data = await dealService.getDeals(idCompany);
+  const { id: idUser, idCompany, roles } = req.user;
+  const data = await dealService.getDeals(idUser, idCompany, roles);
   res.status(StatusCodes.OK).json(data);
 };
 

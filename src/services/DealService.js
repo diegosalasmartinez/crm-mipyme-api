@@ -32,10 +32,16 @@ const lostTypeService = new LostTypeService();
 const ActivityStatusService = require('./ActivityStatusService');
 const activityStatusService = new ActivityStatusService();
 const { generateChartLabels } = require('../utils');
+const { validateRoles } = require('../utils/permissions');
 
 class DealService {
-  async getDeals(idCompany) {
+  async getDeals(idUser, idCompany, roles) {
     try {
+      const assignedRules = {}
+      if (!validateRoles(roles, ['admin', 'admin_sales'])) {
+        assignedRules['$contact.assigned.id$'] = idUser
+      }
+
       const steps = await dealStepService.getAll();
       const data = [];
       for (const step of steps) {
@@ -57,9 +63,10 @@ class DealService {
                   model: User,
                   as: 'assigned',
                   attributes: ['id', 'name', 'lastName'],
-                  required: true,
+                  required: Object.keys(assignedRules).length !== 0,
                   where: {
                     idCompany,
+                    ...assignedRules,
                   },
                 },
               ],
