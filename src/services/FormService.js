@@ -118,12 +118,11 @@ class FormService {
         },
         { transaction: t }
       );
+      await t.commit();
 
       for (const idList of formDTO.listsId) {
-        await form.addList(idList, { through: 'listsxforms' }, { transaction: t });
+        await form.addList(idList, { through: 'listsxforms' });
       }
-
-      await t.commit();
     } catch (e) {
       await t.rollback();
       throw new BadRequestError(e.message);
