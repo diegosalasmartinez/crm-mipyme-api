@@ -18,6 +18,8 @@ const {
   Note,
   sequelize,
 } = require('../models/index');
+const { generateChartLabels } = require('../utils');
+const { validateRoles } = require('../utils/permissions');
 const { BadRequestError } = require('../errors');
 const DealOriginService = require('./DealOriginService');
 const dealOriginService = new DealOriginService();
@@ -31,15 +33,13 @@ const LostTypeService = require('./LostTypeService');
 const lostTypeService = new LostTypeService();
 const ActivityStatusService = require('./ActivityStatusService');
 const activityStatusService = new ActivityStatusService();
-const { generateChartLabels } = require('../utils');
-const { validateRoles } = require('../utils/permissions');
 
 class DealService {
   async getDeals(idUser, idCompany, roles) {
     try {
-      const assignedRules = {}
+      const assignedRules = {};
       if (!validateRoles(roles, ['admin', 'admin_sales'])) {
-        assignedRules['$contact.assigned.id$'] = idUser
+        assignedRules['$contact.assigned.id$'] = idUser;
       }
 
       const steps = await dealStepService.getAll();
@@ -229,6 +229,7 @@ class DealService {
             model: LostType,
             as: 'lostType',
           },
+          { model: DealOrigin, as: 'origin' },
         ],
         order: [[{ model: Quotation, as: 'quotations' }, 'createdAt', 'DESC']],
         where: {
@@ -297,7 +298,7 @@ class DealService {
               {
                 model: ClassificationSales,
                 as: 'classificationSales',
-              }
+              },
             ],
           },
         ],
