@@ -23,6 +23,12 @@ const createDeal = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: `Oportunidad ${deal.name} registrada correctamente` });
 };
 
+const updateDeal = async (req, res) => {
+  const deal = req.body;
+  await dealService.updateDeal(deal);
+  res.status(StatusCodes.OK).json({ message: `La oportunidad se ha actualizado correctamente` });
+};
+
 const getDealDetail = async (req, res) => {
   const { idDeal } = req.params;
   const deal = await dealService.getDealById(idDeal);
@@ -54,6 +60,7 @@ const dashboard = async (req, res) => {
 module.exports = {
   getDeals,
   createDeal,
+  updateDeal,
   getDealDetail,
   getDealBasicInfo,
   updateDealStep,

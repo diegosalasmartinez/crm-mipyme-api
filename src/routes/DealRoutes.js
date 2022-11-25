@@ -5,7 +5,8 @@ const {
   getDealDetail,
   getDealBasicInfo,
   updateDealStep,
-  dashboard
+  dashboard,
+  updateDeal
 } = require('../controllers/DealController');
 
 const router = express.Router();
@@ -13,6 +14,7 @@ const router = express.Router();
 router.get('/', getDeals);
 router.get('/dashboard', dashboard);
 router.post('/', createDeal);
+router.patch('/', updateDeal);
 router.get('/:idDeal', getDealDetail);
 router.get('/:idDeal/basic', getDealBasicInfo);
 router.post('/update/step', updateDealStep);

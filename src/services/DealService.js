@@ -340,6 +340,25 @@ class DealService {
     }
   }
 
+  async updateDeal(dealDTO) {
+    try {
+      const priority = await dealPriorityService.get(dealDTO.priority);
+
+      await Deal.update(
+        {
+          name: dealDTO.name,
+          expectedAmount: dealDTO.expectedAmount,
+          expectedCloseDate: dealDTO.expectedCloseDate,
+          description: dealDTO.description,
+          idPriority: priority.id,
+        },
+        { where: { id: dealDTO.id } }
+      );
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async rejectQuotation(idQuotation) {
     const t = await sequelize.transaction();
     try {
