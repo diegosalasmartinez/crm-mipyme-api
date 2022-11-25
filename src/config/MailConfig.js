@@ -11,8 +11,13 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-transporter.verify().then(() => {
-  console.log('Ready for send emails');
-});
+transporter
+  .verify()
+  .then(() => {
+    console.log('Ready for send emails');
+  })
+  .catch((e) => {
+    console.log('No se pudo iniciar el servidor SMTP: ', e.message);
+  });
 
 module.exports = { transporter };
