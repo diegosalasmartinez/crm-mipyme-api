@@ -15,6 +15,7 @@ const {
   Rejection,
   sequelize,
 } = require('../models/index');
+const { validateRoles } = require('../utils/permissions');
 const { BadRequestError } = require('../errors');
 const CampaignStatusService = require('./CampaignStatusService');
 const campaignStatusService = new CampaignStatusService();
@@ -25,7 +26,6 @@ const dealService = new DealService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
 const MailService = require('./MailService');
-const { validateRoles } = require('../utils/permissions');
 const mailService = new MailService();
 require('dotenv').config();
 
@@ -68,15 +68,14 @@ cron.schedule(
 class CampaignService {
   async getCampaigns(idUser, roles, idCompany, status) {
     try {
-      const assignedRules = {};
-      const whereRules = {};
-      const isAdmin = validateRoles(roles, ['admin', 'admin_marketing']);
-
-      if (!isAdmin) {
+      const whereRules = [];
+      if (validateRoles(roles, ['admin', 'admin_marketing'])) {
+        whereRules.push({ active: true });
+      } else {
         if (status === 'running') {
-          assignedRules['$assigned.id$'] = idUser;
+          whereRules.push({ '$assigned.id$': idUser });
         } else if (status !== 'finished') {
-          whereRules['createdBy'] = idUser;
+          whereRules.push({ createdBy: idUser });
         }
       }
 
@@ -84,7 +83,7 @@ class CampaignService {
         attributes: {
           exclude: ['html', 'segments', 'lists'],
         },
-        required: false,
+        required: true,
         include: [
           {
             model: Program,
@@ -111,10 +110,6 @@ class CampaignService {
             model: User,
             as: 'assigned',
             attributes: ['id', 'name', 'lastName'],
-            required: Object.keys(assignedRules).length !== 0,
-            where: {
-              ...assignedRules,
-            },
           },
           {
             model: User,
@@ -131,7 +126,7 @@ class CampaignService {
         ],
         where: {
           active: true,
-          ...whereRules,
+          [Op.or]: [whereRules.map((rule) => rule)],
         },
       });
       return { data, count };
