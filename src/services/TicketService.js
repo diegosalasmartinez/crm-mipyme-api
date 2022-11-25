@@ -18,6 +18,8 @@ const {
   Note,
   sequelize,
 } = require('../models/index');
+const { generateChartLabels } = require('../utils');
+const { validateRoles } = require('../utils/permissions');
 const { BadRequestError } = require('../errors');
 const DealService = require('./DealService');
 const dealService = new DealService();
@@ -33,8 +35,6 @@ const UserService = require('./UserService');
 const userService = new UserService();
 const MailService = require('./MailService');
 const mailService = new MailService();
-const { generateChartLabels } = require('../utils');
-const { validateRoles } = require('../utils/permissions');
 
 class TicketService {
   async getTickets(idCompany, page = 0, rowsPerPage = 10, finished = false) {

@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const cron = require('node-cron');
 const {
   Quotation,
@@ -11,6 +12,7 @@ const {
   Product,
   sequelize,
 } = require('../models/index');
+const { validateRoles } = require('../utils/permissions');
 const { BadRequestError } = require('../errors');
 const QuotationStatusService = require('./QuotationStatusService');
 const quotationStatusService = new QuotationStatusService();
@@ -18,7 +20,6 @@ const QuotationDetailService = require('./QuotationDetailService');
 const quotationDetailService = new QuotationDetailService();
 const DealStepService = require('./DealStepService');
 const dealStepService = new DealStepService();
-const { Op } = require('sequelize');
 
 cron.schedule(
   '20 0 * * *',
@@ -38,26 +39,33 @@ cron.schedule(
 );
 
 class QuotationService {
-  async getQuotations(idCompany, status) {
+  async getQuotations(idUser, idCompany, roles, status) {
     try {
+      const assignedRules = {};
+      if (!validateRoles(roles, ['admin', 'admin_sales'])) {
+        assignedRules['$deal.contact.assigned.id$'] = idUser;
+      }
       const { rows: data = [], count } = await Quotation.findAndCountAll({
         required: true,
         include: [
           {
             model: Deal,
             as: 'deal',
+            required: true,
             include: [
               {
                 model: Contact,
                 as: 'contact',
                 attributes: ['id'],
+                required: true,
                 include: [
                   { model: Lead, as: 'lead', attributes: ['id', 'name', 'lastName'] },
                   {
                     model: User,
                     as: 'assigned',
                     attributes: ['id', 'name', 'lastName'],
-                    where: { idCompany },
+                    required: true,
+                    where: { idCompany, ...assignedRules },
                   },
                 ],
               },

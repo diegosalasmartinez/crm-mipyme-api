@@ -7,9 +7,9 @@ const PdfService = require('../services/PdfService');
 const pdfService = new PdfService();
 
 const getQuotations = async (req, res) => {
+  const { id: idUser, idCompany, roles } = req.user;
   const { status } = req.query;
-  const { idCompany } = req.user;
-  const obj = await quotationService.getQuotations(idCompany, status);
+  const obj = await quotationService.getQuotations(idUser, idCompany, roles, status);
   res.status(StatusCodes.OK).json({ data: obj.data, count: obj.count });
 };
 

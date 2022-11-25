@@ -1,6 +1,6 @@
 const { Contact, Lead, ClassificationSales, User, sequelize } = require('../models/index');
-const { BadRequestError } = require('../errors');
 const { validateRoles } = require('../utils/permissions');
+const { BadRequestError } = require('../errors');
 const DealService = require('./DealService');
 const dealService = new DealService();
 const LeadService = require('./LeadService');
