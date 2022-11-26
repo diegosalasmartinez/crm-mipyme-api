@@ -376,54 +376,48 @@ class TicketService {
       // Ticket generation
       const chartLabels = generateChartLabels();
 
-      // Activity stats
-      let numActivities = 0;
+      // Ticket stats
       let timeToStart = 0;
-      let numActivitiesStarted = 0;
+      let numStarted = 0;
       let timeToFinish = 0;
-      let numActivitiesFinished = 0;
+      let numFinished = 0;
 
       // Origins
       const originTypes = {};
 
       for (const ticket of tickets) {
         const k = moment(ticket.createdAt).format('YYYY-MM').slice(0, 7);
+
         // Group by created at
         if (chartLabels[k]) {
           chartLabels[k] = { value: chartLabels[k].value + 1, name: chartLabels[k].name };
         }
+
         // Group by win or lost
         if (ticket.deal && ticket.deal.idStep === winStep.id) {
           wonAmount += ticket.deal.realAmount;
         }
-        // Group by activity
-        let activities = [];
-        if (ticket.deal) {
-          activities = ticket.deal.activities;
-        } else {
-          activities = ticket.activities;
+
+        const createdAt = moment(ticket.createdAt);
+        if (ticket.startDate) {
+          numStarted++;
+          const startDate = moment(ticket.startDate);
+          timeToStart += moment.duration(startDate.diff(createdAt)).asSeconds();
         }
-        numActivities += activities.length;
-        activities.map((activity) => {
-          const createdAt = moment(activity.createdAt);
-          if (activity.startDate) {
-            numActivitiesStarted++;
-            const startDate = moment(activity.startDate);
-            timeToStart += moment.duration(startDate.diff(createdAt)).asDays();
-          }
-          if (activity.endDate) {
-            numActivitiesFinished++;
-            const startDate = moment(activity.startDate);
-            const endDate = moment(activity.endDate);
-            timeToFinish += moment.duration(endDate.diff(startDate)).asDays();
-          }
-        });
+        if (ticket.endDate) {
+          numFinished++;
+          const startDate = moment(ticket.startDate);
+          const endDate = moment(ticket.endDate);
+          timeToFinish += moment.duration(endDate.diff(startDate)).asSeconds();
+        } 
+
         // Group by type
         if (originTypes[ticket.type.name]) {
           originTypes[ticket.type.name] = originTypes[ticket.type.name] + 1;
         } else {
           originTypes[ticket.type.name] = 1;
         }
+
         if (ticket.type.key === 'question') {
           numQuestions++;
         } else {
@@ -451,19 +445,19 @@ class TicketService {
         numQuestions,
       };
 
-      const activities = {
-        numActivities,
-        numActivitiesFinished,
+      const performance = {
+        numStarted,
         timeToStart:
-          numActivitiesStarted > 0 ? timeToStart / numActivitiesStarted : numActivitiesStarted,
+          numStarted > 0 ? timeToStart / numStarted : 0,
+        numFinished,
         timeToFinish:
-          numActivitiesFinished > 0 ? timeToFinish / numActivitiesFinished : numActivitiesFinished,
+          numFinished > 0 ? timeToFinish / numFinished : 0,
       };
 
       return {
         events,
         ticketGeneration,
-        activities,
+        performance,
         origins,
       };
     } catch (e) {
