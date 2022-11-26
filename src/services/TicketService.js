@@ -409,7 +409,7 @@ class TicketService {
           const startDate = moment(ticket.startDate);
           const endDate = moment(ticket.endDate);
           timeToFinish += moment.duration(endDate.diff(startDate)).asSeconds();
-        } 
+        }
 
         // Group by type
         if (originTypes[ticket.type.name]) {
@@ -447,11 +447,9 @@ class TicketService {
 
       const performance = {
         numStarted,
-        timeToStart:
-          numStarted > 0 ? timeToStart / numStarted : 0,
+        timeToStart: numStarted > 0 ? timeToStart / numStarted : 0,
         numFinished,
-        timeToFinish:
-          numFinished > 0 ? timeToFinish / numFinished : 0,
+        timeToFinish: numFinished > 0 ? timeToFinish / numFinished : 0,
       };
 
       return {
@@ -495,7 +493,7 @@ class TicketService {
           continue;
         }
 
-        let numTickets = tickets.length
+        let numTickets = tickets.length;
         let timeToStart = 0;
         let timeToFinish = 0;
         let numPending = 0;
@@ -549,6 +547,19 @@ class TicketService {
         arrUsers.push(userJSON);
       }
       return arrUsers;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async reassignTicket(idTicket, idUser) {
+    try {
+      await Ticket.update(
+        {
+          assignedTo: idUser,
+        },
+        { where: { id: idTicket } }
+      );
     } catch (e) {
       throw new BadRequestError(e.message);
     }

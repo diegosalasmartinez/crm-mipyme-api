@@ -6,6 +6,7 @@ const {
   updateTicketStatus,
   dashboard,
   performanceUsers,
+  reassignTicket
 } = require('../controllers/TicketController');
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.get('/dashboard', dashboard);
 router.get('/:idTicket', getTicketDetail);
 router.post('/', addTicket);
 router.post('/update/status', updateTicketStatus);
+router.post('/reassign', reassignTicket);
 
 module.exports = router;

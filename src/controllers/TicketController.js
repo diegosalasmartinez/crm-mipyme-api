@@ -28,6 +28,14 @@ const updateTicketStatus = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: 'La solicitud ha sido actualizada' });
 };
 
+const reassignTicket = async (req, res) => {
+  const { id, user, userName } = req.body;
+  await ticketService.reassignTicket(id, user);
+  res
+    .status(StatusCodes.OK)
+    .json({ message: `La solicitud ha sido asignada al usuario ${userName}` });
+};
+
 const dashboard = async (req, res) => {
   const { idCompany } = req.user;
   const stats = await ticketService.dashboard(idCompany);
@@ -38,7 +46,7 @@ const performanceUsers = async (req, res) => {
   const { idCompany } = req.user;
   const users = await ticketService.performanceUsers(idCompany);
   res.status(StatusCodes.OK).json(users);
-}
+};
 
 module.exports = {
   getTickets,
@@ -46,5 +54,6 @@ module.exports = {
   addTicket,
   updateTicketStatus,
   dashboard,
-  performanceUsers
+  performanceUsers,
+  reassignTicket,
 };
