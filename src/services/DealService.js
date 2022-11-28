@@ -476,22 +476,21 @@ class DealService {
         if (deal.idStep === winStep.id) {
           wonQty++;
           wonAmount += deal.realAmount;
-          if (deal.idOrigin === originSales.id) {
-            if (salesOriginSales[k]) {
-              salesOriginSales[k] = {
-                value: salesOriginSales[k].value + deal.realAmount,
-                name: salesOriginSales[k].name,
-              };
-            }
-          } else if (deal.idOrigin === originTicket.id) {
-            salesOriginTicket[k] = {
-              value: salesOriginTicket[k].value + deal.realAmount,
-              name: salesOriginTicket[k].name,
+          const dateKey = moment(deal.realCloseDate).format('YYYY-MM').slice(0, 7);
+          if (deal.idOrigin === originSales.id && salesOriginSales[dateKey]) {
+            salesOriginSales[dateKey] = {
+              value: salesOriginSales[dateKey].value + deal.realAmount,
+              name: salesOriginSales[dateKey].name,
             };
-          } else {
-            salesOriginMarketing[k] = {
-              value: salesOriginMarketing[k].value + deal.realAmount,
-              name: salesOriginMarketing[k].name,
+          } else if (deal.idOrigin === originTicket.id && salesOriginTicket[dateKey]) {
+            salesOriginTicket[dateKey] = {
+              value: salesOriginTicket[dateKey].value + deal.realAmount,
+              name: salesOriginTicket[dateKey].name,
+            };
+          } else if (salesOriginMarketing[dateKey]) {
+            salesOriginMarketing[dateKey] = {
+              value: salesOriginMarketing[dateKey].value + deal.realAmount,
+              name: salesOriginMarketing[dateKey].name,
             };
           }
           const products = await quotationService.getProductsOfQuotationAccepted(deal.id);
