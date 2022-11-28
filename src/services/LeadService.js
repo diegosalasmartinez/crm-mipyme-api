@@ -349,24 +349,33 @@ class LeadService {
             attributes: [],
           },
           {
+            model: Form,
+            as: 'form',
+          },
+          {
             model: List,
             as: 'lists',
           },
         ],
         where: {
           ...whereClausses,
-          '$creator.idCompany$': idCompany,
+          [Op.or]: [
+            {
+              '$creator.idCompany$': idCompany,
+            },
+            {
+              '$form.idCompany$': idCompany,
+            },
+          ],
           emailValidated: true,
           active: true,
         },
       });
 
-      const leadsOfLists = []
+      const leadsOfLists = [];
       for (const lead of leads) {
-        console.log(lead.id)
-        console.log(lead.lists.map(l => l.id))
-        if (lead.lists.map(l => l.id).some(l => lists.includes(l))) {
-          leadsOfLists.push(lead.id)
+        if (lead.lists.map((l) => l.id).some((l) => lists.includes(l))) {
+          leadsOfLists.push(lead.id);
         }
       }
       return leadsOfLists;
