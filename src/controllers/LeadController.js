@@ -77,9 +77,10 @@ const seed_addLeads = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: 'Done' });
 };
 
-const seed_addLeadsByForm = async (req, res) => {
-  const { idForm, number } = req.query;
-  await leadService.seed_addLeadsByForm(idForm, number);
+const seed_updateLeadsToRM = async (req, res) => {
+  const { idCompany } = req.user;
+  const { number } = req.query;
+  await leadService.seed_updateLeadsToRM(idCompany, number);
   res.status(StatusCodes.OK).json({ message: 'Done' });
 };
 
@@ -92,5 +93,5 @@ module.exports = {
   updateLead,
   addLeadBulk,
   seed_addLeads,
-  seed_addLeadsByForm,
+  seed_updateLeadsToRM,
 };

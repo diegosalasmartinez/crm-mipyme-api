@@ -8,19 +8,20 @@ const {
   validateLead,
   addLeadBulk,
   seed_addLeads,
-  seed_addLeadsByForm
+  seed_updateLeadsToRM
 } = require('../controllers/LeadController');
 
 const router = express.Router();
 
 router.get('/', getLeads);
-router.get('/generate', seed_addLeads);
-router.get('/generate/form', seed_addLeadsByForm);
 router.get('/simple/:idLead', getLeadSimple);
 router.get('/:idLead', getLeadById);
 router.post('/', addLead);
 router.patch('/', updateLead);
 router.patch('/validate', validateLead);
 router.post('/bulk', addLeadBulk);
+// Commands
+router.post('/job', seed_addLeads);
+router.post('/job/update_rm', seed_updateLeadsToRM);
 
 module.exports = router;

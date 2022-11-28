@@ -166,7 +166,7 @@ class LeadService {
               '$form.idCompany$': idCompany,
             },
           ],
-          ...whereRules
+          ...whereRules,
         },
         order: [['createdAt', 'DESC']],
       });
@@ -432,25 +432,41 @@ class LeadService {
     }
   }
 
-  async seed_addLeadsByForm(idForm, number) {
+  async seed_updateLeadsToRM(idCompany, number) {
     try {
-      const leadsInfo = [];
-      const classification = await classificationService.getDefault();
-      for (let i = 0; i < number; i++) {
-        const info = {
-          name: faker.name.firstName(),
-          lastName: faker.name.lastName(),
-          birthday: faker.date.birthdate({ min: 18, max: 65, mode: 'age' }),
-          email: faker.internet.email(),
-          phone: faker.phone.number(),
-          address: faker.address.secondaryAddress(),
-          createdAt: faker.date.past(),
+      const leads = await Lead.findAll({
+        limit: number,
+        include: [
+          {
+            model: User,
+            as: 'creator',
+          },
+          {
+            model: Form,
+            as: 'form',
+          },
+        ],
+        where: {
+          active: true,
+          [Op.or]: [
+            {
+              '$creator.idCompany$': idCompany,
+            },
+            {
+              '$form.idCompany$': idCompany,
+            },
+          ],
+        },
+      });
+      const leadsIds = leads.map((l) => l.id);
+      const classification = await classificationService.get('ready_marketing');
+      await Lead.update(
+        {
           idClassificationMarketing: classification.id,
-          idForm,
-        };
-        leadsInfo.push(info);
-      }
-      await Lead.bulkCreate(leadsInfo);
+          emailValidated: true,
+        },
+        { where: { id: leadsIds } }
+      );
     } catch (e) {
       throw new BadRequestError(e.message);
     }

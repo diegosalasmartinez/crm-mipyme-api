@@ -5,6 +5,7 @@ const {
   addForm,
   updateForm,
   getFormSimple,
+  seed_addLeadsByForm 
 } = require('../controllers/FormController');
 
 const router = express.Router();
@@ -14,5 +15,7 @@ router.get('/:idForm', getFormDetail);
 router.get('/simple/:idForm', getFormSimple);
 router.post('/', addForm);
 router.patch('/', updateForm);
+// Commands
+router.post('/job', seed_addLeadsByForm);
 
 module.exports = router;

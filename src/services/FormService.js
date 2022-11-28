@@ -1,4 +1,5 @@
 const moment = require('moment');
+const { faker } = require('@faker-js/faker');
 const { Form, List, ClassificationMarketing, sequelize } = require('../models/index');
 const { BadRequestError, NotFoundError } = require('../errors');
 const { generateChartLabels } = require('../utils');
@@ -6,6 +7,8 @@ const LeadService = require('./LeadService');
 const leadService = new LeadService();
 const ListService = require('./ListService');
 const listService = new ListService();
+const ClassificationMarketingService = require('./ClassificationMarketingService');
+const classificationMarketingService = new ClassificationMarketingService();
 
 class FormService {
   async getForms(idCompany, page = 0, rowsPerPage = 10) {
@@ -166,6 +169,27 @@ class FormService {
       await t.commit();
     } catch (e) {
       await t.rollback();
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async seed_addLeadsByForm(idForm, number) {
+    try {
+      const classification = await classificationMarketingService.getDefault();
+      for (let i = 0; i < number; i++) {
+        const leadInfo = {
+          name: faker.name.firstName(),
+          lastName: faker.name.lastName(),
+          birthday: faker.date.birthdate({ min: 18, max: 65, mode: 'age' }),
+          email: faker.internet.email(),
+          phone: faker.phone.number(),
+          address: faker.address.secondaryAddress(),
+          createdAt: faker.date.past(),
+          idClassificationMarketing: classification.id,
+        };
+        await this.addLead(idForm, leadInfo);
+      }
+    } catch (e) {
       throw new BadRequestError(e.message);
     }
   }
