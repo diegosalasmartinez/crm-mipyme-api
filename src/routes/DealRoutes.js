@@ -6,7 +6,8 @@ const {
   getDealBasicInfo,
   updateDealStep,
   dashboard,
-  updateDeal
+  updateDeal,
+  seed_addDeals
 } = require('../controllers/DealController');
 
 const router = express.Router();
@@ -18,5 +19,7 @@ router.patch('/', updateDeal);
 router.get('/:idDeal', getDealDetail);
 router.get('/:idDeal/basic', getDealBasicInfo);
 router.post('/update/step', updateDealStep);
+// Commands
+router.post('/job/bulk', seed_addDeals);
 
 module.exports = router;

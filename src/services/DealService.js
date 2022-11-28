@@ -1,3 +1,4 @@
+const { faker } = require('@faker-js/faker');
 const moment = require('moment');
 const {
   Deal,
@@ -602,6 +603,35 @@ class DealService {
         origins,
         topProducts: topProductsFiltered,
       };
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async seed_addDeals(idUser, number, contacts) {
+    try {
+      const origin = await dealOriginService.get('sales');
+      const step = await dealStepService.getDefault();
+      const contactsIds = contacts.map((contact) => contact.id);
+
+      for (let i = 0; i < number; i++) {
+        const priority = await dealPriorityService.get(
+          faker.helpers.arrayElement(['low', 'medium', 'high'])
+        );
+
+        await Deal.create({
+          name: faker.commerce.productDescription(),
+          expectedAmount: faker.finance.amount(),
+          expectedCloseDate: faker.date.past(),
+          description: '',
+          idOrigin: origin.id,
+          idStep: step.id,
+          idPriority: priority.id,
+          idContact: faker.helpers.arrayElement(contactsIds),
+          createdBy: idUser,
+          createdAt: faker.date.past(),
+        });
+      }
     } catch (e) {
       throw new BadRequestError(e.message);
     }

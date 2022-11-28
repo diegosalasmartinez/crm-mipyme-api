@@ -7,6 +7,8 @@ const TicketService = require('../services/TicketService');
 const ticketService = new TicketService();
 const CampaignService = require('../services/CampaignService');
 const campaignService = new CampaignService();
+const ContactService = require('../services/ContactService');
+const contactService = new ContactService();
 
 const getDeals = async (req, res) => {
   const { id: idUser, idCompany, roles } = req.user;
@@ -57,6 +59,14 @@ const dashboard = async (req, res) => {
   res.status(StatusCodes.OK).json(stats);
 };
 
+const seed_addDeals = async (req, res) => {
+  const { id: idUser, idCompany } = req.user;
+  const { number } = req.query;
+  const contacts = await contactService.getAllContacts(idCompany);
+  await dealService.seed_addDeals(idUser, number, contacts);
+  res.status(StatusCodes.OK).json({ message: 'Done' });
+};
+
 module.exports = {
   getDeals,
   createDeal,
@@ -65,4 +75,5 @@ module.exports = {
   getDealBasicInfo,
   updateDealStep,
   dashboard,
+  seed_addDeals,
 };

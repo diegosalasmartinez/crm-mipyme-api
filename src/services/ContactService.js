@@ -69,6 +69,27 @@ class ContactService {
     }
   }
 
+  async getAllContacts(idCompany) {
+    try {
+      const contacts = await Contact.findAll({
+        include: [
+          {
+            model: User,
+            as: 'assigned',
+            attributes: ['id', 'name', 'lastName', 'idCompany'],
+          },
+        ],
+        where: {
+          active: true,
+          '$assigned.idCompany$': idCompany,
+        },
+      });
+      return contacts;
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async convertLead(idUser, idLead, assignedTo, classificationKey, idCampaign, registerDeal, deal) {
     const t = await sequelize.transaction();
     try {
