@@ -405,8 +405,7 @@ class LeadService {
       const classification = await classificationService.get('marketing_engaged');
 
       const lead = await Lead.findOne({
-        id: idLead,
-        where: { idClassificationMarketing: classification.id },
+        where: { id: idLead, idClassificationMarketing: classification.id },
       });
 
       if (lead) {

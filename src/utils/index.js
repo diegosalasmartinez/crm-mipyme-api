@@ -23,8 +23,13 @@ const truncateText = (input, maxLength = 20) => {
   return input;
 };
 
+const roundNumber = (num = 0) => {
+  return Math.round(num * 100) / 100;
+};
+
 module.exports = {
   months,
   generateChartLabels,
-  truncateText
+  truncateText,
+  roundNumber,
 };

@@ -26,6 +26,7 @@ const dealService = new DealService();
 const LeadService = require('./LeadService');
 const leadService = new LeadService();
 const MailService = require('./MailService');
+const { roundNumber } = require('../utils');
 const mailService = new MailService();
 require('dotenv').config();
 
@@ -617,9 +618,9 @@ class CampaignService {
   async updateFidelization(idDeal) {
     try {
       const deal = await dealService.getDealByIdSimple(idDeal);
-      if (deal.idCampaign) {
+      if (deal.contact) {
         const leadPromoted = await leadService.convertClient(deal.contact.lead.id);
-        if (leadPromoted) {
+        if (leadPromoted && deal.idCampaign) {
           await Campaign.increment(
             { numConversions: 1, clientsGenerated: 1 },
             { where: { id: deal.idCampaign } }
@@ -640,7 +641,7 @@ class CampaignService {
       const stats = {
         budget,
         waste,
-        usagePercentage: budget > 0 ? (waste / budget) * 100 : 0,
+        usagePercentage: budget > 0 ? roundNumber((waste / budget) * 100) : 0,
         leadsQty: leads.length,
         cpl: waste > 0 ? leads.length / waste : 0,
       };
