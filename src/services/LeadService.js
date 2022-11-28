@@ -360,9 +360,11 @@ class LeadService {
           active: true,
         },
       });
-      
+
       const leadsOfLists = []
       for (const lead of leads) {
+        console.log(lead.id)
+        console.log(lead.lists.map(l => l.id))
         if (lead.lists.map(l => l.id).some(l => lists.includes(l))) {
           leadsOfLists.push(lead.id)
         }
