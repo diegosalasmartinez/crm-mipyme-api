@@ -77,6 +77,12 @@ const seed_addLeads = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: 'Done' });
 };
 
+const seed_addLeadsByForm = async (req, res) => {
+  const { idForm, number } = req.query;
+  await leadService.seed_addLeadsByForm(idForm, number);
+  res.status(StatusCodes.OK).json({ message: 'Done' });
+};
+
 module.exports = {
   getLeads,
   getLeadById,
@@ -86,4 +92,5 @@ module.exports = {
   updateLead,
   addLeadBulk,
   seed_addLeads,
+  seed_addLeadsByForm,
 };

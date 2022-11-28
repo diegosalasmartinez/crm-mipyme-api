@@ -135,10 +135,10 @@ class PlanService {
         if (chartLabels[k]) {
           chartLabels[k] = { value: chartLabels[k].value + 1, name: chartLabels[k].name };
         }
-        if (lead.createdBy) {
-          leadsOriginData.MANUAL = leadsOriginData.MANUAL + 1;
-        } else {
+        if (lead.idForm) {
           leadsOriginData.FORM = leadsOriginData.FORM + 1;
+        } else {
+          leadsOriginData.MANUAL = leadsOriginData.MANUAL + 1;
         }
       });
 

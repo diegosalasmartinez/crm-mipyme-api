@@ -23,6 +23,7 @@ const attributes = [
   'phone',
   'birthday',
   'companyName',
+  'idForm',
   'createdAt',
 ];
 
@@ -422,6 +423,30 @@ class LeadService {
           createdBy: idUser,
           createdAt: faker.date.past(),
           idClassificationMarketing: classification.id,
+        };
+        leadsInfo.push(info);
+      }
+      await Lead.bulkCreate(leadsInfo);
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
+  async seed_addLeadsByForm(idForm, number) {
+    try {
+      const leadsInfo = [];
+      const classification = await classificationService.getDefault();
+      for (let i = 0; i < number; i++) {
+        const info = {
+          name: faker.name.firstName(),
+          lastName: faker.name.lastName(),
+          birthday: faker.date.birthdate({ min: 18, max: 65, mode: 'age' }),
+          email: faker.internet.email(),
+          phone: faker.phone.number(),
+          address: faker.address.secondaryAddress(),
+          createdAt: faker.date.past(),
+          idClassificationMarketing: classification.id,
+          idForm,
         };
         leadsInfo.push(info);
       }
