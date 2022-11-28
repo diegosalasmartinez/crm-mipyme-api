@@ -33,6 +33,8 @@ class ListService {
           active: true,
         },
       });
+      console.log(data)
+      console.log(count)
       return { data, count };
     } catch (e) {
       throw new BadRequestError(e.message);
