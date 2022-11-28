@@ -348,12 +348,10 @@ class LeadService {
             as: 'creator',
             attributes: [],
           },
-          // {
-          //   model: List,
-          //   as: 'lists',
-          //   where: { id: lists },
-          //   attributes: [],
-          // },
+          {
+            model: List,
+            as: 'lists',
+          },
         ],
         where: {
           ...whereClausses,
@@ -362,7 +360,14 @@ class LeadService {
           active: true,
         },
       });
-      return leads;
+      
+      const leadsOfLists = []
+      for (const lead of leads) {
+        if (lead.lists.map(l => l.id).some(l => lists.includes(l))) {
+          leadsOfLists.push(lead.id)
+        }
+      }
+      return leadsOfLists;
     } catch (e) {
       throw new BadRequestError(e.message);
     }
