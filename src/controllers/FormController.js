@@ -34,6 +34,13 @@ const updateForm = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: `El formulario ${form.name} ha sido actualizado` });
 };
 
+const seed_addForms = async (req, res) => {
+  const { idCompany } = req.user;
+  const { forms } = req.body;
+  await formService.seed_addForms(idCompany, forms);
+  res.status(StatusCodes.OK).json({ message: 'Done' });
+};
+
 const seed_addLeadsByForm = async (req, res) => {
   const { idForm, number } = req.query;
   await formService.seed_addLeadsByForm(idForm, number);
@@ -46,5 +53,6 @@ module.exports = {
   getFormSimple,
   addForm,
   updateForm,
-  seed_addLeadsByForm
+  seed_addForms,
+  seed_addLeadsByForm,
 };

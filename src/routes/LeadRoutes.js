@@ -21,7 +21,7 @@ router.patch('/', updateLead);
 router.patch('/validate', validateLead);
 router.post('/bulk', addLeadBulk);
 // Commands
-router.post('/job', seed_addLeads);
+router.post('/job/bulk', seed_addLeads);
 router.post('/job/update_rm', seed_updateLeadsToRM);
 
 module.exports = router;

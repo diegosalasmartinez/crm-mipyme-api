@@ -5,6 +5,7 @@ const {
   addForm,
   updateForm,
   getFormSimple,
+  seed_addForms,
   seed_addLeadsByForm 
 } = require('../controllers/FormController');
 
@@ -16,6 +17,7 @@ router.get('/simple/:idForm', getFormSimple);
 router.post('/', addForm);
 router.patch('/', updateForm);
 // Commands
-router.post('/job', seed_addLeadsByForm);
+router.post('/job/bulk', seed_addForms);
+router.post('/job/leads', seed_addLeadsByForm);
 
 module.exports = router;

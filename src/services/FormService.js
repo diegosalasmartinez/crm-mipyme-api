@@ -173,6 +173,23 @@ class FormService {
     }
   }
 
+  async seed_addForms(idCompany, forms) {
+    try {
+      for (const formDTO of forms) {
+        const form = {
+          name: formDTO.name,
+          title: 'Bienvenido',
+          subtitle: 'Ingrese sus credenciales para ingresar al sistema',
+          textButton: 'Ingresar',
+          listsId: []
+        };
+        await this.addForm(idCompany, form);
+      }
+    } catch (e) {
+      throw new BadRequestError(e.message);
+    }
+  }
+
   async seed_addLeadsByForm(idForm, number) {
     try {
       const classification = await classificationMarketingService.getDefault();
