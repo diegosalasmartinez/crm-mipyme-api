@@ -346,18 +346,18 @@ class LeadService {
           {
             model: User,
             as: 'creator',
-            where: { idCompany },
             attributes: [],
           },
-          {
-            model: List,
-            as: 'lists',
-            where: { id: lists },
-            attributes: [],
-          },
+          // {
+          //   model: List,
+          //   as: 'lists',
+          //   where: { id: lists },
+          //   attributes: [],
+          // },
         ],
         where: {
           ...whereClausses,
+          '$creator.idCompany$': idCompany,
           emailValidated: true,
           active: true,
         },
