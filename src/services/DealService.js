@@ -19,7 +19,7 @@ const {
   Note,
   sequelize,
 } = require('../models/index');
-const { generateChartLabels } = require('../utils');
+const { generateChartLabels, truncateText } = require('../utils');
 const { validateRoles } = require('../utils/permissions');
 const { BadRequestError } = require('../errors');
 const DealOriginService = require('./DealOriginService');
@@ -546,14 +546,14 @@ class DealService {
         .map((entry) => entry[1].name)
         .reverse();
       const originSalesData = Object.entries(salesOriginSales)
-        .map((entry) => entry[1].value)
+        .map((entry) => Math.round(entry[1].value * 100) / 100)
         .reverse();
 
       const originMarketingData = Object.entries(salesOriginMarketing)
-        .map((entry) => entry[1].value)
+        .map((entry) => Math.round(entry[1].value * 100) / 100)
         .reverse();
       const originTicketsData = Object.entries(salesOriginTicket)
-        .map((entry) => entry[1].value)
+        .map((entry) => Math.round(entry[1].value * 100) / 100)
         .reverse();
 
       const origins = {
@@ -619,7 +619,7 @@ class DealService {
         );
 
         await Deal.create({
-          name: faker.commerce.productDescription(),
+          name: truncateText(faker.commerce.productDescription()),
           expectedAmount: faker.finance.amount(),
           expectedCloseDate: faker.date.past(),
           description: '',

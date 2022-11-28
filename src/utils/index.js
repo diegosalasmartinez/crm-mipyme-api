@@ -16,7 +16,15 @@ const generateChartLabels = (numMonths = 9) => {
   return chartLabels;
 };
 
+const truncateText = (input, maxLength = 20) => {
+  if (input.length > maxLength) {
+    return input.substring(0, maxLength) + '...';
+  }
+  return input;
+};
+
 module.exports = {
   months,
-  generateChartLabels
+  generateChartLabels,
+  truncateText
 };
