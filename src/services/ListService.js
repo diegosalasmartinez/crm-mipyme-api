@@ -12,7 +12,7 @@ const classificationService = new ClassificationMarketingService();
 class ListService {
   async getLists(idCompany, page = 0, rowsPerPage = 10) {
     try {
-      const { rows: data = [], count } = await List.findAndCountAll({
+      const data = await List.findAll({
         offset: page * rowsPerPage,
         limit: rowsPerPage,
         required: true,
@@ -33,8 +33,17 @@ class ListService {
           active: true,
         },
       });
-      console.log(data)
-      console.log(count)
+      const count = await List.count({
+        include: [
+          {
+            model: User,
+            as: 'creator',
+          },
+        ],
+        where: {
+          '$creator.idCompany$': idCompany,
+        },
+      });
       return { data, count };
     } catch (e) {
       throw new BadRequestError(e.message);
